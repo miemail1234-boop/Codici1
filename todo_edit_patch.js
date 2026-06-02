@@ -4,6 +4,7 @@
   const MOVE_TOLERANCE = 8;
   let lastTap = { id: "", time: 0 };
   let pointerStart = null;
+  let activeEditor = null;
 
   function canUseTodoInternals() {
     return typeof state !== "undefined" &&
@@ -12,23 +13,69 @@
       Array.isArray(state.todos);
   }
 
-  function editTodoTitle(todoId) {
-    if (!canUseTodoInternals() || !todoId) return;
+  function saveTodoTitle(todoId, nextTitle) {
+    if (!canUseTodoInternals() || !todoId) return false;
     const todo = state.todos.find(item => item.id === todoId);
-    if (!todo) return;
-    const nextTitle = window.prompt("Modifica task", todo.title || "");
-    if (nextTitle === null) return;
-    const cleanTitle = nextTitle.trim();
+    if (!todo) return false;
+    const cleanTitle = String(nextTitle || "").trim();
     if (!cleanTitle) {
       if (typeof toast === "function") toast("Il testo del task non può essere vuoto");
-      return;
+      return false;
     }
-    if (cleanTitle === todo.title) return;
+    if (cleanTitle === todo.title) return true;
     rememberTodoUndo();
     todo.title = cleanTitle;
     todo.updatedAt = new Date().toISOString();
     autosaveTodos("Task modificato");
     if (typeof switchScreen === "function") switchScreen("todo");
+    return true;
+  }
+
+  function startInlineEdit(textNode) {
+    if (!textNode) return;
+    const card = textNode.closest(".todo-card[data-todo-id]");
+    if (!card) return;
+    const todoId = card.dataset.todoId;
+    const currentText = textNode.textContent || "";
+
+    if (activeEditor && activeEditor.input && activeEditor.input.isConnected) {
+      activeEditor.input.blur();
+    }
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "todo-inline-editor";
+    input.value = currentText;
+    input.setAttribute("aria-label", "Modifica task");
+
+    let finished = false;
+    const finish = (save) => {
+      if (finished) return;
+      finished = true;
+      const value = input.value;
+      if (save) saveTodoTitle(todoId, value);
+      else if (typeof renderTodo === "function") renderTodo();
+      activeEditor = null;
+    };
+
+    input.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        finish(true);
+      }
+      if (event.key === "Escape") {
+        event.preventDefault();
+        finish(false);
+      }
+    });
+    input.addEventListener("blur", () => finish(true));
+    input.addEventListener("click", event => event.stopPropagation());
+    input.addEventListener("pointerdown", event => event.stopPropagation());
+
+    textNode.replaceWith(input);
+    activeEditor = { input, todoId };
+    input.focus();
+    input.select();
   }
 
   function injectStyle() {
@@ -40,6 +87,7 @@
       .todo-card [data-edit-todo], .todo-card .todo-edit-btn { display: none !important; }
       .todo-card p { cursor: text; user-select: text; -webkit-user-select: text; }
       .todo-card p::after { content: ""; }
+      .todo-inline-editor { width: 100%; min-width: 0; border: 1px solid rgba(61,150,120,.75); border-radius: 10px; padding: 7px 9px; font: inherit; background: #fff; color: inherit; }
     `;
     document.head.appendChild(style);
   }
@@ -55,14 +103,13 @@
   document.addEventListener("dblclick", event => {
     const text = event.target.closest?.(".todo-card[data-todo-id] p");
     if (!text) return;
-    const card = text.closest(".todo-card[data-todo-id]");
-    if (!card) return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    editTodoTitle(card.dataset.todoId);
+    startInlineEdit(text);
   }, true);
 
   document.addEventListener("pointerdown", event => {
+    if (event.target.closest?.(".todo-inline-editor")) return;
     const text = event.target.closest?.(".todo-card[data-todo-id] p");
     if (!text) {
       pointerStart = null;
@@ -78,6 +125,7 @@
   }, true);
 
   document.addEventListener("pointerup", event => {
+    if (event.target.closest?.(".todo-inline-editor")) return;
     const text = event.target.closest?.(".todo-card[data-todo-id] p");
     if (!text || !pointerStart) return;
     const card = text.closest(".todo-card[data-todo-id]");
@@ -91,7 +139,7 @@
       event.preventDefault();
       event.stopImmediatePropagation();
       lastTap = { id: "", time: 0 };
-      editTodoTitle(id);
+      startInlineEdit(text);
     } else {
       lastTap = { id, time: now };
     }
@@ -103,7 +151,7 @@
     scheduled = true;
     requestAnimationFrame(() => {
       scheduled = false;
-      removeEditButtons();
+      if (!activeEditor) removeEditButtons();
     });
   }
 
