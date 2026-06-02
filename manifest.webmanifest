@@ -1,0 +1,10 @@
+{
+  "name": "Life Tracker",
+  "short_name": "Tracker",
+  "description": "Monitoraggio personale di workout, alimentazione e diario.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f1eb",
+  "theme_color": "#101820",
+  "icons": []
+}

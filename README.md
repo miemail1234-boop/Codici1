@@ -1,17 +1,17 @@
-# Life Tracker
+# Life Tracker deploy
 
-Repository predisposto per pubblicare Life Tracker come sito statico/PWA.
+Versione pronta per GitHub Pages.
 
-Ho inizializzato il repository con `.nojekyll`. Per completare la pubblicazione, carica nella root del repository i file della cartella `life_tracker_app` aggiornata:
+Contiene solo i file web necessari. I dati personali non sono inclusi: `investment_seed.js` è vuoto. I dati reali vengono caricati da Supabase dopo login.
 
-- `index.html`
-- `app.js`
-- `styles.css`
-- `investment_seed.js`
-- `manifest.webmanifest`
-- `sw.js`
-- cartella `vendor/` con `supabase.js`
+File inclusi:
+- index.html
+- app.js
+- styles.css
+- investment_seed.js vuoto
+- manifest.webmanifest
+- sw.js
+- vendor/supabase.js
+- .nojekyll
 
-Poi abilita GitHub Pages da **Settings → Pages** usando branch `main` e folder `/root`.
-
-Nota: il repository risulta privato. GitHub Pages per repository privati può dipendere dal piano GitHub. Se Pages non è disponibile, rendi il repository pubblico oppure usa Netlify/Vercel/Cloudflare Pages.
+Non pubblicare backup JSON, memoria.json, APK, android, node_modules o service role key.
