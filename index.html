@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101820">
+  <title>Life Tracker</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css?v=41">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow" id="todayLabel"></p>
+        <h1>Life Tracker</h1>
+      </div>
+      <div class="top-actions">
+        <button class="secondary top-home" id="homeButton" data-screen="home">Home</button>
+        <button class="secondary top-sync" id="cloudSyncQuick" title="Scarica gli ultimi dati dal cloud" aria-label="Sincronizza dal cloud">Sync</button>
+        <button class="icon-button" id="exportQuick" title="Esporta backup" aria-label="Esporta backup">
+          <span aria-hidden="true">⇩</span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="screen active" id="screen-home" data-screen-panel="home"></section>
+      <section class="screen" id="screen-todo" data-screen-panel="todo"></section>
+      <section class="screen" id="screen-dashboard" data-screen-panel="dashboard"></section>
+      <section class="screen" id="screen-workout" data-screen-panel="workout"></section>
+      <section class="screen" id="screen-nutrition" data-screen-panel="nutrition"></section>
+      <section class="screen" id="screen-investments" data-screen-panel="investments"></section>
+      <section class="screen" id="screen-links" data-screen-panel="links"></section>
+      <section class="screen" id="screen-foods" data-screen-panel="foods"></section>
+      <section class="screen" id="screen-diary" data-screen-panel="diary"></section>
+      <section class="screen" id="screen-relationships" data-screen-panel="relationships"></section>
+      <section class="screen" id="screen-data" data-screen-panel="data"></section>
+      <section class="screen" id="screen-charts" data-screen-panel="charts"></section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="vendor/supabase.js?v=21"></script>
+  <script src="investment_seed.js?v=41"></script>
+  <script src="app.js?v=41"></script>
+</body>
+</html>
