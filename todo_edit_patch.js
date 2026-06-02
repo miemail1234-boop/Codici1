@@ -13,22 +13,42 @@
       Array.isArray(state.todos);
   }
 
+  function findTodo(todoId) {
+    if (!canUseTodoInternals() || !todoId) return null;
+    return state.todos.find(item => item.id === todoId) || null;
+  }
+
   function saveTodoTitle(todoId, nextTitle) {
-    if (!canUseTodoInternals() || !todoId) return false;
-    const todo = state.todos.find(item => item.id === todoId);
+    const todo = findTodo(todoId);
     if (!todo) return false;
     const cleanTitle = String(nextTitle || "").trim();
     if (!cleanTitle) {
       if (typeof toast === "function") toast("Il testo del task non può essere vuoto");
       return false;
     }
-    if (cleanTitle === todo.title) return true;
-    rememberTodoUndo();
-    todo.title = cleanTitle;
-    todo.updatedAt = new Date().toISOString();
-    autosaveTodos("Task modificato");
-    if (typeof switchScreen === "function") switchScreen("todo");
+    if (cleanTitle !== todo.title) {
+      rememberTodoUndo();
+      todo.title = cleanTitle;
+      todo.updatedAt = new Date().toISOString();
+      autosaveTodos("Task modificato");
+    }
     return true;
+  }
+
+  function replaceEditorWithText(input, todoId) {
+    if (!input || !input.isConnected) return;
+    const todo = findTodo(todoId);
+    const p = document.createElement("p");
+    p.textContent = todo?.title || input.value || "";
+    p.title = "Doppio clic per modificare";
+    input.replaceWith(p);
+  }
+
+  function rerenderTodoSoon(input, todoId) {
+    setTimeout(() => {
+      if (typeof renderTodo === "function") renderTodo();
+      else replaceEditorWithText(input, todoId);
+    }, 0);
   }
 
   function startInlineEdit(textNode) {
@@ -38,8 +58,8 @@
     const todoId = card.dataset.todoId;
     const currentText = textNode.textContent || "";
 
-    if (activeEditor && activeEditor.input && activeEditor.input.isConnected) {
-      activeEditor.input.blur();
+    if (activeEditor?.finish) {
+      activeEditor.finish(true);
     }
 
     const input = document.createElement("input");
@@ -51,11 +71,21 @@
     let finished = false;
     const finish = (save) => {
       if (finished) return;
+      if (save) {
+        const ok = saveTodoTitle(todoId, input.value);
+        if (!ok) {
+          input.focus();
+          input.select();
+          return;
+        }
+      }
       finished = true;
-      const value = input.value;
-      if (save) saveTodoTitle(todoId, value);
-      else if (typeof renderTodo === "function") renderTodo();
+      const editorInput = input;
+      const editorTodoId = todoId;
       activeEditor = null;
+      if (save) rerenderTodoSoon(editorInput, editorTodoId);
+      else if (typeof renderTodo === "function") renderTodo();
+      else replaceEditorWithText(editorInput, editorTodoId);
     };
 
     input.addEventListener("keydown", event => {
@@ -73,7 +103,7 @@
     input.addEventListener("pointerdown", event => event.stopPropagation());
 
     textNode.replaceWith(input);
-    activeEditor = { input, todoId };
+    activeEditor = { input, todoId, finish };
     input.focus();
     input.select();
   }
@@ -109,7 +139,11 @@
   }, true);
 
   document.addEventListener("pointerdown", event => {
-    if (event.target.closest?.(".todo-inline-editor")) return;
+    const clickedInsideEditor = event.target.closest?.(".todo-inline-editor");
+    if (activeEditor?.finish && !clickedInsideEditor) {
+      activeEditor.finish(true);
+    }
+    if (clickedInsideEditor) return;
     const text = event.target.closest?.(".todo-card[data-todo-id] p");
     if (!text) {
       pointerStart = null;
