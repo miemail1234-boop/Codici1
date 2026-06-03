@@ -8,6 +8,24 @@
       typeof investmentLedgerTotals === "function";
   }
 
+  function patchCloudBatchSave() {
+    if (typeof upsertCloudRows !== "function" || upsertCloudRows.__ltDeduped) return;
+    const originalSaveRows = upsertCloudRows;
+    const patchedSaveRows = async function(table, rows) {
+      if (!Array.isArray(rows) || rows.length < 2) return originalSaveRows(table, rows || []);
+      const seen = new Map();
+      rows.forEach(row => {
+        if (!row) return;
+        const idPart = Object.prototype.hasOwnProperty.call(row, "id") ? row.id : "settings";
+        const key = `${row.user_id || ""}::${idPart || ""}`;
+        if (key.trim()) seen.set(key, row);
+      });
+      return originalSaveRows(table, Array.from(seen.values()));
+    };
+    patchedSaveRows.__ltDeduped = true;
+    upsertCloudRows = patchedSaveRows;
+  }
+
   function tradeAmount(trade) {
     const qty = Math.max(0, number(trade?.quantity, 0));
     const price = Math.max(0, number(trade?.price, 0));
@@ -173,6 +191,7 @@
   }
 
   function applyPatch() {
+    patchCloudBatchSave();
     if (!patchReady()) return false;
     investmentLedgerForAsset = patchedInvestmentLedgerForAsset;
     investmentEstimatedTwr = patchedInvestmentEstimatedTwr;
@@ -183,8 +202,10 @@
 
   if (!applyPatch()) {
     const timer = window.setInterval(() => {
+      patchCloudBatchSave();
       if (applyPatch()) window.clearInterval(timer);
     }, 50);
     window.setTimeout(() => window.clearInterval(timer), 5000);
   }
+  window.setInterval(patchCloudBatchSave, 1000);
 })();
