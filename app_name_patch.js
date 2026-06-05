@@ -1,11 +1,12 @@
 (() => {
-  const APP_NAME = "Life Tracker 3.0";
+  const APP_NAME = "Life Tracker 3.1";
 
   function replaceTextNode(node) {
     if (!node || node.nodeType !== Node.TEXT_NODE || !node.nodeValue) return;
     const next = node.nodeValue
       .replace(/Life Tracker 2\.0/g, APP_NAME)
-      .replace(/Life Tracker(?!\s*3\.0)/g, APP_NAME);
+      .replace(/Life Tracker 3\.0/g, APP_NAME)
+      .replace(/Life Tracker(?!\s*3\.1)/g, APP_NAME);
     if (next !== node.nodeValue) node.nodeValue = next;
   }
 
