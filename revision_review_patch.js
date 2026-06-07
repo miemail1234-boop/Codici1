@@ -6,6 +6,7 @@
   let openDocId = "";
   let selInfo = null;
   let popupTimer = null;
+  let rendering = false;
 
   const h = value => String(value ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[ch]));
   const isReady = () => typeof supabaseClient !== "undefined" && supabaseClient && typeof cloudUser !== "undefined" && cloudUser?.id;
@@ -16,7 +17,7 @@
     if (document.getElementById("rev-style")) return;
     const s = document.createElement("style");
     s.id = "rev-style";
-    s.textContent = `.revision-layout{display:grid;grid-template-columns:320px 1fr;gap:16px}.revision-list{display:flex;flex-direction:column;gap:8px}.revision-doc{background:#fff;border:1px solid #ddd;border-radius:12px;padding:10px;text-align:left}.revision-doc.active{outline:2px solid #3e8f75}.revision-reader{background:#fff;border:1px solid #ddd;border-radius:16px;max-height:72vh;overflow:auto;padding:10px;user-select:text}.revision-line{display:grid;grid-template-columns:48px 1fr;gap:12px;border-bottom:1px solid #eee;padding:5px}.revision-num{text-align:right;color:#888;user-select:none}.revision-text{white-space:pre-wrap;overflow-wrap:anywhere}.rev-yellow{background:rgba(255,222,89,.75);border-radius:3px}.rev-red{background:rgba(255,99,99,.45);border-radius:3px}.revision-popup{position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.18);padding:10px;width:min(330px,calc(100vw - 24px))}.revision-popup textarea{width:100%;min-height:70px}.revision-comment{background:#fff;border-left:4px solid #e9c46a;border-radius:10px;padding:9px;margin:8px 0}.revision-comment.red{border-left-color:#e76f51}@media(max-width:820px){.revision-layout{grid-template-columns:1fr}}`;
+    s.textContent = `.revision-layout{display:grid;grid-template-columns:320px 1fr;gap:16px}.revision-list{display:flex;flex-direction:column;gap:8px}.revision-doc{background:#fff;border:1px solid #ddd;border-radius:12px;padding:10px;text-align:left}.revision-doc.active{outline:2px solid #3e8f75}.revision-reader{background:#fff;border:1px solid #ddd;border-radius:16px;max-height:72vh;overflow:auto;padding:10px;user-select:text}.revision-line{display:grid;grid-template-columns:48px 1fr;gap:12px;border-bottom:1px solid #eee;padding:5px}.revision-num{text-align:right;color:#888;user-select:none}.revision-text{white-space:pre-wrap;overflow-wrap:anywhere}.rev-yellow{background:rgba(255,222,89,.75);border-radius:3px}.rev-red{background:rgba(255,99,99,.45);border-radius:3px}.rev-live{background:rgba(80,150,255,.34);outline:2px solid rgba(80,150,255,.75);border-radius:3px}.revision-popup{position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.18);padding:10px;width:min(330px,calc(100vw - 24px))}.revision-popup textarea{width:100%;min-height:70px}.revision-comment{background:#fff;border-left:4px solid #e9c46a;border-radius:10px;padding:9px;margin:8px 0}.revision-comment.red{border-left-color:#e76f51}@media(max-width:820px){.revision-layout{grid-template-columns:1fr}}`;
     document.head.appendChild(s);
   }
 
@@ -45,23 +46,38 @@
   function docNotes(id) { return notes.filter(n => n.document_id === id && n.status !== "resolved"); }
 
   function markLine(text, n, list) {
-    const parts = list.filter(x => Number(x.line_number) === n).map(x => ({ a: Number(x.start_offset), b: Number(x.end_offset), c: x.highlight_color === "red" ? "red" : "yellow" })).filter(x => x.a >= 0 && x.b > x.a && x.b <= text.length).sort((x,y)=>x.a-y.a);
+    const d = doc();
+    const parts = list
+      .filter(x => Number(x.line_number) === n)
+      .map(x => ({ a: Number(x.start_offset), b: Number(x.end_offset), cls: `rev-${x.highlight_color === "red" ? "red" : "yellow"}` }));
+
+    if (selInfo && d && selInfo.docId === d.id && Number(selInfo.line) === n) {
+      parts.push({ a: Number(selInfo.start), b: Number(selInfo.end), cls: "rev-live" });
+    }
+
+    const clean = parts
+      .filter(x => x.a >= 0 && x.b > x.a && x.b <= text.length)
+      .sort((x, y) => x.a - y.a || (x.cls === "rev-live" ? -1 : 1));
+
     let out = "", i = 0;
-    for (const p of parts) {
+    for (const p of clean) {
       if (p.a < i) continue;
-      out += h(text.slice(i, p.a)) + `<mark class="rev-${p.c}">${h(text.slice(p.a, p.b))}</mark>`;
+      out += h(text.slice(i, p.a)) + `<mark class="${p.cls}">${h(text.slice(p.a, p.b))}</mark>`;
       i = p.b;
     }
     return out + h(text.slice(i)) || "&nbsp;";
   }
 
   function render() {
+    if (rendering) return;
+    rendering = true;
     style();
     const p = screen();
-    if (!p) return;
+    if (!p) { rendering = false; return; }
     const d = doc();
     const activeNotes = d ? docNotes(d.id) : [];
     p.innerHTML = `<div class="revision-layout"><div><div class="panel"><h2>Correzione revisioni</h2><p class="hint">Testo non modificabile. Seleziona testo in una sola riga per commentare ed evidenziare.</p>${isReady()?"":"<p class='hint'>Accedi a Supabase nella sezione Dati.</p>"}<div class="field"><label>File Word .docx</label><input id="revisionFile" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"></div><div class="field"><label>Titolo</label><input id="revisionTitle" placeholder="Titolo facoltativo"></div><button class="primary" id="revisionImport">Importa documento</button></div><div class="panel"><h2>Documenti salvati</h2><div class="revision-list">${docs.length?docs.map(x=>`<button class="revision-doc ${x.id===d?.id?"active":""}" data-rev-doc="${h(x.id)}"><strong>${h(x.title)}</strong><br><small>${h(x.original_filename||"")} · ${x.line_count||0} righe</small></button>`).join(""):"<p class='hint'>Nessun documento.</p>"}</div></div></div><div><div class="panel"><div class="section-head"><div><h2>${d?h(d.title):"Documento"}</h2><p class="hint">Numerazione righe attiva.</p></div>${d?"<button class='secondary' id='revisionRefresh'>Aggiorna</button>":""}</div>${d?`<div class="revision-reader" id="revisionReader">${lines(d.text_content).map((line,i)=>`<div class="revision-line" data-line="${i+1}"><span class="revision-num">${i+1}</span><span class="revision-text">${markLine(line,i+1,activeNotes)}</span></div>`).join("")}</div>`:"<p class='hint'>Carica o apri un documento.</p>"}</div><div class="panel"><h2>Commenti</h2>${activeNotes.length?activeNotes.map(n=>`<article class="revision-comment ${n.highlight_color==='red'?'red':''}"><small>Riga ${n.line_number} · ${n.highlight_color}</small><p><strong>${h(n.selected_text)}</strong></p><p>${h(n.comment_text||"Senza commento")}</p></article>`).join(""):"<p class='hint'>Nessun commento aperto.</p>"}</div></div></div>`;
+    rendering = false;
   }
 
   async function load() {
@@ -101,20 +117,28 @@
     const row1 = r.startContainer.parentElement?.closest?.(".revision-line");
     const row2 = r.endContainer.parentElement?.closest?.(".revision-line");
     if (!row1 || row1 !== row2) { msg("Seleziona testo dentro una sola riga"); return null; }
+    const d = doc();
     const textEl = row1.querySelector(".revision-text");
     const pre = document.createRange();
     pre.selectNodeContents(textEl);
     pre.setEnd(r.startContainer, r.startOffset);
     const start = pre.toString().length;
     const selected = s.toString();
-    return { line: Number(row1.dataset.line), lineText: textEl.textContent || "", selected, start, end: start + selected.length, rect: r.getBoundingClientRect() };
+    return { docId: d?.id || "", line: Number(row1.dataset.line), lineText: textEl.textContent || "", selected, start, end: start + selected.length, rect: r.getBoundingClientRect() };
   }
 
-  function closePopup() { document.getElementById("revisionPopup")?.remove(); if (popupTimer) clearTimeout(popupTimer); popupTimer = null; selInfo = null; }
+  function closePopup(options = {}) {
+    document.getElementById("revisionPopup")?.remove();
+    if (popupTimer) clearTimeout(popupTimer);
+    popupTimer = null;
+    selInfo = null;
+    if (!options.noRender && currentScreen === "revisions") render();
+  }
 
   function openPopup(info) {
-    closePopup();
+    closePopup({ noRender: true });
     selInfo = info;
+    render();
     const p = document.createElement("div");
     p.id = "revisionPopup";
     p.className = "revision-popup";
@@ -136,14 +160,19 @@
     const row = { user_id: cloudUser.id, document_id: d.id, line_number: selInfo.line, line_text: selInfo.lineText, selected_text: selInfo.selected, start_offset: selInfo.start, end_offset: selInfo.end, highlight_color: pop?.dataset.color === "red" ? "red" : "yellow", comment_text: document.getElementById("revisionCommentText")?.value?.trim() || "", status: "open", updated_at: new Date().toISOString() };
     const q = await supabaseClient.from(NOTES).insert(row);
     if (q.error) return msg(q.error.message);
-    closePopup();
+    closePopup({ noRender: true });
     await load();
     msg("Commento salvato");
   }
 
   document.addEventListener("click", e => {
+    const insidePopup = e.target.closest?.("#revisionPopup");
+    const insideReader = e.target.closest?.("#revisionReader");
+    const isRevisionControl = e.target.closest?.('[data-screen="revisions"],[data-rev-doc]') || ["revisionImport", "revisionRefresh", "revisionSaveNote", "revisionCancelNote"].includes(e.target.id) || e.target.closest?.("[data-rev-color]");
+    if (selInfo && !insidePopup && !insideReader && !isRevisionControl) closePopup();
+
     if (e.target.closest?.('[data-screen="revisions"]')) { currentScreen = "revisions"; document.querySelectorAll(".screen").forEach(x => x.classList.toggle("active", x.dataset.screenPanel === "revisions")); render(); load(); }
-    const d = e.target.closest?.("[data-rev-doc]"); if (d) { openDocId = d.dataset.revDoc; render(); }
+    const d = e.target.closest?.("[data-rev-doc]"); if (d) { closePopup({ noRender: true }); openDocId = d.dataset.revDoc; render(); }
     if (e.target.id === "revisionImport") importFile();
     if (e.target.id === "revisionRefresh") load();
     if (e.target.id === "revisionSaveNote") saveNote();
@@ -152,7 +181,7 @@
   }, true);
 
   document.addEventListener("selectionchange", () => {
-    if (currentScreen !== "revisions") return;
+    if (currentScreen !== "revisions" || rendering) return;
     const s = window.getSelection();
     if (!s || s.isCollapsed || !s.toString().trim()) return;
     if (!s.anchorNode?.parentElement?.closest?.("#revisionReader")) return;
