@@ -8,18 +8,21 @@
   let popupTimer = null;
   let notesOpen = false;
   let editNoteId = "";
+  let activeNoteId = "";
 
   const h = value => String(value ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[ch]));
   const isReady = () => typeof supabaseClient !== "undefined" && supabaseClient && typeof cloudUser !== "undefined" && cloudUser?.id;
   const msg = text => typeof toast === "function" ? toast(text) : console.log(text);
   const lines = text => String(text || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
+  const css = value => window.CSS?.escape ? CSS.escape(String(value)) : String(value).replace(/"/g, "\\\"");
 
   function style() {
-    if (document.getElementById("rev-style-v4")) return;
+    if (document.getElementById("rev-style-v5")) return;
     document.getElementById("rev-style")?.remove();
     document.getElementById("rev-style-v3")?.remove();
+    document.getElementById("rev-style-v4")?.remove();
     const s = document.createElement("style");
-    s.id = "rev-style-v4";
+    s.id = "rev-style-v5";
     s.textContent = `
       #screen-revisions { padding-bottom: 24px; }
       .revision-full { width: min(100%, 1560px); margin: 0 auto; }
@@ -76,10 +79,11 @@
 
   function doc() { return docs.find(d => d.id === openDocId) || docs[0] || null; }
   function docNotes(id) { return notes.filter(n => n.document_id === id && n.status !== "resolved"); }
+  function activeNotes() { const d = doc(); return d ? docNotes(d.id) : []; }
   function captureReaderScroll() { return document.getElementById("revisionReader")?.scrollTop ?? null; }
-  function restoreReaderScroll(value) { if (value === null || value === undefined) return; requestAnimationFrame(() => { const r = document.getElementById("revisionReader"); if (r) r.scrollTop = value; }); }
+  function restoreReaderScroll(value) { if (value === null || value === undefined) return; const r = document.getElementById("revisionReader"); if (r) r.scrollTop = value; }
   function scrollToLine(line) { requestAnimationFrame(() => document.querySelector(`[data-line="${line}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" })); }
-  function scrollToNote(noteId) { requestAnimationFrame(() => document.querySelector(`[data-revision-note-id="${noteId}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" })); }
+  function scrollToNote(noteId) { requestAnimationFrame(() => document.querySelector(`[data-revision-note-id="${css(noteId)}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" })); }
 
   function markLine(text, n, list) {
     const parts = list
@@ -103,15 +107,37 @@
     return `<button class="chip ${current === color ? "active" : ""}" ${attr}="${color}">${label}</button>`;
   }
 
-  function renderNotesDrawer(activeNotes) {
+  function renderNotesDrawer(activeNotesList = activeNotes()) {
     if (!notesOpen) return "";
-    return `<aside class="revision-notes-drawer" id="revisionNotesDrawer"><div class="revision-drawer-head"><div><h2>Note</h2><p class="hint">Parti selezionate e commenti.</p></div><button class="secondary" id="revisionCloseNotes">Chiudi</button></div>${activeNotes.length ? activeNotes.map(n => {
+    return `<aside class="revision-notes-drawer" id="revisionNotesDrawer"><div class="revision-drawer-head"><div><h2>Note</h2><p class="hint">Parti selezionate e commenti.</p></div><button class="secondary" id="revisionCloseNotes">Chiudi</button></div><div class="revision-note-actions"><button class="secondary" id="revisionExportPdf">Esporta PDF</button></div>${activeNotesList.length ? activeNotesList.map(n => {
       const color = n.highlight_color || "none";
+      const active = activeNoteId === n.id || editNoteId === n.id ? " active" : "";
       if (editNoteId === n.id) {
-        return `<article class="revision-comment ${color} active" data-revision-note-id="${h(n.id)}"><small>Riga ${n.line_number}</small><blockquote>${h(n.selected_text)}</blockquote><textarea class="revision-edit-textarea" data-edit-note-text="${h(n.id)}">${h(n.comment_text || "")}</textarea><div class="revision-note-actions">${colorButton("none", color)}${colorButton("yellow", color)}${colorButton("red", color)}<button class="primary" data-save-revision-note="${h(n.id)}">Salva</button><button class="secondary" data-cancel-edit-revision-note="${h(n.id)}">Annulla</button></div></article>`;
+        return `<article class="revision-comment ${color}${active}" data-revision-note-id="${h(n.id)}"><small>Riga ${n.line_number}</small><blockquote>${h(n.selected_text)}</blockquote><textarea class="revision-edit-textarea" data-edit-note-text="${h(n.id)}">${h(n.comment_text || "")}</textarea><div class="revision-note-actions">${colorButton("none", color)}${colorButton("yellow", color)}${colorButton("red", color)}<button class="primary" data-save-revision-note="${h(n.id)}">Salva</button><button class="secondary" data-cancel-edit-revision-note="${h(n.id)}">Annulla</button></div></article>`;
       }
-      return `<article class="revision-comment ${color}" data-jump-revision-line="${Number(n.line_number)}" data-revision-note-id="${h(n.id)}"><small>Riga ${n.line_number}${color !== 'none' ? ` · ${color}` : ''}</small><blockquote>${h(n.selected_text)}</blockquote><p>${h(n.comment_text || "Senza commento")}</p><div class="revision-note-actions"><button class="chip" data-edit-revision-note="${h(n.id)}">Modifica</button><button class="danger" data-delete-revision-note="${h(n.id)}">Elimina</button></div></article>`;
+      return `<article class="revision-comment ${color}${active}" data-jump-revision-line="${Number(n.line_number)}" data-revision-note-id="${h(n.id)}"><small>Riga ${n.line_number}${color !== 'none' ? ` · ${color}` : ''}</small><blockquote>${h(n.selected_text)}</blockquote><p>${h(n.comment_text || "Senza commento")}</p><div class="revision-note-actions"><button class="chip" data-edit-revision-note="${h(n.id)}">Modifica</button><button class="danger" data-delete-revision-note="${h(n.id)}">Elimina</button></div></article>`;
     }).join("") : "<p class='hint'>Nessuna nota aperta.</p>"}</aside>`;
+  }
+
+  function updateNotesButton() {
+    const button = document.getElementById("revisionToggleNotes");
+    if (!button) return;
+    button.textContent = `📝 Note (${activeNotes().length})`;
+    button.classList.toggle("active", notesOpen);
+  }
+
+  function updateNotesDrawer() {
+    document.getElementById("revisionNotesDrawer")?.remove();
+    if (!notesOpen) return;
+    document.querySelector("#screen-revisions .revision-full")?.insertAdjacentHTML("beforeend", renderNotesDrawer());
+  }
+
+  function redrawLine(lineNumber) {
+    const d = doc();
+    const row = document.querySelector(`[data-line="${lineNumber}"]`);
+    if (!d || !row) return;
+    const text = lines(d.text_content)[Number(lineNumber) - 1] || "";
+    row.innerHTML = `<span class="revision-num">${Number(lineNumber)}</span><span class="revision-text">${markLine(text, Number(lineNumber), activeNotes())}</span>`;
   }
 
   function render(options = {}) {
@@ -120,12 +146,12 @@
     const p = screen();
     if (!p) return;
     const d = doc();
-    const activeNotes = d ? docNotes(d.id) : [];
+    const activeNotesList = d ? docNotes(d.id) : [];
     const select = `<select class="revision-doc-select" id="revisionDocSelect">${docs.length ? docs.map(x => `<option value="${h(x.id)}" ${x.id === d?.id ? "selected" : ""}>${h(x.title)} · ${x.line_count || 0} righe</option>`).join("") : `<option>Nessun documento</option>`}</select>`;
-    p.innerHTML = `<div class="revision-full"><div class="panel revision-main-panel"><div class="revision-toolbar"><div class="revision-toolbar-left"><h2>Correzione revisioni</h2>${select}</div><div class="revision-toolbar-right"><input id="revisionFile" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden><button class="revision-icon-button" id="revisionUploadIcon" title="Carica Word">📄 Carica</button>${d ? "<button class='revision-icon-button' id='revisionRefresh' title='Aggiorna'>↻</button>" : ""}<button class="revision-icon-button ${notesOpen ? "active" : ""}" id="revisionToggleNotes" title="Note">📝 Note (${activeNotes.length})</button></div></div><p class="hint">Testo non modificabile. Seleziona testo in una sola riga per commentare. Il commento compare passando il mouse sulle parti commentate.</p>${d ? `<div class="revision-reader" id="revisionReader">${lines(d.text_content).map((line,i)=>`<div class="revision-line" data-line="${i+1}"><span class="revision-num">${i+1}</span><span class="revision-text">${markLine(line,i+1,activeNotes)}</span></div>`).join("")}</div>` : `<p class="hint">Carica un documento Word con l'icona 📄.</p>`}</div>${renderNotesDrawer(activeNotes)}</div>`;
+    p.innerHTML = `<div class="revision-full"><div class="panel revision-main-panel"><div class="revision-toolbar"><div class="revision-toolbar-left"><h2>Correzione revisioni</h2>${select}</div><div class="revision-toolbar-right"><input id="revisionFile" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden><button class="revision-icon-button" id="revisionUploadIcon" title="Carica Word">📄 Carica</button>${d ? "<button class='revision-icon-button' id='revisionRefresh' title='Aggiorna'>↻</button>" : ""}<button class="revision-icon-button ${notesOpen ? "active" : ""}" id="revisionToggleNotes" title="Note">📝 Note (${activeNotesList.length})</button></div></div><p class="hint">Testo non modificabile. Seleziona testo in una sola riga per commentare. Il commento compare passando il mouse sulle parti commentate.</p>${d ? `<div class="revision-reader" id="revisionReader">${lines(d.text_content).map((line,i)=>`<div class="revision-line" data-line="${i+1}"><span class="revision-num">${i+1}</span><span class="revision-text">${markLine(line,i+1,activeNotesList)}</span></div>`).join("")}</div>` : `<p class="hint">Carica un documento Word con l'icona 📄.</p>`}</div>${renderNotesDrawer(activeNotesList)}</div>`;
     restoreReaderScroll(scrollTop);
     if (options.focusNoteId) scrollToNote(options.focusNoteId);
-    if (options.line) scrollToLine(options.line);
+    if (options.line && !options.keepScroll) scrollToLine(options.line);
   }
 
   async function load(options = {}) {
@@ -203,44 +229,123 @@
     const d = doc();
     if (!isReady() || !d || !selInfo) return;
     const line = selInfo.line;
+    const scrollTop = captureReaderScroll();
     const pop = document.getElementById("revisionPopup");
     const row = { user_id: cloudUser.id, document_id: d.id, line_number: selInfo.line, line_text: selInfo.lineText, selected_text: selInfo.selected, start_offset: selInfo.start, end_offset: selInfo.end, highlight_color: pop?.dataset.color || "none", comment_text: document.getElementById("revisionCommentText")?.value?.trim() || "", status: "open", updated_at: new Date().toISOString() };
-    const q = await supabaseClient.from(NOTES).insert(row);
+    const q = await supabaseClient.from(NOTES).insert(row).select("*").single();
     if (q.error) return msg(q.error.message);
+    notes.push(q.data);
+    activeNoteId = q.data.id;
     closePopup();
     window.getSelection()?.removeAllRanges();
-    await load({ line });
+    redrawLine(line);
+    updateNotesButton();
+    updateNotesDrawer();
+    restoreReaderScroll(scrollTop);
     msg("Commento salvato");
   }
 
   async function updateNote(noteId) {
     if (!isReady() || !noteId) return;
-    const text = document.querySelector(`[data-edit-note-text="${CSS.escape(noteId)}"]`)?.value || "";
-    const card = document.querySelector(`[data-revision-note-id="${CSS.escape(noteId)}"]`);
-    const color = card?.dataset.editColor || notes.find(n => n.id === noteId)?.highlight_color || "none";
-    const q = await supabaseClient.from(NOTES).update({ comment_text: text.trim(), highlight_color: color, updated_at: new Date().toISOString() }).eq("user_id", cloudUser.id).eq("id", noteId);
+    const note = notes.find(n => n.id === noteId);
+    const text = document.querySelector(`[data-edit-note-text="${css(noteId)}"]`)?.value || "";
+    const card = document.querySelector(`[data-revision-note-id="${css(noteId)}"]`);
+    const color = card?.dataset.editColor || note?.highlight_color || "none";
+    const q = await supabaseClient.from(NOTES).update({ comment_text: text.trim(), highlight_color: color, updated_at: new Date().toISOString() }).eq("user_id", cloudUser.id).eq("id", noteId).select("*").single();
     if (q.error) return msg(q.error.message);
+    notes = notes.map(n => n.id === noteId ? q.data : n);
     editNoteId = "";
-    await load({ keepScroll: true, focusNoteId: noteId });
+    activeNoteId = noteId;
+    redrawLine(q.data.line_number);
+    updateNotesDrawer();
     msg("Commento aggiornato");
   }
 
   async function deleteNote(noteId) {
     if (!isReady() || !noteId) return;
+    const note = notes.find(n => n.id === noteId);
     const q = await supabaseClient.from(NOTES).delete().eq("user_id", cloudUser.id).eq("id", noteId);
     if (q.error) return msg(q.error.message);
+    notes = notes.filter(n => n.id !== noteId);
     if (editNoteId === noteId) editNoteId = "";
-    await load({ keepScroll: true });
+    if (activeNoteId === noteId) activeNoteId = "";
+    if (note) redrawLine(note.line_number);
+    updateNotesButton();
+    updateNotesDrawer();
     msg("Commento eliminato");
   }
 
   function openNotesAt(noteId, line) {
     notesOpen = true;
+    activeNoteId = noteId;
     editNoteId = "";
-    const scrollTop = captureReaderScroll();
-    render({ keepScroll: true, focusNoteId: noteId });
-    restoreReaderScroll(scrollTop);
+    updateNotesButton();
+    updateNotesDrawer();
+    if (noteId) scrollToNote(noteId);
     if (line) scrollToLine(line);
+  }
+
+  function ensureJsPdf() {
+    return new Promise((resolve, reject) => {
+      if (window.jspdf?.jsPDF) return resolve(window.jspdf.jsPDF);
+      const existing = document.getElementById("jspdf-cdn");
+      if (existing) {
+        existing.addEventListener("load", () => resolve(window.jspdf.jsPDF), { once: true });
+        existing.addEventListener("error", reject, { once: true });
+        return;
+      }
+      const script = document.createElement("script");
+      script.id = "jspdf-cdn";
+      script.src = "https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js";
+      script.onload = () => resolve(window.jspdf.jsPDF);
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  function safeFileName(value) {
+    return String(value || "note-revisione").replace(/[^a-z0-9_\-]+/gi, "_").replace(/_+/g, "_").slice(0, 80) || "note-revisione";
+  }
+
+  async function exportNotesPdf() {
+    const d = doc();
+    const list = activeNotes();
+    if (!d) return msg("Nessun documento aperto");
+    if (!list.length) return msg("Nessuna nota da esportare");
+    try {
+      const JsPDF = await ensureJsPdf();
+      const pdf = new JsPDF({ unit: "pt", format: "a4" });
+      const margin = 48;
+      const width = pdf.internal.pageSize.getWidth() - margin * 2;
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      let y = margin;
+      const addText = (text, size = 11, bold = false, extra = 4) => {
+        pdf.setFont("helvetica", bold ? "bold" : "normal");
+        pdf.setFontSize(size);
+        const chunks = pdf.splitTextToSize(String(text || ""), width);
+        chunks.forEach(line => {
+          if (y > pageHeight - margin) { pdf.addPage(); y = margin; }
+          pdf.text(line, margin, y);
+          y += size + 4;
+        });
+        y += extra;
+      };
+      addText(`Note revisione - ${d.title || d.original_filename || "Documento"}`, 15, true, 8);
+      addText(`File: ${d.original_filename || ""}`, 10, false, 2);
+      addText(`Esportato: ${new Date().toLocaleString("it-IT")}`, 10, false, 12);
+      list.forEach((note, index) => {
+        addText(`${index + 1}. Riga ${note.line_number}${note.highlight_color && note.highlight_color !== "none" ? ` - ${note.highlight_color}` : ""}`, 12, true, 4);
+        addText("Testo selezionato:", 10, true, 0);
+        addText(note.selected_text || "", 10, false, 4);
+        addText("Commento:", 10, true, 0);
+        addText(note.comment_text || "Senza commento", 10, false, 10);
+      });
+      pdf.save(`${safeFileName(d.title || d.original_filename)}_note.pdf`);
+      msg("PDF note esportato");
+    } catch (error) {
+      msg("Esportazione PDF non riuscita");
+      console.error(error);
+    }
   }
 
   function showTooltip(target, event) {
@@ -267,7 +372,7 @@
   document.addEventListener("click", e => {
     const insidePopup = e.target.closest?.("#revisionPopup");
     const insideReader = e.target.closest?.("#revisionReader");
-    const isControl = e.target.closest?.('[data-screen="revisions"],[data-rev-doc]') || ["revisionUploadIcon", "revisionFile", "revisionDocSelect", "revisionRefresh", "revisionSaveNote", "revisionCancelNote", "revisionToggleNotes", "revisionCloseNotes"].includes(e.target.id) || e.target.closest?.("[data-rev-color],[data-rev-edit-color],[data-jump-revision-line],[data-edit-revision-note],[data-delete-revision-note],[data-save-revision-note],[data-cancel-edit-revision-note]");
+    const isControl = e.target.closest?.('[data-screen="revisions"],[data-rev-doc]') || ["revisionUploadIcon", "revisionFile", "revisionDocSelect", "revisionRefresh", "revisionSaveNote", "revisionCancelNote", "revisionToggleNotes", "revisionCloseNotes", "revisionExportPdf"].includes(e.target.id) || e.target.closest?.("[data-rev-color],[data-rev-edit-color],[data-jump-revision-line],[data-edit-revision-note],[data-delete-revision-note],[data-save-revision-note],[data-cancel-edit-revision-note]");
     if (selInfo && !insidePopup && !insideReader && !isControl) closePopup();
 
     if (e.target.closest?.('[data-screen="revisions"]')) { currentScreen = "revisions"; document.querySelectorAll(".screen").forEach(x => x.classList.toggle("active", x.dataset.screenPanel === "revisions")); render(); load(); }
@@ -275,6 +380,7 @@
     if (e.target.id === "revisionRefresh") load({ keepScroll: true });
     if (e.target.id === "revisionToggleNotes") { notesOpen = !notesOpen; render({ keepScroll: true }); }
     if (e.target.id === "revisionCloseNotes") { notesOpen = false; render({ keepScroll: true }); }
+    if (e.target.id === "revisionExportPdf") exportNotesPdf();
     if (e.target.id === "revisionSaveNote") saveNote();
     if (e.target.id === "revisionCancelNote") closePopup();
 
@@ -298,7 +404,7 @@
     if (jump && !e.target.closest("button, textarea")) document.querySelector(`[data-line="${jump.dataset.jumpRevisionLine}"]`)?.scrollIntoView({ behavior:"smooth", block:"center" });
 
     const edit = e.target.closest?.("[data-edit-revision-note]");
-    if (edit) { editNoteId = edit.dataset.editRevisionNote; render({ keepScroll: true, focusNoteId: editNoteId }); requestAnimationFrame(() => document.querySelector(`[data-edit-note-text="${CSS.escape(editNoteId)}"]`)?.focus()); }
+    if (edit) { editNoteId = edit.dataset.editRevisionNote; activeNoteId = editNoteId; updateNotesDrawer(); requestAnimationFrame(() => document.querySelector(`[data-edit-note-text="${css(editNoteId)}"]`)?.focus()); }
 
     const del = e.target.closest?.("[data-delete-revision-note]");
     if (del) deleteNote(del.dataset.deleteRevisionNote);
@@ -307,7 +413,7 @@
     if (save) updateNote(save.dataset.saveRevisionNote);
 
     const cancel = e.target.closest?.("[data-cancel-edit-revision-note]");
-    if (cancel) { editNoteId = ""; render({ keepScroll: true, focusNoteId: cancel.dataset.cancelEditRevisionNote }); }
+    if (cancel) { editNoteId = ""; activeNoteId = cancel.dataset.cancelEditRevisionNote; updateNotesDrawer(); scrollToNote(activeNoteId); }
   }, true);
 
   document.addEventListener("change", e => {
