@@ -14,10 +14,38 @@
   const lines = text => String(text || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
 
   function style() {
-    if (document.getElementById("rev-style")) return;
+    if (document.getElementById("rev-style-v3")) return;
+    document.getElementById("rev-style")?.remove();
     const s = document.createElement("style");
-    s.id = "rev-style";
-    s.textContent = `.revision-layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:12px}.revision-layout .panel{margin-bottom:12px}.revision-list{display:flex;flex-direction:column;gap:8px;max-height:56vh;overflow:auto}.revision-doc{background:#fff;border:1px solid #ddd;border-radius:12px;padding:9px;text-align:left}.revision-doc.active{outline:2px solid #3e8f75}.revision-main-panel{min-height:78vh}.revision-reader{background:#fff;border:1px solid #ddd;border-radius:16px;height:calc(100vh - 245px);min-height:560px;overflow:auto;padding:12px;user-select:text;-webkit-user-select:text;font-size:15.5px;line-height:1.6}.revision-line{display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px;border-bottom:1px solid #eee;padding:5px 7px}.revision-num{text-align:right;color:#888;user-select:none}.revision-text{white-space:pre-wrap;overflow-wrap:anywhere}.rev-yellow{background:rgba(255,222,89,.78);border-radius:3px}.rev-red{background:rgba(255,99,99,.48);border-radius:3px}.revision-popup{position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.18);padding:10px;width:min(350px,calc(100vw - 24px))}.revision-popup textarea{width:100%;min-height:72px}.revision-notes-panel{max-height:42vh;overflow:auto}.revision-comment{background:#fff;border-left:4px solid #d8d6cf;border-radius:10px;padding:9px;margin:8px 0}.revision-comment.yellow{border-left-color:#e9c46a}.revision-comment.red{border-left-color:#e76f51}.revision-comment blockquote{margin:6px 0;padding-left:8px;border-left:2px solid #ddd;color:#333}.revision-top-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.revision-icon-button{border:1px solid #ddd;border-radius:999px;background:#fff;padding:8px 10px;cursor:pointer}.revision-icon-button.active{outline:2px solid #3e8f75}@media(max-width:900px){.revision-layout{grid-template-columns:1fr}.revision-reader{height:65vh;min-height:420px}}`;
+    s.id = "rev-style-v3";
+    s.textContent = `
+      #screen-revisions { padding-bottom: 24px; }
+      .revision-full { width: min(100%, 1500px); margin: 0 auto; }
+      .revision-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+      .revision-toolbar-left, .revision-toolbar-right { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+      .revision-icon-button { border:1px solid rgba(16,24,32,.16); border-radius:999px; background:#fff; padding:8px 12px; cursor:pointer; font-weight:700; }
+      .revision-icon-button.active { outline:2px solid #3e8f75; }
+      .revision-doc-select { min-width:min(430px, 100%); max-width:100%; }
+      .revision-main-panel { min-height:82vh; }
+      .revision-reader { background:#fff; border:1px solid #ddd; border-radius:16px; height:calc(100vh - 205px); min-height:650px; overflow:auto; padding:14px; user-select:text; -webkit-user-select:text; font-size:16px; line-height:1.68; }
+      .revision-line { display:grid; grid-template-columns:50px minmax(0,1fr); gap:13px; border-bottom:1px solid #eee; padding:5px 8px; }
+      .revision-num { text-align:right; color:#888; user-select:none; font-variant-numeric:tabular-nums; }
+      .revision-text { white-space:pre-wrap; overflow-wrap:anywhere; }
+      .rev-note-target { border-bottom:1px dotted rgba(16,24,32,.55); cursor:help; }
+      .rev-yellow { background:rgba(255,222,89,.78); border-radius:3px; cursor:help; }
+      .rev-red { background:rgba(255,99,99,.48); border-radius:3px; cursor:help; }
+      .revision-popup { position:fixed; z-index:9999; background:#fff; border:1px solid #ccc; border-radius:14px; box-shadow:0 12px 30px rgba(0,0,0,.18); padding:10px; width:min(360px,calc(100vw - 24px)); }
+      .revision-popup textarea { width:100%; min-height:74px; }
+      .revision-notes-drawer { position:fixed; z-index:9998; top:70px; right:14px; bottom:14px; width:min(430px, calc(100vw - 28px)); background:#fff; border:1px solid rgba(16,24,32,.16); border-radius:18px; box-shadow:0 18px 50px rgba(0,0,0,.20); padding:14px; overflow:auto; }
+      .revision-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+      .revision-comment { background:#fff; border-left:4px solid #d8d6cf; border-radius:10px; padding:9px; margin:8px 0; box-shadow:0 1px 5px rgba(0,0,0,.05); cursor:pointer; }
+      .revision-comment.yellow { border-left-color:#e9c46a; }
+      .revision-comment.red { border-left-color:#e76f51; }
+      .revision-comment blockquote { margin:6px 0; padding-left:8px; border-left:2px solid #ddd; color:#333; }
+      .revision-comment small { color:#666; }
+      .revision-tooltip { position:fixed; z-index:10000; max-width:360px; background:#101820; color:#fff; border-radius:10px; padding:8px 10px; box-shadow:0 8px 22px rgba(0,0,0,.2); font-size:13px; line-height:1.4; pointer-events:none; white-space:pre-wrap; }
+      @media(max-width:900px){ .revision-reader{height:68vh;min-height:460px;font-size:15px}.revision-doc-select{min-width:100%}.revision-toolbar{align-items:stretch}.revision-toolbar-left,.revision-toolbar-right{width:100%}.revision-icon-button{flex:1}.revision-notes-drawer{top:60px;right:8px;bottom:8px;width:calc(100vw - 16px)} }
+    `;
     document.head.appendChild(s);
   }
 
@@ -47,22 +75,24 @@
 
   function markLine(text, n, list) {
     const parts = list
-      .filter(x => Number(x.line_number) === n && (x.highlight_color === "yellow" || x.highlight_color === "red"))
-      .map(x => ({ a: Number(x.start_offset), b: Number(x.end_offset), c: x.highlight_color }))
+      .filter(x => Number(x.line_number) === n)
+      .map(x => ({ a: Number(x.start_offset), b: Number(x.end_offset), color: x.highlight_color, comment: x.comment_text || "Senza commento" }))
       .filter(x => x.a >= 0 && x.b > x.a && x.b <= text.length)
       .sort((x, y) => x.a - y.a);
     let out = "", i = 0;
     for (const p of parts) {
       if (p.a < i) continue;
-      out += h(text.slice(i, p.a)) + `<mark class="rev-${p.c}">${h(text.slice(p.a, p.b))}</mark>`;
+      const cls = p.color === "yellow" ? "rev-yellow" : p.color === "red" ? "rev-red" : "rev-note-target";
+      out += h(text.slice(i, p.a));
+      out += `<span class="${cls}" data-rev-tooltip="${h(`Riga ${n}\n${p.comment}`)}">${h(text.slice(p.a, p.b))}</span>`;
       i = p.b;
     }
     return out + h(text.slice(i)) || "&nbsp;";
   }
 
-  function renderNotesPanel(activeNotes) {
+  function renderNotesDrawer(activeNotes) {
     if (!notesOpen) return "";
-    return `<div class="panel revision-notes-panel"><h2>Note</h2>${activeNotes.length ? activeNotes.map(n => `<article class="revision-comment ${n.highlight_color || 'none'}"><small>Riga ${n.line_number}${n.highlight_color && n.highlight_color !== 'none' ? ` · ${n.highlight_color}` : ''}</small><blockquote>${h(n.selected_text)}</blockquote><p>${h(n.comment_text || "Senza commento")}</p></article>`).join("") : "<p class='hint'>Nessuna nota aperta.</p>"}</div>`;
+    return `<aside class="revision-notes-drawer" id="revisionNotesDrawer"><div class="revision-drawer-head"><div><h2>Note</h2><p class="hint">Parti selezionate e commenti.</p></div><button class="secondary" id="revisionCloseNotes">Chiudi</button></div>${activeNotes.length ? activeNotes.map(n => `<article class="revision-comment ${n.highlight_color || 'none'}" data-jump-revision-line="${Number(n.line_number)}"><small>Riga ${n.line_number}${n.highlight_color && n.highlight_color !== 'none' ? ` · ${n.highlight_color}` : ''}</small><blockquote>${h(n.selected_text)}</blockquote><p>${h(n.comment_text || "Senza commento")}</p></article>`).join("") : "<p class='hint'>Nessuna nota aperta.</p>"}</aside>`;
   }
 
   function render() {
@@ -71,7 +101,8 @@
     if (!p) return;
     const d = doc();
     const activeNotes = d ? docNotes(d.id) : [];
-    p.innerHTML = `<div class="revision-layout"><aside><div class="panel"><h2>Correzione revisioni</h2><p class="hint">Testo non modificabile. Seleziona testo in una sola riga per commentare.</p>${isReady()?"":"<p class='hint'>Accedi a Supabase nella sezione Dati.</p>"}<div class="field"><label>File Word .docx</label><input id="revisionFile" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"></div><div class="field"><label>Titolo</label><input id="revisionTitle" placeholder="Titolo facoltativo"></div><button class="primary" id="revisionImport">Importa documento</button></div><div class="panel"><h2>Documenti</h2><div class="revision-list">${docs.length?docs.map(x=>`<button class="revision-doc ${x.id===d?.id?"active":""}" data-rev-doc="${h(x.id)}"><strong>${h(x.title)}</strong><br><small>${h(x.original_filename||"")} · ${x.line_count||0} righe</small></button>`).join(""):"<p class='hint'>Nessun documento.</p>"}</div></div></aside><main><div class="panel revision-main-panel"><div class="section-head"><div><h2>${d?h(d.title):"Documento"}</h2><p class="hint">Il testo selezionato resta selezionato finché non clicchi altrove. Il testo viene evidenziato solo se scegli Giallo o Rosso nel box commento.</p></div><div class="revision-top-actions">${d?"<button class='secondary' id='revisionRefresh'>Aggiorna</button>":""}<button class="revision-icon-button ${notesOpen?"active":""}" id="revisionToggleNotes" title="Note">📝 Note (${activeNotes.length})</button></div></div>${d?`<div class="revision-reader" id="revisionReader">${lines(d.text_content).map((line,i)=>`<div class="revision-line" data-line="${i+1}"><span class="revision-num">${i+1}</span><span class="revision-text">${markLine(line,i+1,activeNotes)}</span></div>`).join("")}</div>`:"<p class='hint'>Carica o apri un documento.</p>"}</div>${renderNotesPanel(activeNotes)}</main></div>`;
+    const select = `<select class="revision-doc-select" id="revisionDocSelect">${docs.length ? docs.map(x => `<option value="${h(x.id)}" ${x.id === d?.id ? "selected" : ""}>${h(x.title)} · ${x.line_count || 0} righe</option>`).join("") : `<option>Nessun documento</option>`}</select>`;
+    p.innerHTML = `<div class="revision-full"><div class="panel revision-main-panel"><div class="revision-toolbar"><div class="revision-toolbar-left"><h2>Correzione revisioni</h2>${select}</div><div class="revision-toolbar-right"><input id="revisionFile" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden><button class="revision-icon-button" id="revisionUploadIcon" title="Carica Word">📄 Carica</button>${d ? "<button class='revision-icon-button' id='revisionRefresh' title='Aggiorna'>↻</button>" : ""}<button class="revision-icon-button ${notesOpen ? "active" : ""}" id="revisionToggleNotes" title="Note">📝 Note (${activeNotes.length})</button></div></div><p class="hint">Testo non modificabile. Seleziona testo in una sola riga per commentare. Il commento compare passando il mouse sulle parti commentate.</p>${d ? `<div class="revision-reader" id="revisionReader">${lines(d.text_content).map((line,i)=>`<div class="revision-line" data-line="${i+1}"><span class="revision-num">${i+1}</span><span class="revision-text">${markLine(line,i+1,activeNotes)}</span></div>`).join("")}</div>` : `<p class="hint">Carica un documento Word con l'icona 📄.</p>`}</div>${renderNotesDrawer(activeNotes)}</div>`;
   }
 
   async function load() {
@@ -86,16 +117,15 @@
     render();
   }
 
-  async function importFile() {
+  async function importFile(file) {
     if (!isReady()) return msg("Accedi a Supabase nella sezione Dati");
-    const file = document.getElementById("revisionFile")?.files?.[0];
     if (!file) return msg("Scegli un file .docx");
     if (!window.mammoth?.extractRawText) return msg("Parser Word non ancora caricato");
     const ab = await file.arrayBuffer();
     const res = await window.mammoth.extractRawText({ arrayBuffer: ab });
     const text = String(res.value || "").trimEnd();
     if (!text.trim()) return msg("Nessun testo leggibile");
-    const title = document.getElementById("revisionTitle")?.value?.trim() || file.name.replace(/\.docx$/i, "");
+    const title = file.name.replace(/\.docx$/i, "");
     const row = { user_id: cloudUser.id, title, original_filename: file.name, text_content: text, line_count: lines(text).length, updated_at: new Date().toISOString() };
     const q = await supabaseClient.from(DOCS).insert(row).select("*").single();
     if (q.error) return msg(q.error.message);
@@ -135,8 +165,8 @@
     p.id = "revisionPopup";
     p.className = "revision-popup";
     p.dataset.color = "none";
-    p.style.left = `${Math.min(Math.max(12, info.rect.left), window.innerWidth - 370)}px`;
-    p.style.top = `${Math.min(Math.max(12, info.rect.bottom + 8), window.innerHeight - 235)}px`;
+    p.style.left = `${Math.min(Math.max(12, info.rect.left), window.innerWidth - 380)}px`;
+    p.style.top = `${Math.min(Math.max(12, info.rect.bottom + 8), window.innerHeight - 240)}px`;
     p.innerHTML = `<small>Riga ${info.line}: ${h(info.selected.slice(0,80))}</small><textarea id="revisionCommentText" placeholder="Commento..."></textarea><div class="row-actions"><button class="chip active" data-rev-color="none">No evidenziazione</button><button class="chip" data-rev-color="yellow">Giallo</button><button class="chip" data-rev-color="red">Rosso</button><button class="primary" id="revisionSaveNote">Salva</button><button class="secondary" id="revisionCancelNote">Annulla</button></div>`;
     document.body.appendChild(p);
     const t = p.querySelector("textarea");
@@ -157,20 +187,51 @@
     msg("Commento salvato");
   }
 
+  function showTooltip(target, event) {
+    const text = target?.dataset?.revTooltip;
+    if (!text) return;
+    hideTooltip();
+    const tip = document.createElement("div");
+    tip.id = "revisionTooltip";
+    tip.className = "revision-tooltip";
+    tip.textContent = text;
+    document.body.appendChild(tip);
+    moveTooltip(event);
+  }
+
+  function moveTooltip(event) {
+    const tip = document.getElementById("revisionTooltip");
+    if (!tip) return;
+    tip.style.left = `${Math.min(event.clientX + 12, window.innerWidth - tip.offsetWidth - 12)}px`;
+    tip.style.top = `${Math.min(event.clientY + 14, window.innerHeight - tip.offsetHeight - 12)}px`;
+  }
+
+  function hideTooltip() { document.getElementById("revisionTooltip")?.remove(); }
+
   document.addEventListener("click", e => {
     const insidePopup = e.target.closest?.("#revisionPopup");
     const insideReader = e.target.closest?.("#revisionReader");
-    const isControl = e.target.closest?.('[data-screen="revisions"],[data-rev-doc]') || ["revisionImport", "revisionRefresh", "revisionSaveNote", "revisionCancelNote", "revisionToggleNotes"].includes(e.target.id) || e.target.closest?.("[data-rev-color]");
+    const isControl = e.target.closest?.('[data-screen="revisions"],[data-rev-doc]') || ["revisionUploadIcon", "revisionFile", "revisionDocSelect", "revisionRefresh", "revisionSaveNote", "revisionCancelNote", "revisionToggleNotes", "revisionCloseNotes"].includes(e.target.id) || e.target.closest?.("[data-rev-color],[data-jump-revision-line]");
     if (selInfo && !insidePopup && !insideReader && !isControl) closePopup();
     if (e.target.closest?.('[data-screen="revisions"]')) { currentScreen = "revisions"; document.querySelectorAll(".screen").forEach(x => x.classList.toggle("active", x.dataset.screenPanel === "revisions")); render(); load(); }
-    const d = e.target.closest?.("[data-rev-doc]"); if (d) { closePopup(); openDocId = d.dataset.revDoc; render(); }
-    if (e.target.id === "revisionImport") importFile();
+    if (e.target.id === "revisionUploadIcon") document.getElementById("revisionFile")?.click();
     if (e.target.id === "revisionRefresh") load();
     if (e.target.id === "revisionToggleNotes") { notesOpen = !notesOpen; render(); }
+    if (e.target.id === "revisionCloseNotes") { notesOpen = false; render(); }
     if (e.target.id === "revisionSaveNote") saveNote();
     if (e.target.id === "revisionCancelNote") closePopup();
     const c = e.target.closest?.("[data-rev-color]"); if (c) { const p = document.getElementById("revisionPopup"); if (p) p.dataset.color = c.dataset.revColor; p?.querySelectorAll("[data-rev-color]").forEach(b => b.classList.toggle("active", b === c)); }
+    const jump = e.target.closest?.("[data-jump-revision-line]"); if (jump) document.querySelector(`[data-line="${jump.dataset.jumpRevisionLine}"]`)?.scrollIntoView({ behavior:"smooth", block:"center" });
   }, true);
+
+  document.addEventListener("change", e => {
+    if (e.target.id === "revisionFile") importFile(e.target.files?.[0]);
+    if (e.target.id === "revisionDocSelect") { openDocId = e.target.value; closePopup(); render(); }
+  }, true);
+
+  document.addEventListener("mouseover", e => showTooltip(e.target.closest?.("[data-rev-tooltip]"), e), true);
+  document.addEventListener("mousemove", moveTooltip, true);
+  document.addEventListener("mouseout", e => { if (e.target.closest?.("[data-rev-tooltip]")) hideTooltip(); }, true);
 
   document.addEventListener("selectionchange", () => {
     if (currentScreen !== "revisions") return;
