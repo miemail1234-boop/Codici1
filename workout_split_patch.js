@@ -16,6 +16,7 @@
     "polpacci": { id: "polpacci", name: "Polpacci", note: "Calf raise", sets: [{ kg: 0, reps: 15 }, { kg: 0, reps: 15 }, { kg: 0, reps: 15 }] },
     "addominali": { id: "addominali", name: "Addominali", note: "Prima casella: secondi esercizio · seconda casella: secondi recupero", userNote: "3 serie da 35 secondi con 30 secondi di recupero", sets: [{ kg: 35, reps: 30 }, { kg: 35, reps: 30 }, { kg: 35, reps: 30 }] },
   };
+
   let activeDay = localStorage.getItem(KEY) || "upper";
   if (!SPLITS[activeDay]) activeDay = "upper";
 
@@ -28,6 +29,9 @@
   const isSplitExercise = (exercise, day = activeDay) => SPLITS[day]?.ids.includes(exercise?.id);
   const safeClone = value => JSON.parse(JSON.stringify(value));
   const template = () => Array.isArray(state?.workoutTemplate) ? state.workoutTemplate : [];
+  const exerciseTotal = exercise => typeof exerciseVolume === "function"
+    ? exerciseVolume(exercise)
+    : (exercise?.sets || []).reduce((sum, set) => sum + number(set.kg, 0) * number(set.reps, 0), 0);
 
   function latestExerciseById(id) {
     for (const workout of [...(state.workouts || [])].sort((a, b) => String(b.date).localeCompare(String(a.date)))) {
@@ -47,7 +51,7 @@
   }
 
   function normalizeWithDay(workout) {
-    const normalized = oldNormalizeWorkout ? oldNormalizeWorkout(workout) : {
+    const normalized = oldNormalizeWorkout ? oldNormalizeWorkout(workout || {}) : {
       id: workout?.id || uid(),
       date: workout?.date || todayISO(),
       exercises: Array.isArray(workout?.exercises) ? workout.exercises : [],
@@ -66,13 +70,13 @@
     return (state.workouts || []).find(workout => workout.date === date && workoutDayOf(workout) === day);
   }
 
-  function sourceWorkoutForDate(date) {
-    return findSplitWorkout(date, activeDay) || (state.workouts || []).find(workout => workout.date === date && workoutDayOf(workout) === "full") || null;
+  function sourceWorkoutForDate(date, day = activeDay) {
+    return findSplitWorkout(date, day) || (state.workouts || []).find(workout => workout.date === date && workoutDayOf(workout) === "full") || null;
   }
 
   function createSplitWorkout(date, day = activeDay) {
     ensureWorkoutTemplate();
-    const source = sourceWorkoutForDate(date);
+    const source = sourceWorkoutForDate(date, day);
     const exercises = SPLITS[day].ids.map(id => {
       const fromSource = source?.exercises?.find(ex => ex.id === id);
       return safeClone(fromSource || latestExerciseById(id));
@@ -83,7 +87,7 @@
   function setDraftForSplit(date = selectedDate, day = activeDay) {
     ensureWorkoutTemplate();
     selectedDate = date || todayISO();
-    activeDay = day;
+    activeDay = SPLITS[day] ? day : "upper";
     localStorage.setItem(KEY, activeDay);
     draftWorkout = safeClone(findSplitWorkout(selectedDate, activeDay) || createSplitWorkout(selectedDate, activeDay));
     draftWorkout.date = selectedDate;
@@ -123,15 +127,17 @@
     if (!workouts.length) return `<p class="hint">Ancora vuoto.</p>`;
     return workouts.map(workout => {
       const day = workoutDayOf(workout);
-      const volume = workout.exercises.reduce((sum, exercise) => sum + exerciseVolume(exercise), 0);
-      return `<div class="history-item"><strong>${prettyDate(workout.date)} · ${splitTitle(day)}</strong><small>${workout.exercises.length} esercizi · volume totale ${fmt(volume)}</small><div class="row-actions"><button class="chip" data-load-workout-split="${workout.date}:${day}">Apri</button><button class="danger" data-delete-workout-split="${workout.date}:${day}">Elimina</button></div></div>`;
+      const volume = (workout.exercises || []).reduce((sum, exercise) => sum + exerciseTotal(exercise), 0);
+      return `<div class="history-item"><strong>${prettyDate(workout.date)} · ${splitTitle(day)}</strong><small>${(workout.exercises || []).length} esercizi · volume totale ${fmt(volume)}</small><div class="row-actions"><button class="chip" data-load-workout-split="${workout.date}:${day}">Apri</button><button class="danger" data-delete-workout-split="${workout.date}:${day}">Elimina</button></div></div>`;
     }).join("");
   }
 
   function renderWorkoutSplit() {
+    const panel = document.getElementById("screen-workout");
+    if (!panel) return;
     setDraftForSplit(draftWorkout?.date || selectedDate || todayISO(), activeDay);
     const selectedExercise = draftWorkout.exercises[0]?.id;
-    document.getElementById("screen-workout").innerHTML = `
+    panel.innerHTML = `
       <div class="wide-layout">
         <div>
           <div class="panel">
@@ -200,12 +206,19 @@
   }
 
   document.addEventListener("click", event => {
+    const screenButton = event.target.closest?.('[data-screen="workout"], [data-jump="workout"]');
+    if (screenButton) {
+      setTimeout(renderWorkoutSplit, 0);
+      setTimeout(renderWorkoutSplit, 80);
+      return;
+    }
+
     const dayBtn = event.target.closest?.("[data-workout-day]");
     if (dayBtn) {
       event.preventDefault();
       event.stopImmediatePropagation();
       setDraftForSplit(draftWorkout?.date || selectedDate || todayISO(), dayBtn.dataset.workoutDay);
-      renderWorkout();
+      renderWorkoutSplit();
       return;
     }
     if (event.target.id === "saveWorkoutSplit") {
@@ -244,11 +257,10 @@
       event.preventDefault();
       event.stopImmediatePropagation();
       setDraftForSplit(event.target.value || todayISO(), activeDay);
-      render();
-      switchScreen("workout");
+      renderWorkoutSplit();
     }
   }, true);
 
   ensureWorkoutTemplate();
-  if (document.querySelector("#screen-workout.active")) renderWorkout();
+  renderWorkoutSplit();
 })();
