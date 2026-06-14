@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Workout Tracker</title>
+  <style>
+    :root{--bg:#0f1720;--panel:#162331;--panel2:#1c2d3f;--text:#eef6ff;--muted:#9fb1c3;--accent:#7dd3fc;--danger:#fb7185;--ok:#86efac;--border:rgba(255,255,255,.12)}
+    *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#0b1118,#111c28);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif} a{color:inherit} button,input,textarea,select{font:inherit} .wrap{max-width:1100px;margin:0 auto;padding:18px} .top{position:sticky;top:0;z-index:2;background:rgba(15,23,32,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)} .top .wrap{display:flex;justify-content:space-between;gap:12px;align-items:center}.title{margin:0;font-size:26px}.sub{margin:4px 0 0;color:var(--muted);font-size:14px}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:14px;padding:10px 14px;cursor:pointer}.btn.primary{background:linear-gradient(135deg,#0284c7,#0f766e);border:0}.btn.danger{background:rgba(251,113,133,.12);color:#fecdd3}.tabs{display:flex;gap:8px;margin:18px 0}.tabs button{flex:1;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:16px;padding:12px}.tabs button.active{background:var(--accent);color:#06202b}.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}.panel{background:rgba(22,35,49,.88);border:1px solid var(--border);border-radius:22px;padding:16px;margin-bottom:16px}.row{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}.field label{color:var(--muted);font-size:13px}input,textarea,select{width:100%;border:1px solid var(--border);border-radius:12px;background:#0b141d;color:var(--text);padding:10px}textarea{min-height:72px}.exercise{border:1px solid var(--border);background:rgba(255,255,255,.03);border-radius:18px;padding:14px;margin:12px 0}.exercise h3{margin:0 0 4px}.note{color:var(--muted);font-size:13px;margin:0 0 10px}.sets{display:grid;gap:8px}.setrow{display:grid;grid-template-columns:34px 1fr 1fr 42px;gap:8px;align-items:center}.chip{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--border);border-radius:999px;padding:6px 10px;color:var(--muted);font-size:13px}.history-item{border-bottom:1px solid var(--border);padding:12px 0}.history-item:last-child{border-bottom:0}.history-title{display:flex;justify-content:space-between;gap:10px}.small{font-size:13px;color:var(--muted)}.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#06131d;color:white;border:1px solid var(--border);border-radius:999px;padding:10px 14px;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}.hidden{display:none!important}@media(max-width:850px){.grid{grid-template-columns:1fr}.top .wrap{display:block}.actions{margin-top:12px}.setrow{grid-template-columns:28px 1fr 1fr 36px}}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="wrap"><div><h1 class="title">Workout Tracker</h1><p class="sub">Modulo separato: legge e salva solo le tabelle workout.</p></div><div class="actions"><a class="btn" href="./?v=80">Life Tracker</a><button class="btn" id="reloadBtn">Ricarica cloud</button><button class="btn primary" id="saveBtn">Salva</button></div></div></header>
+  <main class="wrap">
+    <div id="authBox" class="panel">Controllo accesso Supabase...</div>
+    <div id="app" class="hidden">
+      <div class="tabs"><button data-day="upper" class="active">Upper</button><button data-day="lower">Lower</button><button data-day="full">Archivio full</button></div>
+      <div class="grid">
+        <section>
+          <div class="panel"><div class="row"><div class="field" style="min-width:210px;flex:1"><label>Data workout</label><input type="date" id="dateInput"></div><div class="field"><label>&nbsp;</label><button class="btn primary" id="saveBtn2">Salva</button></div></div><p class="small" id="modeHint"></p></div>
+          <div id="exerciseList"></div>
+        </section>
+        <aside>
+          <div class="panel"><h2>Riepilogo</h2><div id="summary"></div></div>
+          <div class="panel"><h2>Storico</h2><div id="history"></div></div>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <div class="toast" id="toast"></div>
+  <script src="vendor/supabase.js?v=21"></script>
+  <script>
+    const SUPABASE_URL="https://kujyowhezihjambhpahe.supabase.co";
+    const SUPABASE_KEY="sb_publishable_VBzZaA3NAIvqMxJcZZTwPg_4_GEi1a3";
+    const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+    const $=id=>document.getElementById(id);
+    const today=()=>new Date().toISOString().slice(0,10);
+    const num=v=>{const n=Number(String(v??0).replace(",","."));return Number.isFinite(n)?n:0};
+    const fmt=n=>new Intl.NumberFormat("it-IT",{maximumFractionDigits:0}).format(num(n));
+    const safe=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+    const splits={upper:["panca-inclinata","trazioni","rematore","alzate-laterali","tricipiti","bicipiti"],lower:["bulgarian-split-squat","stacco-rumeno","back-extension","polpacci","addominali"]};
+    const defaults={
+      "panca-inclinata":{id:"panca-inclinata",name:"Panca inclinata",note:"Manubri/macchina",sets:[{kg:9,reps:10},{kg:9,reps:10},{kg:9,reps:10}]},
+      "trazioni":{id:"trazioni",name:"Trazioni",note:"Peso corporeo",sets:[{kg:0,reps:6},{kg:0,reps:6},{kg:0,reps:6}]},
+      "rematore":{id:"rematore",name:"Rematore",note:"Carico per mano/macchina",sets:[{kg:11,reps:10},{kg:11,reps:10},{kg:11,reps:10}]},
+      "alzate-laterali":{id:"alzate-laterali",name:"Alzate laterali",note:"Manubri",sets:[{kg:4,reps:10},{kg:4,reps:10},{kg:4,reps:10}]},
+      "tricipiti":{id:"tricipiti",name:"Tricipiti",note:"Esercizio corrente",sets:[{kg:5,reps:10},{kg:5,reps:10}]},
+      "bicipiti":{id:"bicipiti",name:"Bicipiti",note:"Esercizio corrente",sets:[{kg:7,reps:12},{kg:7,reps:12}]},
+      "bulgarian-split-squat":{id:"bulgarian-split-squat",name:"Bulgarian split squat",note:"Carico totale",sets:[{kg:6,reps:12},{kg:6,reps:12},{kg:6,reps:12}]},
+      "stacco-rumeno":{id:"stacco-rumeno",name:"Stacco rumeno",note:"Femorali e glutei",sets:[{kg:8,reps:10},{kg:8,reps:10},{kg:8,reps:10}]},
+      "back-extension":{id:"back-extension",name:"Back extension",note:"Iperestensioni lombari",sets:[{kg:0,reps:12},{kg:0,reps:12},{kg:0,reps:12}]},
+      "polpacci":{id:"polpacci",name:"Polpacci",note:"Calf raise",sets:[{kg:0,reps:15},{kg:0,reps:15},{kg:0,reps:15}]},
+      "addominali":{id:"addominali",name:"Addominali",note:"Prima casella: secondi esercizio · seconda casella: secondi recupero",userNote:"3 serie da 35 secondi con 30 secondi di recupero",sets:[{kg:35,reps:30},{kg:35,reps:30},{kg:35,reps:30}]}
+    };
+    let session=null,userId="",activeDay="upper",workouts=[],exercises=[],sets=[],draft=[];
+    function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
+    function vol(ex){return (ex.sets||[]).reduce((s,x)=>s+num(x.kg)*num(x.reps),0)}
+    function workoutVolume(w){return getExercises(w.id).reduce((s,e)=>s+vol(e),0)}
+    function getExercises(workoutId){return exercises.filter(e=>e.workout_id===workoutId).sort((a,b)=>num(a.sort_order)-num(b.sort_order)).map(e=>({...e,sets:sets.filter(s=>s.exercise_row_id===e.id).sort((a,b)=>num(a.sort_order)-num(b.sort_order))}))}
+    function findWorkout(date,day){return workouts.filter(w=>w.date===date&&(w.workout_day||"full")===day).sort((a,b)=>String(b.updated_at||"").localeCompare(String(a.updated_at||"")))[0]||null}
+    function latestExercise(id){for(const w of [...workouts].sort((a,b)=>String(b.date).localeCompare(String(a.date)))){const found=getExercises(w.id).find(e=>e.exercise_id===id);if(found)return {...found,id:found.exercise_id,name:found.name,note:found.note||"",user_note:found.user_note||"",sets:found.sets.map(s=>({kg:num(s.kg),reps:num(s.reps)}))}} const d=defaults[id];return {...d,user_note:d.userNote||"",sets:d.sets.map(s=>({...s}))}}
+    function buildDraft(){const date=$("dateInput").value||today(); const w=findWorkout(date,activeDay); if(w){draft=getExercises(w.id).map(e=>({id:e.exercise_id,name:e.name,note:e.note||"",user_note:e.user_note||"",sets:e.sets.map(s=>({kg:num(s.kg),reps:num(s.reps)}))}));}else{const ids=activeDay==="full"?[...splits.upper,...splits.lower]:splits[activeDay]; draft=ids.map(latestExercise)} render();}
+    function render(){document.querySelectorAll("[data-day]").forEach(b=>b.classList.toggle("active",b.dataset.day===activeDay)); $("modeHint").textContent=activeDay==="full"?"Archivio storico dei vecchi workout completi. Salva qui solo se vuoi mantenere un workout non diviso.":`Workout ${activeDay}: salvataggio indipendente, senza toccare altre sezioni.`; $("exerciseList").innerHTML=draft.map((ex,i)=>exerciseHtml(ex,i)).join(""); renderSummary(); renderHistory();}
+    function exerciseHtml(ex,i){return `<div class="exercise" data-ex="${i}"><h3>${safe(ex.name)}</h3><p class="note">${safe(ex.note||"")} · volume ${fmt(vol(ex))}</p><div class="sets">${(ex.sets||[]).map((s,j)=>`<div class="setrow"><span>${j+1}</span><input data-kg="${i}:${j}" inputmode="decimal" value="${safe(s.kg)}" placeholder="kg/sec"><input data-reps="${i}:${j}" inputmode="decimal" value="${safe(s.reps)}" placeholder="reps/rec"><button class="btn danger" data-delset="${i}:${j}">×</button></div>`).join("")}</div><div class="row" style="margin-top:10px"><button class="btn" data-addset="${i}">+ serie</button></div><div class="field" style="margin-top:10px"><label>Note esercizio</label><textarea data-note="${i}">${safe(ex.user_note||"")}</textarea></div></div>`}
+    function renderSummary(){const total=draft.reduce((s,e)=>s+vol(e),0);$("summary").innerHTML=`<p><span class="chip">${draft.length} esercizi</span> <span class="chip">volume ${fmt(total)}</span></p>`}
+    function renderHistory(){const list=workouts.filter(w=>(w.workout_day||"full")===activeDay).sort((a,b)=>String(b.date).localeCompare(String(a.date)));$("history").innerHTML=list.length?list.map(w=>`<div class="history-item"><div class="history-title"><strong>${safe(w.date)} · ${safe(activeDay)}</strong><button class="btn" data-open="${safe(w.date)}">Apri</button></div><div class="small">${getExercises(w.id).length} esercizi · volume ${fmt(workoutVolume(w))}</div></div>`).join(""):`<p class="small">Nessun workout ${safe(activeDay)} salvato.</p>`}
+    async function loadCloud(){const auth=await client.auth.getSession();session=auth.data.session;if(!session){$("authBox").innerHTML="Non risulti collegato a Supabase. Apri prima la Life Tracker e fai login da Dati → Cloud Supabase.";return}userId=session.user.id;$("authBox").classList.add("hidden");$("app").classList.remove("hidden");const [w,e,s]=await Promise.all([client.from("workouts").select("*").eq("user_id",userId).order("date",{ascending:false}),client.from("workout_exercises").select("*").eq("user_id",userId),client.from("workout_sets").select("*").eq("user_id",userId)]);if(w.error||e.error||s.error){toast("Errore lettura cloud");console.error(w.error,e.error,s.error);return}workouts=w.data||[];exercises=e.data||[];sets=s.data||[];$("dateInput").value=today();buildDraft();toast("Workout caricati")}
+    async function saveWorkout(){if(activeDay==="full"&&!confirm("Salvare un workout completo non diviso?"))return; const date=$("dateInput").value||today(); const old=findWorkout(date,activeDay); const workoutId=old?.id||`workout-${date}-${activeDay}`; const oldExercises=old?getExercises(old.id):[]; if(oldExercises.length){const oldIds=oldExercises.map(e=>e.id); await client.from("workout_sets").delete().eq("user_id",userId).in("exercise_row_id",oldIds); await client.from("workout_exercises").delete().eq("user_id",userId).eq("workout_id",workoutId)} const up=await client.from("workouts").upsert({user_id:userId,id:workoutId,date,workout_day:activeDay,updated_at:new Date().toISOString()},{onConflict:"user_id,id"}); if(up.error){toast("Errore salvataggio workout");console.error(up.error);return} const exRows=[]; const setRows=[]; draft.forEach((ex,i)=>{const exRowId=`${workoutId}-${ex.id}`; exRows.push({user_id:userId,id:exRowId,workout_id:workoutId,exercise_id:ex.id,name:ex.name,note:ex.note||"",user_note:ex.user_note||"",sort_order:i,updated_at:new Date().toISOString()}); (ex.sets||[]).forEach((set,j)=>setRows.push({user_id:userId,id:`${exRowId}-set-${j}`,exercise_row_id:exRowId,kg:num(set.kg),reps:num(set.reps),sort_order:j,updated_at:new Date().toISOString()}))}); const ie=await client.from("workout_exercises").insert(exRows); if(ie.error){toast("Errore esercizi");console.error(ie.error);return} if(setRows.length){const is=await client.from("workout_sets").insert(setRows); if(is.error){toast("Errore serie");console.error(is.error);return}} await loadCloud(); activeDay=activeDay; $("dateInput").value=date; toast("Workout salvato")}
+    document.addEventListener("input",e=>{const kg=e.target.dataset.kg;const reps=e.target.dataset.reps;const note=e.target.dataset.note;if(kg){const [i,j]=kg.split(":").map(Number);draft[i].sets[j].kg=e.target.value;renderSummary()} if(reps){const [i,j]=reps.split(":").map(Number);draft[i].sets[j].reps=e.target.value;renderSummary()} if(note){draft[Number(note)].user_note=e.target.value}});
+    document.addEventListener("click",e=>{const day=e.target.dataset.day;if(day){activeDay=day;buildDraft();return} const add=e.target.dataset.addset;if(add!=null){draft[Number(add)].sets.push({kg:0,reps:10});render();return} const del=e.target.dataset.delset;if(del){const [i,j]=del.split(":").map(Number);draft[i].sets.splice(j,1);render();return} const open=e.target.dataset.open;if(open){$("dateInput").value=open;buildDraft();return}});
+    $("dateInput").addEventListener("change",buildDraft);$("saveBtn").addEventListener("click",saveWorkout);$("saveBtn2").addEventListener("click",saveWorkout);$("reloadBtn").addEventListener("click",loadCloud);loadCloud();
+  </script>
+</body>
+</html>
