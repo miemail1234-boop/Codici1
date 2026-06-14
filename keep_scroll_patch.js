@@ -43,6 +43,15 @@
     restoreLoop();
   }
 
+  function refreshWorkoutSplit() {
+    try {
+      const panel = document.getElementById("screen-workout");
+      if (panel?.classList.contains("active") && typeof renderWorkout === "function") {
+        renderWorkout();
+      }
+    } catch {}
+  }
+
   document.addEventListener("pointerdown", event => {
     if (!isActionControl(event.target)) return;
     captureScroll();
@@ -50,6 +59,10 @@
   }, true);
 
   document.addEventListener("click", event => {
+    if (event.target?.closest?.('[data-screen="workout"], [data-jump="workout"]')) {
+      window.setTimeout(refreshWorkoutSplit, 80);
+      window.setTimeout(refreshWorkoutSplit, 250);
+    }
     if (!isActionControl(event.target)) return;
     if (!saved) captureScroll();
     preserveScroll();
