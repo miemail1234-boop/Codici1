@@ -29,6 +29,37 @@
   const safe = value => String(value ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]));
   let patching = false;
 
+  function ensureChartTooltip() {
+    if (!document.getElementById("assetChartTooltipStyles")) {
+      const style = document.createElement("style");
+      style.id = "assetChartTooltipStyles";
+      style.textContent = `.asset-chart-tooltip{position:fixed;z-index:9999;pointer-events:none;background:#06131d;color:#eef6ff;border:1px solid var(--border);border-radius:12px;padding:8px 10px;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:0;transform:translate(-50%,-115%);transition:opacity .08s}.asset-chart-tooltip.show{opacity:1}.chart-hit{cursor:pointer}.chart-hit:focus-visible+.chart-dot,.chart-hit:hover+.chart-dot{filter:drop-shadow(0 0 5px currentColor)}`;
+      document.head.appendChild(style);
+    }
+    let tip = document.getElementById("assetChartTooltip");
+    if (!tip) {
+      tip = document.createElement("div");
+      tip.id = "assetChartTooltip";
+      tip.className = "asset-chart-tooltip";
+      document.body.appendChild(tip);
+    }
+    return tip;
+  }
+
+  function moveChartTooltip(event) {
+    const tip = ensureChartTooltip();
+    const point = event.target.closest?.("[data-chart-tooltip]");
+    if (!point) return;
+    tip.innerHTML = point.dataset.chartTooltip || "";
+    tip.style.left = `${event.clientX}px`;
+    tip.style.top = `${event.clientY - 10}px`;
+    tip.classList.add("show");
+  }
+
+  function hideChartTooltip() {
+    document.getElementById("assetChartTooltip")?.classList.remove("show");
+  }
+
   function blockName(blocks, id) {
     return blocks.find(block => block.id === id)?.name || blocks.find(block => block.id === id)?.title || "Altro";
   }
@@ -130,11 +161,12 @@
     const min = Math.min(...rows.map(row => row.value));
     const max = Math.max(...rows.map(row => row.value));
     const span = Math.max(1, max - min);
-    const points = rows.map((row, index) => {
+    const coords = rows.map((row, index) => {
       const x = pad + (rows.length === 1 ? 0 : index * (w - pad * 2) / (rows.length - 1));
       const y = h - pad - ((row.value - min) / span) * (h - pad * 2);
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    }).join(" ");
+      return { row, x: x.toFixed(1), y: y.toFixed(1) };
+    });
+    const points = coords.map(point => `${point.x},${point.y}`).join(" ");
     const first = rows[0];
     const last = rows[rows.length - 1];
     const delta = last.value - first.value;
@@ -142,9 +174,9 @@
       <div class="history-title"><strong>Andamento valore asset</strong><span class="small ${delta >= 0 ? "pos" : "neg"}">${delta >= 0 ? "+" : ""}${eur(delta)}</span></div>
       <svg viewBox="0 0 ${w} ${h}" width="100%" height="120" role="img" aria-label="Andamento valore ${safe(asset.name)}">
         <polyline points="${points}" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
-        ${rows.map((row, index) => {
-          const [x, y] = points.split(" ")[index].split(",");
-          return `<circle cx="${x}" cy="${y}" r="3.5" fill="currentColor"><title>${safe(row.date)} · ${eur(row.value)}</title></circle>`;
+        ${coords.map(({ row, x, y }) => {
+          const tooltip = `${safe(row.date)}<br>${eur(row.value)}`;
+          return `<g data-chart-tooltip="${tooltip}" tabindex="0"><circle class="chart-hit" cx="${x}" cy="${y}" r="10" fill="transparent"></circle><circle class="chart-dot" cx="${x}" cy="${y}" r="3.8" fill="currentColor"></circle><title>${safe(row.date)} · ${eur(row.value)}</title></g>`;
         }).join("")}
       </svg>
       <div class="history-title small"><span>${safe(first.date.slice(5))} · ${eur(first.value)}</span><span>${safe(last.date.slice(5))} · ${eur(last.value)}</span></div>
@@ -211,6 +243,7 @@
     if (patching) return;
     patching = true;
     try {
+      ensureChartTooltip();
       const rows = await loadRows();
       if (!rows) return;
       const positions = rows.assets.map(asset => computePosition(asset, rows.trades, rows.entries));
@@ -241,6 +274,26 @@
     }
   }
 
+  document.addEventListener("pointerover", event => {
+    if (event.target.closest?.("[data-chart-tooltip]")) moveChartTooltip(event);
+  }, true);
+  document.addEventListener("pointermove", event => {
+    if (event.target.closest?.("[data-chart-tooltip]")) moveChartTooltip(event);
+  }, true);
+  document.addEventListener("pointerout", event => {
+    if (event.target.closest?.("[data-chart-tooltip]")) hideChartTooltip();
+  }, true);
+  document.addEventListener("focusin", event => {
+    const point = event.target.closest?.("[data-chart-tooltip]");
+    if (!point) return;
+    const rect = point.getBoundingClientRect();
+    const tip = ensureChartTooltip();
+    tip.innerHTML = point.dataset.chartTooltip || "";
+    tip.style.left = `${rect.left + rect.width / 2}px`;
+    tip.style.top = `${rect.top - 8}px`;
+    tip.classList.add("show");
+  }, true);
+  document.addEventListener("focusout", hideChartTooltip, true);
   document.addEventListener("input", e => {
     if (e.target.matches("[data-metric-check]")) setTimeout(applyCoherence, 0);
   }, true);
