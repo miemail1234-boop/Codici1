@@ -33,7 +33,7 @@
     panel = document.createElement("section");
     panel.className = "panel";
     panel.id = "overviewChartPanel";
-    panel.innerHTML = `<h2>Andamento generale</h2><p class="small">Linee normalizzate base 100 dal valore di acquisto. La linea media è la media semplice degli asset selezionati.</p><div class="overview-chart-actions"><button class="btn" type="button" id="overviewSelectAll">Tutti</button><button class="btn" type="button" id="overviewSelectNone">Nessuno</button><button class="btn" type="button" id="overviewOnlyAverage">Solo media</button></div><div class="overview-chart-controls" id="overviewAssetControls"></div><div id="overviewChart"></div>`;
+    panel.innerHTML = `<h2>Andamento generale</h2><p class="small">Linee normalizzate base 100 dal valore di acquisto. Puoi mostrare la media da sola oppure insieme agli asset selezionati.</p><div class="overview-chart-actions"><button class="btn" type="button" id="overviewSelectAll">Tutti</button><button class="btn" type="button" id="overviewSelectNone">Nessuno</button><button class="btn" type="button" id="overviewOnlyAverage">Solo media</button></div><div class="overview-chart-controls" id="overviewAssetControls"></div><div id="overviewChart"></div>`;
     dashboard.insertAdjacentElement("afterend", panel);
     return panel;
   }
@@ -89,20 +89,32 @@
     return [...byDate.values()].sort((a, b) => String(a.date).localeCompare(String(b.date)));
   }
 
+  function availableHistories() {
+    return allAssets
+      .map(asset => ({ asset, rows: rawHistory(asset) }))
+      .filter(item => item.rows.length > 0)
+      .sort((a, b) => a.asset.name.localeCompare(b.asset.name));
+  }
+
   function selectedAssetIds() {
     return [...document.querySelectorAll("#overviewAssetControls input[data-overview-asset]:checked")].map(input => input.value);
+  }
+
+  function showAverageLine() {
+    return Boolean(document.getElementById("overviewAverageLine")?.checked);
   }
 
   function renderControls() {
     const holder = document.getElementById("overviewAssetControls");
     if (!holder) return;
     const existing = new Set(selectedAssetIds());
-    const hasExisting = existing.size > 0;
-    holder.innerHTML = allAssets
-      .filter(asset => rawHistory(asset).length > 0)
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map(asset => `<label class="check"><input type="checkbox" data-overview-asset value="${safe(asset.id)}" ${!hasExisting || existing.has(asset.id) ? "checked" : ""}> ${safe(asset.name)}</label>`)
+    const averageAlreadyExists = Boolean(document.getElementById("overviewAverageLine"));
+    const averageChecked = averageAlreadyExists ? showAverageLine() : true;
+    const hasExistingAssets = existing.size > 0;
+    const assetControls = availableHistories()
+      .map(({ asset }) => `<label class="check"><input type="checkbox" data-overview-asset value="${safe(asset.id)}" ${!hasExistingAssets || existing.has(asset.id) ? "checked" : ""}> ${safe(asset.name)}</label>`)
       .join("");
+    holder.innerHTML = `<label class="check"><input type="checkbox" id="overviewAverageLine" ${averageChecked ? "checked" : ""}> Media</label>${assetControls}`;
   }
 
   function unionDates(histories) {
@@ -126,22 +138,30 @@
   function renderChart() {
     const holder = document.getElementById("overviewChart");
     if (!holder) return;
+    const allHistories = availableHistories();
     const ids = new Set(selectedAssetIds());
-    const selected = allAssets.filter(asset => ids.has(asset.id));
-    const histories = selected.map(asset => ({ asset, rows: rawHistory(asset) })).filter(item => item.rows.length > 0);
-    if (!histories.length) {
-      holder.innerHTML = `<p class="small">Seleziona almeno un asset per visualizzare il grafico.</p>`;
+    const assetHistories = allHistories.filter(item => ids.has(item.asset.id));
+    const averageEnabled = showAverageLine();
+    const averageSourceHistories = assetHistories.length ? assetHistories : allHistories;
+    const dateSources = [...assetHistories, ...(averageEnabled ? averageSourceHistories : [])];
+
+    if (!assetHistories.length && !averageEnabled) {
+      holder.innerHTML = `<p class="small">Seleziona almeno la media o un asset per visualizzare il grafico.</p>`;
+      return;
+    }
+    if (!dateSources.length) {
+      holder.innerHTML = `<p class="small">Nessun dato storico disponibile.</p>`;
       return;
     }
 
-    const dates = unionDates(histories);
-    const allIndexes = histories.flatMap(item => item.rows.map(row => row.index));
-    const average = dates.map(date => {
-      const values = histories.map(item => valueAtOrBefore(item.rows, date)?.index).filter(value => Number.isFinite(value));
+    const dates = unionDates(dateSources);
+    const average = averageEnabled ? dates.map(date => {
+      const values = averageSourceHistories.map(item => valueAtOrBefore(item.rows, date)?.index).filter(value => Number.isFinite(value));
       return { date, index: values.reduce((sum, value) => sum + value, 0) / values.length };
-    }).filter(row => Number.isFinite(row.index));
-    allIndexes.push(...average.map(row => row.index));
+    }).filter(row => Number.isFinite(row.index)) : [];
 
+    const allIndexes = assetHistories.flatMap(item => item.rows.map(row => row.index));
+    allIndexes.push(...average.map(row => row.index));
     const min = Math.min(...allIndexes, 100);
     const max = Math.max(...allIndexes, 100);
     const span = Math.max(1, max - min);
@@ -155,13 +175,14 @@
     const yForIndex = value => h - padB - ((value - min) / span) * (h - padT - padB);
 
     const avgPoints = average.map(row => ({ ...row, x: xForDate(row.date), y: yForIndex(row.index) }));
-    const assetPaths = histories.map(item => {
+    const assetPaths = assetHistories.map(item => {
       const points = item.rows.map(row => ({ ...row, x: xForDate(row.date), y: yForIndex(row.index) }));
       return { ...item, points };
     });
 
     const yTicks = [min, min + span * .25, min + span * .5, min + span * .75, max];
     const dateTicks = dates.filter((_, i) => i === 0 || i === dates.length - 1 || i % Math.ceil(dates.length / 8) === 0);
+    const footerRight = averageEnabled && average.length ? `Media: ${pct(average[average.length - 1].index - 100)}` : `${assetHistories.length} asset selezionati`;
 
     holder.innerHTML = `<div class="overview-chart-wrap">
       <svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="Andamento generale asset selezionati">
@@ -169,11 +190,11 @@
         ${dateTicks.map(date => `<text x="${xForDate(date).toFixed(1)}" y="${h - 8}" fill="currentColor" opacity=".65" font-size="10" text-anchor="middle">${safe(String(date).slice(5))}</text>`).join("")}
         <line x1="${padL}" x2="${w - padR}" y1="${yForIndex(100).toFixed(1)}" y2="${yForIndex(100).toFixed(1)}" stroke="rgba(255,255,255,.32)" stroke-dasharray="5 5"></line>
         ${assetPaths.map(item => `<path d="${pathFor(item.points)}" fill="none" stroke="currentColor" stroke-width="1.7" opacity=".46" stroke-linecap="round" stroke-linejoin="round"></path><path class="overview-line-hit" d="${pathFor(item.points)}" data-overview-tip="${safe(item.asset.name)}"></path>`).join("")}
-        <path d="${pathFor(avgPoints)}" fill="none" stroke="currentColor" stroke-width="4" opacity=".98" stroke-linecap="round" stroke-linejoin="round"></path>
+        ${avgPoints.length ? `<path d="${pathFor(avgPoints)}" fill="none" stroke="currentColor" stroke-width="4" opacity=".98" stroke-linecap="round" stroke-linejoin="round"></path>` : ""}
         ${avgPoints.map(point => `<circle class="overview-point" cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="4" fill="currentColor" data-overview-tip="Media<br>${safe(point.date)}<br>${pct(point.index - 100)}"></circle>`).join("")}
         ${assetPaths.map(item => item.points.map(point => `<circle class="overview-point" cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="3" fill="currentColor" opacity=".55" data-overview-tip="${safe(item.asset.name)}<br>${safe(point.date)}<br>${safe(point.label)}<br>${pct(point.index - 100)}"></circle>`).join("")).join("")}
       </svg>
-      <div class="history-title small"><span>Base 100 = valore di acquisto</span><span>Media selezionati: ${pct(average[average.length - 1].index - 100)}</span></div>
+      <div class="history-title small"><span>Base 100 = valore di acquisto</span><span>${footerRight}</span></div>
     </div>`;
   }
 
@@ -204,19 +225,21 @@
   }
 
   document.addEventListener("change", event => {
-    if (event.target.matches?.("#overviewAssetControls input[data-overview-asset]")) renderChart();
+    if (event.target.matches?.("#overviewAssetControls input")) renderChart();
   }, true);
   document.addEventListener("click", event => {
     if (event.target.closest?.("#overviewSelectAll")) {
-      document.querySelectorAll("#overviewAssetControls input[data-overview-asset]").forEach(input => input.checked = true);
+      document.querySelectorAll("#overviewAssetControls input").forEach(input => input.checked = true);
       renderChart();
     }
     if (event.target.closest?.("#overviewSelectNone")) {
-      document.querySelectorAll("#overviewAssetControls input[data-overview-asset]").forEach(input => input.checked = false);
+      document.querySelectorAll("#overviewAssetControls input").forEach(input => input.checked = false);
       renderChart();
     }
     if (event.target.closest?.("#overviewOnlyAverage")) {
-      document.querySelectorAll("#overviewAssetControls input[data-overview-asset]").forEach(input => input.checked = true);
+      document.querySelectorAll("#overviewAssetControls input[data-overview-asset]").forEach(input => input.checked = false);
+      const average = document.getElementById("overviewAverageLine");
+      if (average) average.checked = true;
       renderChart();
     }
     if (event.target.closest?.("#reloadBtn,[data-metric-preset]")) setTimeout(initOverviewChart, 1600);
