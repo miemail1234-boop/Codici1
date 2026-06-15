@@ -29,10 +29,6 @@
   const safe = value => String(value ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]));
   let patching = false;
 
-  function assetName(assets, id) {
-    return assets.find(asset => asset.id === id)?.name || id;
-  }
-
   function blockName(blocks, id) {
     return blocks.find(block => block.id === id)?.name || blocks.find(block => block.id === id)?.title || "Altro";
   }
@@ -115,10 +111,50 @@
     $("dashboard").innerHTML = metricCards(totals).filter(card => visible.has(card.key)).map(card => `<div class="card"><h3>${safe(card.title)}</h3><div class="value">${card.value}</div><div class="small">${safe(card.hint)}</div></div>`).join("");
   }
 
-  function renderPositions(totals, blocks) {
+  function assetHistory(asset, entries, currentValue) {
+    const byDate = new Map();
+    entries
+      .filter(entry => entry.generic_option === asset.block_id && n(entry.current_value) > 0 && entry.date)
+      .sort((a, b) => String(a.date).localeCompare(String(b.date)) || n(a.created_at_ms) - n(b.created_at_ms))
+      .forEach(entry => byDate.set(entry.date, n(entry.current_value)));
+    if (currentValue > 0) byDate.set("2026-06-15", currentValue);
+    return [...byDate.entries()].sort((a, b) => String(a[0]).localeCompare(String(b[0]))).map(([date, value]) => ({ date, value })).slice(-12);
+  }
+
+  function lineChartHtml(asset, entries, currentValue) {
+    const rows = assetHistory(asset, entries, currentValue);
+    if (rows.length < 2) return `<p class="small">Grafico valore: servono almeno due aggiornamenti prezzo.</p>`;
+    const w = 520;
+    const h = 120;
+    const pad = 12;
+    const min = Math.min(...rows.map(row => row.value));
+    const max = Math.max(...rows.map(row => row.value));
+    const span = Math.max(1, max - min);
+    const points = rows.map((row, index) => {
+      const x = pad + (rows.length === 1 ? 0 : index * (w - pad * 2) / (rows.length - 1));
+      const y = h - pad - ((row.value - min) / span) * (h - pad * 2);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(" ");
+    const first = rows[0];
+    const last = rows[rows.length - 1];
+    const delta = last.value - first.value;
+    return `<div class="asset-line-chart" style="margin-top:12px;border:1px solid var(--border);border-radius:14px;padding:10px;background:rgba(0,0,0,.12)">
+      <div class="history-title"><strong>Andamento valore asset</strong><span class="small ${delta >= 0 ? "pos" : "neg"}">${delta >= 0 ? "+" : ""}${eur(delta)}</span></div>
+      <svg viewBox="0 0 ${w} ${h}" width="100%" height="120" role="img" aria-label="Andamento valore ${safe(asset.name)}">
+        <polyline points="${points}" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+        ${rows.map((row, index) => {
+          const [x, y] = points.split(" ")[index].split(",");
+          return `<circle cx="${x}" cy="${y}" r="3.5" fill="currentColor"><title>${safe(row.date)} · ${eur(row.value)}</title></circle>`;
+        }).join("")}
+      </svg>
+      <div class="history-title small"><span>${safe(first.date.slice(5))} · ${eur(first.value)}</span><span>${safe(last.date.slice(5))} · ${eur(last.value)}</span></div>
+    </div>`;
+  }
+
+  function renderPositions(totals, blocks, entries) {
     $("positions").innerHTML = totals.openPositions.sort((a, b) => b.marketValue - a.marketValue).map(pos => {
       const allocation = totals.marketValue > 0 ? pos.marketValue / totals.marketValue * 100 : 0;
-      return `<div class="asset"><div class="asset-head"><div><h3>${safe(pos.asset.name)}</h3><p class="small">Altro · Altro · ${safe(blockName(blocks, pos.asset.block_id))} · valori screenshot Trade Republic</p></div><div class="actions"><button class="btn" data-sellall="${safe(pos.asset.id)}">Vendi tutto</button></div></div><div class="metrics"><span class="pill">Quantità ${fmt4(pos.openQty)}</span><span class="pill">Costo medio ${eur(pos.avgCost)}</span><span class="pill">Valore aperto ${eur(pos.marketValue)}</span><span class="pill ${pos.unrealizedGain >= 0 ? "pos" : "neg"}">Guadagno ${eur(pos.unrealizedGain)}</span></div><p class="small">Realizzato ${eur(pos.realizedGain)} · aperto ${eur(pos.unrealizedGain)} · costo residuo ${eur(pos.openCost)} · allocazione ${pct(allocation)}</p></div>`;
+      return `<div class="asset"><div class="asset-head"><div><h3>${safe(pos.asset.name)}</h3><p class="small">Altro · Altro · ${safe(blockName(blocks, pos.asset.block_id))} · valori screenshot Trade Republic</p></div><div class="actions"><button class="btn" data-sellall="${safe(pos.asset.id)}">Vendi tutto</button></div></div><div class="metrics"><span class="pill">Quantità ${fmt4(pos.openQty)}</span><span class="pill">Costo medio ${eur(pos.avgCost)}</span><span class="pill">Valore aperto ${eur(pos.marketValue)}</span><span class="pill ${pos.unrealizedGain >= 0 ? "pos" : "neg"}">Guadagno ${eur(pos.unrealizedGain)}</span></div><p class="small">Realizzato ${eur(pos.realizedGain)} · aperto ${eur(pos.unrealizedGain)} · costo residuo ${eur(pos.openCost)} · allocazione ${pct(allocation)}</p>${lineChartHtml(pos.asset, entries, pos.marketValue)}</div>`;
     }).join("");
   }
 
@@ -143,6 +179,16 @@
     });
     rows.push(`<div class="asset"><h3>Cash non investito</h3><div class="metrics"><span class="pill">Overnight + saldo ${eur(totals.cashNonInvested)}</span><span class="pill">Altcoin escluse</span></div></div>`);
     $("blocks").innerHTML = rows.join("");
+  }
+
+  function renderPriceUpdates(entries) {
+    const panel = $("entryLog")?.closest(".panel");
+    const title = panel?.querySelector("h2");
+    if (title) title.textContent = "Aggiornamenti prezzo";
+    const holder = $("entryLog");
+    if (!holder) return;
+    const rows = entries.slice().filter(row => n(row.current_value) > 0).sort((a, b) => String(b.date).localeCompare(String(a.date)) || n(b.created_at_ms) - n(a.created_at_ms)).slice(0, 80);
+    holder.innerHTML = rows.length ? rows.map(row => `<div class="log-item"><strong>${safe(row.date)} · ${safe(row.characteristic || "Aggiornamento prezzo")}</strong><div class="small">valore ${eur(row.current_value)}${n(row.current_price) ? ` · prezzo ${eur(row.current_price)}` : ""}${n(row.number_value) ? ` · quantità ${fmt4(row.number_value)}` : ""}</div>${row.text_value ? `<p class="small">${safe(row.text_value)}</p>` : ""}</div>`).join("") : `<p class="small">Nessun aggiornamento prezzo.</p>`;
   }
 
   async function loadRows() {
@@ -186,9 +232,10 @@
       totals.annualGross = grossReturn * 12 / 13;
       totals.annualNet = netReturn * 12 / 13;
       renderDashboard(totals);
-      renderPositions(totals, rows.blocks);
+      renderPositions(totals, rows.blocks, rows.entries);
       renderAllocation(totals);
       renderBlocks(totals, rows.blocks, rows.assets, positions);
+      renderPriceUpdates(rows.entries);
     } finally {
       patching = false;
     }
