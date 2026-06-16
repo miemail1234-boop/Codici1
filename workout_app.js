@@ -81,6 +81,10 @@
     return Math.max(...exercise.sets.map(set => exercise.id === "addominali" ? num(set.kg) : num(set.kg)));
   }
 
+  function setCount(exercise) {
+    return Array.isArray(exercise?.sets) ? exercise.sets.length : 0;
+  }
+
   function getExercises(workoutId) {
     return exercises
       .filter(exercise => exercise.workout_id === workoutId)
@@ -170,38 +174,88 @@
       .map(workout => {
         const exercise = getExercises(workout.id).find(item => item.id === exerciseId);
         if (!exercise) return null;
-        return { date: workout.date, volume: setVolume(exercise), load: maxLoad(exercise) };
+        return { date: workout.date, volume: setVolume(exercise), load: maxLoad(exercise), setCount: setCount(exercise) };
       })
       .filter(Boolean);
     const currentDate = $("dateInput")?.value || today();
     if (previewExercise) {
-      const preview = { date: currentDate, volume: setVolume(previewExercise), load: maxLoad(previewExercise), preview: true };
+      const preview = { date: currentDate, volume: setVolume(previewExercise), load: maxLoad(previewExercise), setCount: setCount(previewExercise), preview: true };
       const existingIndex = rows.findIndex(row => row.date === currentDate);
       if (existingIndex >= 0) rows[existingIndex] = preview;
       else rows.push(preview);
     }
-    return rows.sort((a, b) => String(a.date).localeCompare(String(b.date))).slice(-8);
+    return rows.sort((a, b) => String(a.date).localeCompare(String(b.date)));
   }
 
-  function trendInfo(rows) {
-    if (rows.length < 2) return { symbol: "·", label: "Dati insufficienti", className: "" };
-    const previous = rows[rows.length - 2];
-    const latest = rows[rows.length - 1];
+  function trendInfo(rows, index = rows.length - 1) {
+    if (rows.length < 2 || index <= 0) return { symbol: "·", label: "Dati insufficienti", className: "" };
+    const previous = rows[index - 1];
+    const latest = rows[index];
     const tolerance = Math.max(1, Math.abs(previous.volume) * 0.01);
-    if (latest.volume > previous.volume + tolerance) return { symbol: "↗", label: "Migliora", className: "good" };
-    if (latest.volume < previous.volume - tolerance) return { symbol: "↘", label: "Peggiora", className: "bad" };
-    return { symbol: "→", label: "Stasi", className: "flat" };
+    if (latest.volume > previous.volume + tolerance) return { symbol: "↗", label: "Migliora", className: "good", color: "var(--ok)" };
+    if (latest.volume < previous.volume - tolerance) return { symbol: "↘", label: "Peggiora", className: "bad", color: "var(--danger)" };
+    return { symbol: "→", label: "Stasi", className: "warn", color: "var(--warn)" };
+  }
+
+  function progressionInfo(rows, index) {
+    if (rows.length < 2 || index <= 0) return false;
+    const previous = rows[index - 1];
+    const latest = rows[index];
+    return num(latest.load) > num(previous.load) || num(latest.setCount) > num(previous.setCount);
   }
 
   function chartHtml(exerciseId, previewExercise = null) {
     const rows = historyForExercise(exerciseId, previewExercise);
     if (rows.length < 2) return `<div class="chart-title">Andamento</div><p class="small">Servono almeno due salvataggi per il grafico.</p>`;
-    const max = Math.max(...rows.map(row => row.volume), 1);
-    const trend = trendInfo(rows);
-    const loadIncreased = rows.length >= 2 && rows[rows.length - 1].load > rows[rows.length - 2].load;
-    return `<div class="chart-title">Andamento volume <span class="trend ${trend.className}">${trend.symbol} ${trend.label}</span>${loadIncreased ? `<span class="trend warn">! carico/tempo aumentato</span>` : ""}</div>
-      <div class="spark">${rows.map(row => `<div class="bar-wrap"><div class="bar ${row.preview ? "preview" : ""}" style="height:${Math.max(8, Math.round((row.volume / max) * 78))}px"></div><small>${safe(row.date.slice(5))}</small></div>`).join("")}</div>
-      <div class="legend">↗ Migliora · → Stasi · ↘ Peggiora · ! carico/tempo aumentato</div>`;
+
+    const width = Math.max(330, 52 + (rows.length - 1) * 58);
+    const height = 132;
+    const padX = 26;
+    const top = 14;
+    const chartHeight = 82;
+    const volumes = rows.map(row => num(row.volume));
+    const min = Math.min(...volumes);
+    const max = Math.max(...volumes);
+    const range = max - min || 1;
+    const xFor = index => padX + index * ((width - padX * 2) / (rows.length - 1));
+    const yFor = volume => top + ((max - volume) / range) * chartHeight;
+    const points = rows.map((row, index) => {
+      const trend = trendInfo(rows, index);
+      return {
+        row,
+        index,
+        x: Math.round(xFor(index) * 10) / 10,
+        y: Math.round(yFor(num(row.volume)) * 10) / 10,
+        trend,
+        progression: progressionInfo(rows, index),
+      };
+    });
+    const latestTrend = trendInfo(rows);
+    const latestProgression = progressionInfo(rows, rows.length - 1);
+    const labelStep = Math.max(1, Math.ceil(rows.length / 7));
+    const segments = points.slice(1).map(point => {
+      const previous = points[point.index - 1];
+      const dash = point.row.preview ? ` stroke-dasharray="5 5"` : "";
+      return `<line x1="${previous.x}" y1="${previous.y}" x2="${point.x}" y2="${point.y}" stroke="${point.trend.color || "var(--accent)"}" stroke-width="3.5" stroke-linecap="round"${dash}></line>`;
+    }).join("");
+    const markers = points.map(point => {
+      const showDate = rows.length <= 10 || point.index === 0 || point.index === rows.length - 1 || point.index % labelStep === 0;
+      const title = `${point.row.date}: ${fmt(point.row.volume)} · ${point.trend.label}${point.progression ? " · aumento serie/carico" : ""}`;
+      return `<g><title>${safe(title)}</title><circle cx="${point.x}" cy="${point.y}" r="5" fill="${point.trend.color || "var(--accent)"}" stroke="#0b141d" stroke-width="${point.row.preview ? 3 : 2}"></circle></g>
+        ${point.progression ? `<text x="${point.x}" y="${Math.max(12, point.y - 9)}" fill="var(--warn)" font-size="17" font-weight="800" text-anchor="middle">!</text>` : ""}
+        ${showDate ? `<text x="${point.x}" y="${height - 10}" fill="var(--muted)" font-size="10" text-anchor="middle">${safe(point.row.date.slice(5))}</text>` : ""}`;
+    }).join("");
+
+    return `<div class="chart-title">Andamento volume <span class="trend ${latestTrend.className}">${latestTrend.symbol} ${latestTrend.label}</span>${latestProgression ? `<span class="trend warn">! serie/carico aumentato</span>` : ""}</div>
+      <div class="spark line-spark" style="height:148px;display:block;padding:8px;overflow-x:auto">
+        <svg class="line-chart" viewBox="0 0 ${width} ${height}" style="display:block;height:132px;min-width:100%" role="img" aria-label="Andamento volume ${safe(exerciseId)}">
+          <line x1="${padX}" y1="${top}" x2="${width - padX}" y2="${top}" stroke="rgba(255,255,255,.11)" stroke-width="1"></line>
+          <line x1="${padX}" y1="${top + chartHeight}" x2="${width - padX}" y2="${top + chartHeight}" stroke="rgba(255,255,255,.11)" stroke-width="1"></line>
+          ${segments}
+          ${markers}
+        </svg>
+      </div>
+      <div class="legend"><span style="color:var(--ok)">● migliora</span> · <span style="color:var(--warn)">● stasi</span> · <span style="color:var(--danger)">● peggiora</span> · <span style="color:var(--warn);font-weight:800">!</span> serie/carico aumentato</div>`;
   }
 
   function updateVolumes() {
