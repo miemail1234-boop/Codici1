@@ -188,12 +188,11 @@
   }
 
   function trendInfo(rows, index = rows.length - 1) {
-    if (rows.length < 2 || index <= 0) return { symbol: "·", label: "Dati insufficienti", className: "" };
-    const previous = rows[index - 1];
-    const latest = rows[index];
-    const tolerance = Math.max(1, Math.abs(previous.volume) * 0.01);
-    if (latest.volume > previous.volume + tolerance) return { symbol: "↗", label: "Migliora", className: "good", color: "var(--ok)" };
-    if (latest.volume < previous.volume - tolerance) return { symbol: "↘", label: "Peggiora", className: "bad", color: "var(--danger)" };
+    if (rows.length < 2 || index <= 0) return { symbol: "·", label: "Baseline", className: "", color: "var(--accent)" };
+    const previous = num(rows[index - 1].volume);
+    const latest = num(rows[index].volume);
+    if (latest > previous) return { symbol: "↗", label: "Migliora", className: "good", color: "var(--ok)" };
+    if (latest < previous) return { symbol: "↘", label: "Peggiora", className: "bad", color: "var(--danger)" };
     return { symbol: "→", label: "Stasi", className: "warn", color: "var(--warn)" };
   }
 
