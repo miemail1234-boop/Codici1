@@ -12,6 +12,7 @@
   };
   const fmt = value => new Intl.NumberFormat("it-IT", { maximumFractionDigits: 0 }).format(num(value));
   const safe = value => String(value ?? "").replace(/[&<>"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[char]));
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
   const splits = {
     upper: ["panca-inclinata", "trazioni", "rematore", "alzate-laterali", "tricipiti", "bicipiti"],
@@ -187,6 +188,35 @@
     return rows.sort((a, b) => String(a.date).localeCompare(String(b.date)));
   }
 
+  function globalHistoryRows() {
+    const rows = workouts
+      .filter(workout => (workout.workout_day || "full") === activeDay)
+      .sort((a, b) => String(a.date).localeCompare(String(b.date)))
+      .map(workout => {
+        const list = getExercises(workout.id);
+        return {
+          date: workout.date,
+          volume: totalVolume(list),
+          load: list.reduce((sum, exercise) => sum + maxLoad(exercise), 0),
+          setCount: list.reduce((sum, exercise) => sum + setCount(exercise), 0),
+        };
+      });
+    const currentDate = $("dateInput")?.value || today();
+    if (draft.length) {
+      const preview = {
+        date: currentDate,
+        volume: totalVolume(draft),
+        load: draft.reduce((sum, exercise) => sum + maxLoad(exercise), 0),
+        setCount: draft.reduce((sum, exercise) => sum + setCount(exercise), 0),
+        preview: true,
+      };
+      const existingIndex = rows.findIndex(row => row.date === currentDate);
+      if (existingIndex >= 0) rows[existingIndex] = preview;
+      else rows.push(preview);
+    }
+    return rows.sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  }
+
   function trendInfo(rows, index = rows.length - 1) {
     if (rows.length < 2 || index <= 0) return { symbol: "·", label: "Baseline", className: "", color: "var(--accent)" };
     const previous = num(rows[index - 1].volume);
@@ -203,10 +233,42 @@
     return num(latest.load) > num(previous.load) || num(latest.setCount) > num(previous.setCount);
   }
 
-  function chartHtml(exerciseId, previewExercise = null) {
-    const rows = historyForExercise(exerciseId, previewExercise);
-    if (rows.length < 2) return `<div class="chart-title">Andamento</div><p class="small">Servono almeno due salvataggi per il grafico.</p>`;
+  function progressIndex(rows) {
+    if (rows.length < 3) {
+      return { score: 50, label: "Dati insufficienti", className: "warn", advice: "Servono almeno 3 salvataggi per stimare la stasi." };
+    }
+    const recent = rows.slice(-6);
+    let improvements = 0;
+    let declines = 0;
+    let stases = 0;
+    let progressions = 0;
+    for (let index = 1; index < recent.length; index += 1) {
+      const previous = num(recent[index - 1].volume);
+      const latest = num(recent[index].volume);
+      if (latest > previous) improvements += 1;
+      else if (latest < previous) declines += 1;
+      else stases += 1;
+      if (progressionInfo(recent, index)) progressions += 1;
+    }
+    const first = Math.max(1, num(recent[0].volume));
+    const last = num(recent[recent.length - 1].volume);
+    const percentChange = ((last - first) / first) * 100;
+    const latestTrend = trendInfo(recent);
+    const rawScore = 50 + improvements * 8 + progressions * 5 - declines * 12 - stases * 4 + clamp(percentChange, -20, 20);
+    const score = Math.round(clamp(rawScore, 0, 100));
+    if (score >= 70) return { score, label: "Progressione buona", className: "good", advice: "Segnale positivo: non serve aumentare calorie per questo indicatore.", latestTrend };
+    if (score >= 45) return { score, label: "Stasi lieve", className: "warn", advice: "Monitorare: non è ancora un segnale forte per aumentare calorie.", latestTrend };
+    return { score, label: "Stallo probabile", className: "bad", advice: "Possibile limite di recupero/energia: valuta +150-250 kcal se dura 2-3 settimane.", latestTrend };
+  }
 
+  function calorieSignal(rows) {
+    const index = progressIndex(rows);
+    if (index.score >= 70) return { ...index, label: "Calorie ok", advice: "Progressione globale buona: puoi restare sulle calorie attuali." };
+    if (index.score >= 45) return { ...index, label: "Monitora", advice: "Progressione incerta: resta stabile e rivaluta tra 1-2 settimane." };
+    return { ...index, label: "Possibile aumento", advice: "Stallo globale: valuta +150-250 kcal/die, soprattutto se peso e performance calano." };
+  }
+
+  function lineChartSvg(rows, ariaLabel) {
     const width = Math.max(330, 52 + (rows.length - 1) * 58);
     const height = 132;
     const padX = 26;
@@ -229,8 +291,6 @@
         progression: progressionInfo(rows, index),
       };
     });
-    const latestTrend = trendInfo(rows);
-    const latestProgression = progressionInfo(rows, rows.length - 1);
     const labelStep = Math.max(1, Math.ceil(rows.length / 7));
     const segments = points.slice(1).map(point => {
       const previous = points[point.index - 1];
@@ -244,17 +304,49 @@
         ${point.progression ? `<text x="${point.x}" y="${Math.max(12, point.y - 9)}" fill="var(--warn)" font-size="17" font-weight="800" text-anchor="middle">!</text>` : ""}
         ${showDate ? `<text x="${point.x}" y="${height - 10}" fill="var(--muted)" font-size="10" text-anchor="middle">${safe(point.row.date.slice(5))}</text>` : ""}`;
     }).join("");
+    return `<div class="spark line-spark" style="height:148px;display:block;padding:8px;overflow-x:auto">
+      <svg class="line-chart" viewBox="0 0 ${width} ${height}" style="display:block;height:132px;min-width:100%" role="img" aria-label="${safe(ariaLabel)}">
+        <line x1="${padX}" y1="${top}" x2="${width - padX}" y2="${top}" stroke="rgba(255,255,255,.11)" stroke-width="1"></line>
+        <line x1="${padX}" y1="${top + chartHeight}" x2="${width - padX}" y2="${top + chartHeight}" stroke="rgba(255,255,255,.11)" stroke-width="1"></line>
+        ${segments}
+        ${markers}
+      </svg>
+    </div>`;
+  }
 
-    return `<div class="chart-title">Andamento volume <span class="trend ${latestTrend.className}">${latestTrend.symbol} ${latestTrend.label}</span>${latestProgression ? `<span class="trend warn">! serie/carico aumentato</span>` : ""}</div>
-      <div class="spark line-spark" style="height:148px;display:block;padding:8px;overflow-x:auto">
-        <svg class="line-chart" viewBox="0 0 ${width} ${height}" style="display:block;height:132px;min-width:100%" role="img" aria-label="Andamento volume ${safe(exerciseId)}">
-          <line x1="${padX}" y1="${top}" x2="${width - padX}" y2="${top}" stroke="rgba(255,255,255,.11)" stroke-width="1"></line>
-          <line x1="${padX}" y1="${top + chartHeight}" x2="${width - padX}" y2="${top + chartHeight}" stroke="rgba(255,255,255,.11)" stroke-width="1"></line>
-          ${segments}
-          ${markers}
-        </svg>
-      </div>
-      <div class="legend"><span style="color:var(--ok)">● migliora</span> · <span style="color:var(--warn)">● stasi</span> · <span style="color:var(--danger)">● peggiora</span> · <span style="color:var(--warn);font-weight:800">!</span> serie/carico aumentato</div>`;
+  function indexBadge(index) {
+    return `<span class="trend ${index.className}">IP ${index.score}/100 · ${safe(index.label)}</span>`;
+  }
+
+  function chartHtml(exerciseId, previewExercise = null) {
+    const rows = historyForExercise(exerciseId, previewExercise);
+    if (rows.length < 2) return `<div class="chart-title">Andamento</div><p class="small">Servono almeno due salvataggi per il grafico.</p>`;
+    const latestTrend = trendInfo(rows);
+    const latestProgression = progressionInfo(rows, rows.length - 1);
+    const index = progressIndex(rows);
+    return `<div class="chart-title">Andamento volume <span class="trend ${latestTrend.className}">${latestTrend.symbol} ${latestTrend.label}</span>${latestProgression ? `<span class="trend warn">! serie/carico aumentato</span>` : ""}${indexBadge(index)}</div>
+      ${lineChartSvg(rows, `Andamento volume ${exerciseId}`)}
+      <div class="legend"><span style="color:var(--ok)">● migliora</span> · <span style="color:var(--warn)">● stasi</span> · <span style="color:var(--danger)">● peggiora</span> · <span style="color:var(--warn);font-weight:800">!</span> serie/carico aumentato</div>
+      <div class="small">${safe(index.advice)}</div>`;
+  }
+
+  function renderOverallChart() {
+    const node = $("overallChart");
+    if (!node) return;
+    const rows = globalHistoryRows();
+    if (rows.length < 2) {
+      node.innerHTML = `<h2>Andamento generale</h2><p class="small">Servono almeno due salvataggi per il grafico generale.</p>`;
+      return;
+    }
+    const latestTrend = trendInfo(rows);
+    const latestProgression = progressionInfo(rows, rows.length - 1);
+    const progress = progressIndex(rows);
+    const calories = calorieSignal(rows);
+    node.innerHTML = `<h2>Andamento generale</h2>
+      <div class="chart-title">Volume totale ${safe(activeDay)} <span class="trend ${latestTrend.className}">${latestTrend.symbol} ${latestTrend.label}</span>${latestProgression ? `<span class="trend warn">! serie/carico aumentato</span>` : ""}${indexBadge(progress)} <span class="trend ${calories.className}">${safe(calories.label)}</span></div>
+      ${lineChartSvg(rows, `Andamento generale ${activeDay}`)}
+      <div class="legend"><span style="color:var(--ok)">● migliora</span> · <span style="color:var(--warn)">● stasi</span> · <span style="color:var(--danger)">● peggiora</span> · <span style="color:var(--warn);font-weight:800">!</span> serie/carico aumentato</div>
+      <p class="small"><strong>Indice globale:</strong> ${progress.score}/100. ${safe(calories.advice)}</p>`;
   }
 
   function updateVolumes() {
@@ -267,6 +359,7 @@
     const total = totalVolume();
     $("topVolume").textContent = fmt(total);
     $("summary").innerHTML = `<p><span class="chip">${draft.length} esercizi</span> <span class="chip">volume totale ${fmt(total)}</span></p>`;
+    renderOverallChart();
   }
 
   function workoutVolume(workout) {
