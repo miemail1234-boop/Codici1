@@ -23,6 +23,7 @@
   let isRendering = false;
   let renderTimer = 0;
   let fetchTimer = 0;
+  let cloudRevision = 0;
 
   function injectStyles() {
     if (document.getElementById("workoutLineChartStyles")) return;
@@ -52,6 +53,7 @@
     workouts = workoutRows.data || [];
     workoutExercises = exerciseRows.data || [];
     workoutSets = setRows.data || [];
+    cloudRevision += 1;
     scheduleRender();
   }
 
@@ -105,6 +107,16 @@
       return { kg: num(input.value), reps: num(repsInput?.value) };
     });
     return { id: exerciseId, sets };
+  }
+
+  function chartSignature(exerciseId, previewExercise) {
+    return JSON.stringify({
+      cloudRevision,
+      day: activeDay(),
+      date: currentDate(),
+      exerciseId,
+      sets: (previewExercise?.sets || []).map(set => [num(set.kg), num(set.reps)]),
+    });
   }
 
   function rowsForExercise(exerciseId, previewExercise) {
@@ -208,9 +220,13 @@
       [...document.querySelectorAll("#exerciseList .exercise")].forEach((card, index) => {
         const exerciseId = ids[index];
         const chart = card.querySelector(".mini-chart");
-        if (!exerciseId || !chart || chart.dataset.lineRendered === "1") return;
-        chart.innerHTML = chartHtml(exerciseId, draftExerciseFromDom(card, exerciseId, index));
-        chart.dataset.lineRendered = "1";
+        if (!exerciseId || !chart) return;
+        const previewExercise = draftExerciseFromDom(card, exerciseId, index);
+        const signature = chartSignature(exerciseId, previewExercise);
+        const alreadyLineChart = Boolean(chart.querySelector(".line-chart"));
+        if (alreadyLineChart && chart.dataset.lineSignature === signature) return;
+        chart.innerHTML = chartHtml(exerciseId, previewExercise);
+        chart.dataset.lineSignature = signature;
       });
     } finally {
       isRendering = false;
