@@ -10,4 +10,4 @@
 - Massimo storico close: **124.290001** al **2026-06-02**
 - Distanza dal massimo close: **-0.1207%**
 - Righe usate: 4278
-- Generato UTC: 2026-06-17T22:05:04+00:00
+- Generato UTC: 2026-06-17T22:06:26+00:00
