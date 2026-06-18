@@ -9,7 +9,6 @@ from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-import requests
 import yfinance as yf
 
 OUT = Path("finance-drawdown/results")
@@ -33,7 +32,7 @@ ASSETS = [
     {"n": 16, "asset": "S&P MidCap 400", "tickers": ["SPY4.DE"], "isin": "da verificare"},
     {"n": 17, "asset": "S&P SmallCap 600", "tickers": ["ISP6.DE"], "isin": "da verificare"},
     {"n": 18, "asset": "Russell 2000", "tickers": ["IUS3.DE", "RTWO.L"], "isin": "da verificare"},
-    {"n": 19, "asset": "Nasdaq 100", "tickers": ["CNDX.L", "SXRV.DE"], "isin": "IE00B53SZB19"},
+    {"n": 19, "asset": "Nasdaq 100", "tickers": ["SXRV.DE", "CNDX.L"], "isin": "IE00B53SZB19"},
     {"n": 20, "asset": "Nasdaq 100 Equal Weight", "tickers": ["EQAC.DE"], "isin": "da verificare"},
     {"n": 21, "asset": "STOXX Europe 600", "tickers": ["EXSA.DE"], "isin": "DE0002635307"},
     {"n": 22, "asset": "MSCI Europe", "tickers": ["IMEU.L"], "isin": "da verificare"},
@@ -152,37 +151,6 @@ def rows_from_yfinance(ticker):
     raise RuntimeError(last or "empty yfinance result")
 
 
-def rows_from_yahoo_chart(ticker):
-    headers = {"User-Agent": "Mozilla/5.0"}
-    errors = []
-    for host in ("query1.finance.yahoo.com", "query2.finance.yahoo.com"):
-        url = f"https://{host}/v8/finance/chart/{ticker}"
-        params = {"range": "max", "interval": "1d", "events": "history", "includeAdjustedClose": "true"}
-        try:
-            r = requests.get(url, params=params, headers=headers, timeout=30)
-            if r.status_code != 200:
-                errors.append(f"{host} HTTP {r.status_code}: {r.text[:180]}")
-                continue
-            data = r.json()
-            chart = data.get("chart", {})
-            if chart.get("error"):
-                errors.append(f"{host} chart error: {chart['error']}")
-                continue
-            res = chart["result"][0]
-            ts = res["timestamp"]
-            q = res["indicators"]["quote"][0]
-            rows = []
-            for t, h, c in zip(ts, q.get("high", []), q.get("close", [])):
-                h2, c2 = fnum(h), fnum(c)
-                if h2 is not None and c2 is not None:
-                    rows.append((t, h2, c2))
-            if rows:
-                return rows, f"yahoo_chart.{host}"
-        except Exception as e:
-            errors.append(f"{host}: {repr(e)}")
-    raise RuntimeError("; ".join(errors))
-
-
 def calc(asset, ticker, rows, source):
     latest_i, _, latest_close = rows[-1]
     latest_dt = to_dt(latest_i)
@@ -192,26 +160,16 @@ def calc(asset, ticker, rows, source):
     rows_52w = [r for r in rows if to_dt(r[0]) >= cutoff] or rows
     max_52w_i, max_52w, _ = max(rows_52w, key=lambda r: r[1])
     return Result(
-        n=asset["n"],
-        asset=asset["asset"],
-        isin=asset["isin"],
-        tickers_tried=", ".join(asset["tickers"]),
-        yahoo_ticker=ticker,
-        status="ok",
-        source=source,
-        latest_date=dstr(latest_i),
-        latest_close=round(latest_close, 6),
-        all_time_high_date=dstr(max_high_i),
-        all_time_high=round(max_high, 6),
+        n=asset["n"], asset=asset["asset"], isin=asset["isin"],
+        tickers_tried=", ".join(asset["tickers"]), yahoo_ticker=ticker, status="ok", source=source,
+        latest_date=dstr(latest_i), latest_close=round(latest_close, 6),
+        all_time_high_date=dstr(max_high_i), all_time_high=round(max_high, 6),
         drawdown_from_high_pct=round((latest_close / max_high - 1) * 100, 4),
-        all_time_close_high_date=dstr(max_close_i),
-        all_time_close_high=round(max_close, 6),
+        all_time_close_high_date=dstr(max_close_i), all_time_close_high=round(max_close, 6),
         drawdown_from_close_high_pct=round((latest_close / max_close - 1) * 100, 4),
-        week_52_high_date=dstr(max_52w_i),
-        week_52_high=round(max_52w, 6),
+        week_52_high_date=dstr(max_52w_i), week_52_high=round(max_52w, 6),
         drawdown_from_52w_high_pct=round((latest_close / max_52w - 1) * 100, 4),
-        rows_used=len(rows),
-        error=None,
+        rows_used=len(rows), error=None,
         generated_at_utc=datetime.now(timezone.utc).isoformat(timespec="seconds"),
     )
 
@@ -232,13 +190,12 @@ def fail(asset, errors):
 def process(asset):
     errors = {}
     for ticker in asset["tickers"]:
-        for loader in (rows_from_yfinance, rows_from_yahoo_chart):
-            try:
-                rows, source = loader(ticker)
-                return calc(asset, ticker, rows, source)
-            except Exception as e:
-                errors[f"{ticker}/{loader.__name__}"] = str(e)
-                print(f"FAILED {asset['n']} {asset['asset']} {ticker} {loader.__name__}: {e}")
+        try:
+            rows, source = rows_from_yfinance(ticker)
+            return calc(asset, ticker, rows, source)
+        except Exception as e:
+            errors[f"{ticker}/rows_from_yfinance"] = str(e)
+            print(f"FAILED {asset['n']} {asset['asset']} {ticker}: {e}")
     return fail(asset, errors)
 
 
@@ -246,7 +203,6 @@ def write(results):
     OUT.mkdir(parents=True, exist_ok=True)
     data = [asdict(r) for r in results]
     (OUT / "all_drawdowns.json").write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    # keep latest_* names for backward compatibility; now they contain all rows
     (OUT / "latest_drawdown.json").write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     fields = list(data[0].keys())
     for filename in ("all_drawdowns.csv", "latest_drawdown.csv"):
