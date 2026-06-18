@@ -1,8 +1,15 @@
 (() => {
   'use strict';
 
-  const DATA_URL = 'finance-drawdown/results/all_drawdowns.json?v=1';
+  const DATA_URL = 'finance-drawdown/results/all_drawdowns.json';
+  const CSV_URL = 'finance-drawdown/results/all_drawdowns.csv';
   const CACHE_KEY = 'lifeTracker.etfDrawdowns.v1';
+  const SUPABASE_URL = 'https://kujyowhezihjambhpahe.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_VBzZaA3NAIvqMxJcZZTwPg_4_GEi1a3';
+  const FUNCTION_NAME = 'trigger-etf-drawdown-update';
+  const ACTIONS_URL = 'https://github.com/miemail1234-boop/Codici1/actions/workflows/etf-drawdown.yml';
+
+  const client = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_KEY);
 
   const state = {
     rows: [],
@@ -11,6 +18,7 @@
     sort: 'drawdown_asc',
     expanded: null,
     source: 'loading',
+    refreshing: false,
   };
 
   const els = {};
@@ -85,15 +93,24 @@
     })).sort((a, b) => a.n - b.n);
   }
 
-  async function loadRows() {
+  function latestGeneratedAt(rows = state.rows) {
+    return rows.map((row) => row.generated_at_utc).filter(Boolean).sort().at(-1) || '';
+  }
+
+  function dataUrl() {
+    return `${DATA_URL}?t=${Date.now()}`;
+  }
+
+  async function loadRows(options = {}) {
     try {
-      const res = await fetch(DATA_URL, { cache: 'no-store' });
+      const res = await fetch(dataUrl(), { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const rows = normalizeRows(await res.json());
       localStorage.setItem(CACHE_KEY, JSON.stringify({ savedAt: new Date().toISOString(), rows }));
       state.source = 'online';
       return rows;
     } catch (err) {
+      if (options.noCacheFallback) throw err;
       const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
@@ -103,6 +120,37 @@
       state.source = `errore: ${err.message}`;
       return [];
     }
+  }
+
+  function setUpdateStatus(message, tone = 'info') {
+    const node = els.updateStatus || $('etfDrawdownUpdateStatus');
+    if (!node) return;
+    node.textContent = message;
+    node.dataset.tone = tone;
+  }
+
+  function ensureRefreshControls() {
+    const root = $('etfDrawdownSection');
+    if (!root || $('etfDrawdownUpdateBtn')) return;
+    const head = root.querySelector('.etf-head');
+    if (!head) return;
+    const actions = document.createElement('div');
+    actions.className = 'etf-update-actions';
+    actions.innerHTML = `
+      <button class="btn primary" type="button" id="etfDrawdownUpdateBtn">Aggiorna ETF Drawdown</button>
+      <a class="btn" href="${CSV_URL}" target="_blank" rel="noopener">Scarica CSV</a>
+      <a class="btn" href="${ACTIONS_URL}" target="_blank" rel="noopener">GitHub Action</a>
+    `;
+    const oldCsv = head.querySelector(`a[href="${CSV_URL}"]`);
+    oldCsv?.remove();
+    head.appendChild(actions);
+    const status = document.createElement('p');
+    status.className = 'small';
+    status.id = 'etfDrawdownUpdateStatus';
+    status.textContent = 'Premi “Aggiorna ETF Drawdown” per avviare il ricalcolo con yfinance.';
+    head.insertAdjacentElement('afterend', status);
+    els.updateBtn = $('etfDrawdownUpdateBtn');
+    els.updateStatus = status;
   }
 
   function getFilteredRows() {
@@ -133,7 +181,7 @@
     const nearHigh = okRows.filter((r) => (num(r.drawdown_from_high_pct) ?? -999) >= -1).length;
     const drawdowns = okRows.map((r) => num(r.drawdown_from_high_pct)).filter((v) => v !== null).sort((a, b) => a - b);
     const median = drawdowns.length ? drawdowns[Math.floor(drawdowns.length / 2)] : null;
-    const updated = state.rows.map((r) => r.generated_at_utc).filter(Boolean).sort().at(-1);
+    const updated = latestGeneratedAt();
 
     els.summary.innerHTML = `
       <div class="etf-card"><span>Totale</span><strong>${total}</strong><small>asset monitorati</small></div>
@@ -193,6 +241,68 @@
     renderTable();
   }
 
+  async function refreshDataOnce() {
+    state.rows = await loadRows({ noCacheFallback: true });
+    state.source = 'online';
+    render();
+  }
+
+  async function pollForUpdatedData(previousGeneratedAt) {
+    for (let attempt = 1; attempt <= 12; attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 15000));
+      try {
+        const rows = await loadRows({ noCacheFallback: true });
+        const nextGeneratedAt = latestGeneratedAt(rows);
+        if (nextGeneratedAt && nextGeneratedAt !== previousGeneratedAt) {
+          state.rows = rows;
+          state.source = 'online';
+          render();
+          setUpdateStatus(`Aggiornamento completato. Dati aggiornati al ${new Date(nextGeneratedAt).toLocaleString('it-IT')}.`, 'ok');
+          return true;
+        }
+        setUpdateStatus(`GitHub Action avviata. Attendo nuovi dati… tentativo ${attempt}/12.`, 'info');
+      } catch (err) {
+        setUpdateStatus(`GitHub Action avviata. Attendo pubblicazione risultati… tentativo ${attempt}/12.`, 'info');
+      }
+    }
+    setUpdateStatus('Aggiornamento avviato, ma i nuovi risultati non sono ancora pubblicati. Apri “GitHub Action” o riprova tra poco.', 'warn');
+    return false;
+  }
+
+  async function triggerDrawdownUpdate() {
+    if (state.refreshing) return;
+    if (!client) {
+      setUpdateStatus('Supabase client non disponibile: ricarica la pagina e riprova.', 'warn');
+      return;
+    }
+
+    state.refreshing = true;
+    const button = els.updateBtn || $('etfDrawdownUpdateBtn');
+    const previousGeneratedAt = latestGeneratedAt();
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'Aggiornamento…';
+    }
+    setUpdateStatus('Avvio GitHub Action ETF Drawdown…', 'info');
+
+    try {
+      const { data, error } = await client.functions.invoke(FUNCTION_NAME, { body: { requested_at: new Date().toISOString() } });
+      if (error) throw error;
+      if (data && data.ok === false) throw new Error(data.message || data.error || 'Errore avvio GitHub Action');
+      setUpdateStatus('GitHub Action avviata. Attendo la pubblicazione del nuovo JSON…', 'info');
+      await pollForUpdatedData(previousGeneratedAt);
+    } catch (err) {
+      const message = err?.message || String(err);
+      setUpdateStatus(`Errore: ${message}`, 'warn');
+    } finally {
+      state.refreshing = false;
+      if (button) {
+        button.disabled = false;
+        button.textContent = 'Aggiorna ETF Drawdown';
+      }
+    }
+  }
+
   function bindEvents() {
     els.search.addEventListener('input', (event) => {
       state.query = event.target.value;
@@ -213,21 +323,27 @@
       state.expanded = state.expanded === n ? null : n;
       renderTable();
     });
+    $('etfDrawdownUpdateBtn')?.addEventListener('click', triggerDrawdownUpdate);
   }
 
   async function init() {
     const root = $('etfDrawdownSection');
     if (!root) return;
+    ensureRefreshControls();
     els.summary = $('etfDrawdownSummary');
     els.meta = $('etfDrawdownMeta');
     els.search = $('etfDrawdownSearch');
     els.status = $('etfDrawdownStatus');
     els.sort = $('etfDrawdownSort');
     els.table = $('etfDrawdownTable');
+    els.updateBtn = $('etfDrawdownUpdateBtn');
+    els.updateStatus = $('etfDrawdownUpdateStatus');
     bindEvents();
     state.rows = await loadRows();
     render();
   }
+
+  window.refreshEtfDrawdownData = refreshDataOnce;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
