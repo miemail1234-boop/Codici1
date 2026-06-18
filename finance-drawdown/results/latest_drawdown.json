@@ -8,16 +8,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 124.660004,
+    "latest_close": 124.620003,
     "all_time_high_date": "2026-06-18",
-    "all_time_high": 124.949997,
-    "drawdown_from_high_pct": -0.2321,
+    "all_time_high": 125.18,
+    "drawdown_from_high_pct": -0.4474,
     "all_time_close_high_date": "2026-06-18",
-    "all_time_close_high": 124.660004,
+    "all_time_close_high": 124.620003,
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 4280,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:35:45+00:00"
+    "generated_at_utc": "2026-06-18T20:53:43+00:00"
   },
   {
     "n": 2,
@@ -28,16 +28,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 165.279999,
+    "latest_close": 165.460007,
     "all_time_high_date": "2026-06-18",
-    "all_time_high": 165.679993,
-    "drawdown_from_high_pct": -0.2414,
+    "all_time_high": 165.940002,
+    "drawdown_from_high_pct": -0.2893,
     "all_time_close_high_date": "2026-06-18",
-    "all_time_close_high": 165.279999,
+    "all_time_close_high": 165.460007,
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 1750,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:35:45+00:00"
+    "generated_at_utc": "2026-06-18T20:53:43+00:00"
   },
   {
     "n": 3,
@@ -48,16 +48,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 9179.799805,
+    "latest_close": 9189.0,
     "all_time_high_date": "2026-06-18",
-    "all_time_high": 9196.0,
-    "drawdown_from_high_pct": -0.1762,
+    "all_time_high": 9223.0,
+    "drawdown_from_high_pct": -0.3686,
     "all_time_close_high_date": "2026-06-18",
-    "all_time_close_high": 9179.799805,
+    "all_time_close_high": 9189.0,
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 3699,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:35:46+00:00"
+    "generated_at_utc": "2026-06-18T20:53:43+00:00"
   },
   {
     "n": 4,
@@ -68,16 +68,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 11.406,
+    "latest_close": 11.414,
     "all_time_high_date": "2014-12-29",
     "all_time_high": 83.410004,
-    "drawdown_from_high_pct": -86.3254,
+    "drawdown_from_high_pct": -86.3158,
     "all_time_close_high_date": "2014-12-29",
     "all_time_close_high": 83.410004,
-    "drawdown_from_close_high_pct": -86.3254,
+    "drawdown_from_close_high_pct": -86.3158,
     "rows_used": 3831,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:35:46+00:00"
+    "generated_at_utc": "2026-06-18T20:53:44+00:00"
   },
   {
     "n": 5,
@@ -88,16 +88,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 101.800003,
+    "latest_close": 101.779999,
     "all_time_high_date": "2026-06-16",
     "all_time_high": 102.419998,
-    "drawdown_from_high_pct": -0.6053,
+    "drawdown_from_high_pct": -0.6249,
     "all_time_close_high_date": "2026-06-15",
     "all_time_close_high": 102.080002,
-    "drawdown_from_close_high_pct": -0.2743,
+    "drawdown_from_close_high_pct": -0.2939,
     "rows_used": 2998,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:35:46+00:00"
+    "generated_at_utc": "2026-06-18T20:53:44+00:00"
   },
   {
     "n": 6,
@@ -108,16 +108,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 73.279999,
+    "latest_close": 72.82,
     "all_time_high_date": "2025-08-26",
     "all_time_high": 78.660004,
-    "drawdown_from_high_pct": -6.8396,
+    "drawdown_from_high_pct": -7.4244,
     "all_time_close_high_date": "2026-02-27",
     "all_time_close_high": 77.019997,
-    "drawdown_from_close_high_pct": -4.8559,
+    "drawdown_from_close_high_pct": -5.4531,
     "rows_used": 3421,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:35:46+00:00"
+    "generated_at_utc": "2026-06-18T20:53:44+00:00"
   },
   {
     "n": 7,
@@ -128,16 +128,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 86.980003,
+    "latest_close": 87.050003,
     "all_time_high_date": "2026-02-11",
     "all_time_high": 88.410004,
-    "drawdown_from_high_pct": -1.6175,
+    "drawdown_from_high_pct": -1.5383,
     "all_time_close_high_date": "2026-06-15",
     "all_time_close_high": 88.040001,
-    "drawdown_from_close_high_pct": -1.204,
+    "drawdown_from_close_high_pct": -1.1245,
     "rows_used": 2956,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:35:47+00:00"
+    "generated_at_utc": "2026-06-18T20:53:44+00:00"
   },
   {
     "n": 8,
@@ -148,16 +148,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 122.790001,
+    "latest_close": 123.230003,
     "all_time_high_date": "2026-06-18",
-    "all_time_high": 123.110001,
-    "drawdown_from_high_pct": -0.2599,
+    "all_time_high": 123.709999,
+    "drawdown_from_high_pct": -0.388,
     "all_time_close_high_date": "2026-06-18",
-    "all_time_close_high": 122.790001,
+    "all_time_close_high": 123.230003,
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 2956,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:35:47+00:00"
+    "generated_at_utc": "2026-06-18T20:53:45+00:00"
   },
   {
     "n": 9,
@@ -168,16 +168,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 80.010002,
+    "latest_close": 80.440002,
     "all_time_high_date": "2026-06-16",
     "all_time_high": 81.860001,
-    "drawdown_from_high_pct": -2.26,
+    "drawdown_from_high_pct": -1.7347,
     "all_time_close_high_date": "2026-06-02",
     "all_time_close_high": 81.540001,
-    "drawdown_from_close_high_pct": -1.8764,
+    "drawdown_from_close_high_pct": -1.349,
     "rows_used": 2956,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:35:47+00:00"
+    "generated_at_utc": "2026-06-18T20:53:45+00:00"
   },
   {
     "n": 10,
@@ -188,16 +188,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 10.394,
+    "latest_close": 10.426,
     "all_time_high_date": "2026-06-15",
     "all_time_high": 10.644,
-    "drawdown_from_high_pct": -2.3487,
+    "drawdown_from_high_pct": -2.0481,
     "all_time_close_high_date": "2026-06-15",
     "all_time_close_high": 10.534,
-    "drawdown_from_close_high_pct": -1.329,
+    "drawdown_from_close_high_pct": -1.0253,
     "rows_used": 2077,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:35:47+00:00"
+    "generated_at_utc": "2026-06-18T20:53:45+00:00"
   },
   {
     "n": 11,
@@ -208,16 +208,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 804.039978,
+    "latest_close": 805.23999,
     "all_time_high_date": "2026-01-06",
     "all_time_high": 888.76001,
-    "drawdown_from_high_pct": -9.5324,
+    "drawdown_from_high_pct": -9.3974,
     "all_time_close_high_date": "2026-06-02",
     "all_time_close_high": 819.099976,
-    "drawdown_from_close_high_pct": -1.8386,
+    "drawdown_from_close_high_pct": -1.6921,
     "rows_used": 3978,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:35:47+00:00"
+    "generated_at_utc": "2026-06-18T20:53:45+00:00"
   },
   {
     "n": 12,
@@ -228,16 +228,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 5026.585938,
+    "latest_close": 5032.0,
     "all_time_high_date": "2026-06-15",
     "all_time_high": 5044.0,
-    "drawdown_from_high_pct": -0.3452,
+    "drawdown_from_high_pct": -0.2379,
     "all_time_close_high_date": "2026-06-18",
-    "all_time_close_high": 5026.585938,
+    "all_time_close_high": 5032.0,
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 1311,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:35:48+00:00"
+    "generated_at_utc": "2026-06-18T20:53:46+00:00"
   },
   {
     "n": 13,
@@ -257,7 +257,7 @@
     "drawdown_from_close_high_pct": null,
     "rows_used": 0,
     "error": "{\"IQUF.L/rows_from_yfinance\": \"empty yfinance result\", \"IQUF.L/rows_from_yahoo_chart\": \"query1.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}; query2.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}\"}",
-    "generated_at_utc": "2026-06-18T11:35:55+00:00"
+    "generated_at_utc": "2026-06-18T20:53:53+00:00"
   },
   {
     "n": 14,
@@ -268,16 +268,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 19.059999,
+    "latest_close": 19.16,
     "all_time_high_date": "2026-06-16",
     "all_time_high": 19.545,
-    "drawdown_from_high_pct": -2.4815,
+    "drawdown_from_high_pct": -1.9698,
     "all_time_close_high_date": "2026-06-02",
     "all_time_close_high": 19.33,
-    "drawdown_from_close_high_pct": -1.3968,
+    "drawdown_from_close_high_pct": -0.8795,
     "rows_used": 2444,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:35:55+00:00"
+    "generated_at_utc": "2026-06-18T20:53:53+00:00"
   },
   {
     "n": 15,
@@ -297,7 +297,7 @@
     "drawdown_from_close_high_pct": null,
     "rows_used": 0,
     "error": "{\"IUMV.L/rows_from_yfinance\": \"empty yfinance result\", \"IUMV.L/rows_from_yahoo_chart\": \"query1.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}; query2.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}\"}",
-    "generated_at_utc": "2026-06-18T11:36:01+00:00"
+    "generated_at_utc": "2026-06-18T20:53:59+00:00"
   },
   {
     "n": 16,
@@ -317,7 +317,7 @@
     "drawdown_from_close_high_pct": -0.1755,
     "rows_used": 301,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:02+00:00"
+    "generated_at_utc": "2026-06-18T20:53:59+00:00"
   },
   {
     "n": 17,
@@ -337,7 +337,7 @@
     "drawdown_from_close_high_pct": null,
     "rows_used": 0,
     "error": "{\"ISP6.DE/rows_from_yfinance\": \"empty yfinance result\", \"ISP6.DE/rows_from_yahoo_chart\": \"query1.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}; query2.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}\"}",
-    "generated_at_utc": "2026-06-18T11:36:08+00:00"
+    "generated_at_utc": "2026-06-18T20:54:06+00:00"
   },
   {
     "n": 18,
@@ -348,16 +348,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 100.580002,
+    "latest_close": 101.040001,
     "all_time_high_date": "2026-06-15",
     "all_time_high": 101.699997,
-    "drawdown_from_high_pct": -1.1013,
-    "all_time_close_high_date": "2026-06-12",
-    "all_time_close_high": 100.940002,
-    "drawdown_from_close_high_pct": -0.3566,
+    "drawdown_from_high_pct": -0.649,
+    "all_time_close_high_date": "2026-06-18",
+    "all_time_close_high": 101.040001,
+    "drawdown_from_close_high_pct": 0.0,
     "rows_used": 4598,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:09+00:00"
+    "generated_at_utc": "2026-06-18T20:54:06+00:00"
   },
   {
     "n": 19,
@@ -368,16 +368,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 1727.400024,
+    "latest_close": 1738.0,
     "all_time_high_date": "2026-06-03",
     "all_time_high": 1765.900024,
-    "drawdown_from_high_pct": -2.1802,
+    "drawdown_from_high_pct": -1.5799,
     "all_time_close_high_date": "2026-06-02",
     "all_time_close_high": 1758.199951,
-    "drawdown_from_close_high_pct": -1.7518,
+    "drawdown_from_close_high_pct": -1.1489,
     "rows_used": 3973,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:09+00:00"
+    "generated_at_utc": "2026-06-18T20:54:06+00:00"
   },
   {
     "n": 20,
@@ -397,7 +397,7 @@
     "drawdown_from_close_high_pct": null,
     "rows_used": 0,
     "error": "{\"EQAC.DE/rows_from_yfinance\": \"empty yfinance result\", \"EQAC.DE/rows_from_yahoo_chart\": \"query1.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}; query2.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}\"}",
-    "generated_at_utc": "2026-06-18T11:36:15+00:00"
+    "generated_at_utc": "2026-06-18T20:54:13+00:00"
   },
   {
     "n": 21,
@@ -408,16 +408,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 63.220001,
+    "latest_close": 63.360001,
     "all_time_high_date": "2026-05-25",
     "all_time_high": 64.029999,
-    "drawdown_from_high_pct": -1.265,
+    "drawdown_from_high_pct": -1.0464,
     "all_time_close_high_date": "2026-05-25",
     "all_time_close_high": 63.939999,
-    "drawdown_from_close_high_pct": -1.1261,
+    "drawdown_from_close_high_pct": -0.9071,
     "rows_used": 4686,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:15+00:00"
+    "generated_at_utc": "2026-06-18T20:54:13+00:00"
   },
   {
     "n": 22,
@@ -428,16 +428,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 3444.5,
+    "latest_close": 3456.0,
     "all_time_high_date": "2026-06-15",
     "all_time_high": 3464.5,
-    "drawdown_from_high_pct": -0.5773,
+    "drawdown_from_high_pct": -0.2453,
     "all_time_close_high_date": "2026-06-17",
     "all_time_close_high": 3457.5,
-    "drawdown_from_close_high_pct": -0.376,
+    "drawdown_from_close_high_pct": -0.0434,
     "rows_used": 4408,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:16+00:00"
+    "generated_at_utc": "2026-06-18T20:54:14+00:00"
   },
   {
     "n": 23,
@@ -448,16 +448,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 13.532,
+    "latest_close": 13.556,
     "all_time_high_date": "2015-03-25",
     "all_time_high": 24.15,
-    "drawdown_from_high_pct": -43.9669,
+    "drawdown_from_high_pct": -43.8675,
     "all_time_close_high_date": "2026-06-17",
     "all_time_close_high": 13.666,
-    "drawdown_from_close_high_pct": -0.9805,
+    "drawdown_from_close_high_pct": -0.8049,
     "rows_used": 2884,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:16+00:00"
+    "generated_at_utc": "2026-06-18T20:54:14+00:00"
   },
   {
     "n": 24,
@@ -468,16 +468,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 40.154999,
+    "latest_close": 40.345001,
     "all_time_high_date": "2008-01-02",
     "all_time_high": 42.34,
-    "drawdown_from_high_pct": -5.1606,
+    "drawdown_from_high_pct": -4.7119,
     "all_time_close_high_date": "2008-01-02",
     "all_time_close_high": 42.34,
-    "drawdown_from_close_high_pct": -5.1606,
+    "drawdown_from_close_high_pct": -4.7119,
     "rows_used": 4686,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:16+00:00"
+    "generated_at_utc": "2026-06-18T20:54:14+00:00"
   },
   {
     "n": 25,
@@ -488,16 +488,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 111.980003,
+    "latest_close": 112.519997,
     "all_time_high_date": "2026-06-18",
-    "all_time_high": 112.580002,
-    "drawdown_from_high_pct": -0.533,
-    "all_time_close_high_date": "2026-06-17",
-    "all_time_close_high": 112.080002,
-    "drawdown_from_close_high_pct": -0.0892,
+    "all_time_high": 112.720001,
+    "drawdown_from_high_pct": -0.1774,
+    "all_time_close_high_date": "2026-06-18",
+    "all_time_close_high": 112.519997,
+    "drawdown_from_close_high_pct": 0.0,
     "rows_used": 4519,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:16+00:00"
+    "generated_at_utc": "2026-06-18T20:54:15+00:00"
   },
   {
     "n": 26,
@@ -517,7 +517,7 @@
     "drawdown_from_close_high_pct": null,
     "rows_used": 0,
     "error": "{\"SX5EEX.DE/rows_from_yfinance\": \"empty yfinance result\", \"SX5EEX.DE/rows_from_yahoo_chart\": \"query1.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}; query2.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}\", \"EUEA.DE/rows_from_yfinance\": \"empty yfinance result\", \"EUEA.DE/rows_from_yahoo_chart\": \"query1.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}; query2.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}\"}",
-    "generated_at_utc": "2026-06-18T11:36:29+00:00"
+    "generated_at_utc": "2026-06-18T20:54:27+00:00"
   },
   {
     "n": 27,
@@ -528,16 +528,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 437.600006,
+    "latest_close": 437.75,
     "all_time_high_date": "2026-06-15",
     "all_time_high": 440.105988,
-    "drawdown_from_high_pct": -0.5694,
+    "drawdown_from_high_pct": -0.5353,
     "all_time_close_high_date": "2026-06-17",
     "all_time_close_high": 438.649994,
-    "drawdown_from_close_high_pct": -0.2394,
+    "drawdown_from_close_high_pct": -0.2052,
     "rows_used": 4538,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:29+00:00"
+    "generated_at_utc": "2026-06-18T20:54:28+00:00"
   },
   {
     "n": 28,
@@ -548,16 +548,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 1010.799988,
+    "latest_close": 1011.200012,
     "all_time_high_date": "2026-02-25",
     "all_time_high": 1148.400024,
-    "drawdown_from_high_pct": -11.9819,
+    "drawdown_from_high_pct": -11.9471,
     "all_time_close_high_date": "2026-02-27",
     "all_time_close_high": 1067.599976,
-    "drawdown_from_close_high_pct": -5.3203,
+    "drawdown_from_close_high_pct": -5.2829,
     "rows_used": 4409,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:30+00:00"
+    "generated_at_utc": "2026-06-18T20:54:28+00:00"
   },
   {
     "n": 29,
@@ -568,16 +568,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 2138.5,
+    "latest_close": 2155.5,
     "all_time_high_date": "2021-09-06",
     "all_time_high": 2312.0,
-    "drawdown_from_high_pct": -7.5043,
+    "drawdown_from_high_pct": -6.769,
     "all_time_close_high_date": "2021-09-06",
     "all_time_close_high": 2299.5,
-    "drawdown_from_close_high_pct": -7.0015,
+    "drawdown_from_close_high_pct": -6.2622,
     "rows_used": 4409,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:30+00:00"
+    "generated_at_utc": "2026-06-18T20:54:29+00:00"
   },
   {
     "n": 30,
@@ -588,16 +588,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 35.185001,
+    "latest_close": 35.465,
     "all_time_high_date": "2021-09-06",
     "all_time_high": 38.099998,
-    "drawdown_from_high_pct": -7.6509,
+    "drawdown_from_high_pct": -6.916,
     "all_time_close_high_date": "2021-09-06",
     "all_time_close_high": 37.91,
-    "drawdown_from_close_high_pct": -7.1881,
+    "drawdown_from_close_high_pct": -6.4495,
     "rows_used": 2959,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:30+00:00"
+    "generated_at_utc": "2026-06-18T20:54:29+00:00"
   },
   {
     "n": 31,
@@ -608,16 +608,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 21235.0,
+    "latest_close": 21250.0,
     "all_time_high_date": "2026-02-27",
     "all_time_high": 22090.0,
-    "drawdown_from_high_pct": -3.8705,
+    "drawdown_from_high_pct": -3.8026,
     "all_time_close_high_date": "2026-02-27",
     "all_time_close_high": 22040.0,
-    "drawdown_from_close_high_pct": -3.6525,
+    "drawdown_from_close_high_pct": -3.5844,
     "rows_used": 3977,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:31+00:00"
+    "generated_at_utc": "2026-06-18T20:54:29+00:00"
   },
   {
     "n": 32,
@@ -628,16 +628,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 149.639999,
+    "latest_close": 150.220001,
     "all_time_high_date": "2026-06-15",
     "all_time_high": 150.580002,
-    "drawdown_from_high_pct": -0.6243,
+    "drawdown_from_high_pct": -0.2391,
     "all_time_close_high_date": "2026-06-18",
-    "all_time_close_high": 149.639999,
+    "all_time_close_high": 150.220001,
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 4719,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:31+00:00"
+    "generated_at_utc": "2026-06-18T20:54:30+00:00"
   },
   {
     "n": 33,
@@ -648,16 +648,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 205.350006,
+    "latest_close": 206.300003,
     "all_time_high_date": "2026-01-13",
     "all_time_high": 211.25,
-    "drawdown_from_high_pct": -2.7929,
+    "drawdown_from_high_pct": -2.3432,
     "all_time_close_high_date": "2026-01-13",
     "all_time_close_high": 210.449997,
-    "drawdown_from_close_high_pct": -2.4234,
+    "drawdown_from_close_high_pct": -1.972,
     "rows_used": 4686,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:31+00:00"
+    "generated_at_utc": "2026-06-18T20:54:30+00:00"
   },
   {
     "n": 34,
@@ -668,16 +668,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 260.5,
+    "latest_close": 261.850006,
     "all_time_high_date": "2026-06-18",
-    "all_time_high": 261.600006,
-    "drawdown_from_high_pct": -0.4205,
-    "all_time_close_high_date": "2026-06-17",
-    "all_time_close_high": 260.950012,
-    "drawdown_from_close_high_pct": -0.1725,
+    "all_time_high": 262.200012,
+    "drawdown_from_high_pct": -0.1335,
+    "all_time_close_high_date": "2026-06-18",
+    "all_time_close_high": 261.850006,
+    "drawdown_from_close_high_pct": 0.0,
     "rows_used": 4059,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:32+00:00"
+    "generated_at_utc": "2026-06-18T20:54:31+00:00"
   },
   {
     "n": 35,
@@ -687,17 +687,17 @@
     "yahoo_ticker": "EWP",
     "status": "ok",
     "source": "yfinance.download",
-    "latest_date": "2026-06-17",
-    "latest_close": 58.849998,
+    "latest_date": "2026-06-18",
+    "latest_close": 59.009998,
     "all_time_high_date": "2007-11-14",
     "all_time_high": 71.849998,
-    "drawdown_from_high_pct": -18.0933,
+    "drawdown_from_high_pct": -17.8706,
     "all_time_close_high_date": "2007-12-10",
     "all_time_close_high": 68.68,
-    "drawdown_from_close_high_pct": -14.3128,
-    "rows_used": 7612,
+    "drawdown_from_close_high_pct": -14.0798,
+    "rows_used": 7613,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:32+00:00"
+    "generated_at_utc": "2026-06-18T20:54:31+00:00"
   },
   {
     "n": 36,
@@ -708,16 +708,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 143.279999,
+    "latest_close": 143.399994,
     "all_time_high_date": "2026-02-24",
     "all_time_high": 145.660004,
-    "drawdown_from_high_pct": -1.6339,
+    "drawdown_from_high_pct": -1.5516,
     "all_time_close_high_date": "2026-02-27",
     "all_time_close_high": 145.080002,
-    "drawdown_from_close_high_pct": -1.2407,
+    "drawdown_from_close_high_pct": -1.158,
     "rows_used": 4639,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:32+00:00"
+    "generated_at_utc": "2026-06-18T20:54:31+00:00"
   },
   {
     "n": 37,
@@ -728,16 +728,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 53.080002,
+    "latest_close": 53.09,
     "all_time_high_date": "2024-06-12",
     "all_time_high": 58.299999,
-    "drawdown_from_high_pct": -8.9537,
+    "drawdown_from_high_pct": -8.9365,
     "all_time_close_high_date": "2024-06-12",
     "all_time_close_high": 57.959999,
-    "drawdown_from_close_high_pct": -8.4196,
+    "drawdown_from_close_high_pct": -8.4023,
     "rows_used": 3243,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:33+00:00"
+    "generated_at_utc": "2026-06-18T20:54:32+00:00"
   },
   {
     "n": 38,
@@ -748,16 +748,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 6217.155762,
+    "latest_close": 6228.0,
     "all_time_high_date": "2025-10-24",
     "all_time_high": 6767.080078,
-    "drawdown_from_high_pct": -8.1265,
+    "drawdown_from_high_pct": -7.9662,
     "all_time_close_high_date": "2025-10-24",
     "all_time_close_high": 6767.080078,
-    "drawdown_from_close_high_pct": -8.1265,
+    "drawdown_from_close_high_pct": -7.9662,
     "rows_used": 4224,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:33+00:00"
+    "generated_at_utc": "2026-06-18T20:54:32+00:00"
   },
   {
     "n": 39,
@@ -768,16 +768,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 170.789993,
+    "latest_close": 170.695007,
     "all_time_high_date": "2025-10-24",
     "all_time_high": 21747.0,
-    "drawdown_from_high_pct": -99.2147,
+    "drawdown_from_high_pct": -99.2151,
     "all_time_close_high_date": "2025-10-24",
     "all_time_close_high": 21747.0,
-    "drawdown_from_close_high_pct": -99.2147,
+    "drawdown_from_close_high_pct": -99.2151,
     "rows_used": 2708,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:33+00:00"
+    "generated_at_utc": "2026-06-18T20:54:32+00:00"
   },
   {
     "n": 40,
@@ -788,16 +788,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 237.539993,
+    "latest_close": 237.399994,
     "all_time_high_date": "2020-04-28",
     "all_time_high": 289.799988,
-    "drawdown_from_high_pct": -18.0331,
+    "drawdown_from_high_pct": -18.0814,
     "all_time_close_high_date": "2026-02-27",
     "all_time_close_high": 246.25,
-    "drawdown_from_close_high_pct": -3.5371,
+    "drawdown_from_close_high_pct": -3.5939,
     "rows_used": 3965,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:33+00:00"
+    "generated_at_utc": "2026-06-18T20:54:32+00:00"
   },
   {
     "n": 41,
@@ -808,16 +808,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 56.997581,
+    "latest_close": 57.639999,
     "all_time_high_date": "2026-02-19",
     "all_time_high": 60.549999,
-    "drawdown_from_high_pct": -5.8669,
-    "all_time_close_high_date": "2026-06-02",
-    "all_time_close_high": 57.580002,
-    "drawdown_from_close_high_pct": -1.0115,
+    "drawdown_from_high_pct": -4.8059,
+    "all_time_close_high_date": "2026-06-18",
+    "all_time_close_high": 57.639999,
+    "drawdown_from_close_high_pct": 0.0,
     "rows_used": 3046,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:34+00:00"
+    "generated_at_utc": "2026-06-18T20:54:33+00:00"
   },
   {
     "n": 42,
@@ -828,16 +828,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 50.119999,
+    "latest_close": 50.830002,
     "all_time_high_date": "2026-06-18",
-    "all_time_high": 50.48,
-    "drawdown_from_high_pct": -0.7132,
+    "all_time_high": 50.939999,
+    "drawdown_from_high_pct": -0.2159,
     "all_time_close_high_date": "2026-06-18",
-    "all_time_close_high": 50.119999,
+    "all_time_close_high": 50.830002,
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 1767,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:34+00:00"
+    "generated_at_utc": "2026-06-18T20:54:33+00:00"
   },
   {
     "n": 43,
@@ -848,16 +848,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 8.842,
+    "latest_close": 8.875,
     "all_time_high_date": "2024-09-27",
     "all_time_high": 10.742,
-    "drawdown_from_high_pct": -17.6876,
+    "drawdown_from_high_pct": -17.3804,
     "all_time_close_high_date": "2024-09-27",
     "all_time_close_high": 10.72,
-    "drawdown_from_close_high_pct": -17.5187,
+    "drawdown_from_close_high_pct": -17.2108,
     "rows_used": 2036,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:34+00:00"
+    "generated_at_utc": "2026-06-18T20:54:33+00:00"
   },
   {
     "n": 44,
@@ -877,7 +877,7 @@
     "drawdown_from_close_high_pct": null,
     "rows_used": 0,
     "error": "{\"ICHN.L/rows_from_yfinance\": \"empty yfinance result\", \"ICHN.L/rows_from_yahoo_chart\": \"query1.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}; query2.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}\"}",
-    "generated_at_utc": "2026-06-18T11:36:40+00:00"
+    "generated_at_utc": "2026-06-18T20:54:39+00:00"
   },
   {
     "n": 45,
@@ -888,16 +888,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 15456.0,
+    "latest_close": 15531.0,
     "all_time_high_date": "2026-06-18",
-    "all_time_high": 15496.0,
-    "drawdown_from_high_pct": -0.2581,
+    "all_time_high": 15623.275391,
+    "drawdown_from_high_pct": -0.5906,
     "all_time_close_high_date": "2026-06-18",
-    "all_time_close_high": 15456.0,
+    "all_time_close_high": 15531.0,
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 4408,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:41+00:00"
+    "generated_at_utc": "2026-06-18T20:54:40+00:00"
   },
   {
     "n": 46,
@@ -908,16 +908,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 11557.0,
+    "latest_close": 11883.0,
     "all_time_high_date": "2026-06-18",
-    "all_time_high": 11635.5,
-    "drawdown_from_high_pct": -0.6747,
+    "all_time_high": 11932.0,
+    "drawdown_from_high_pct": -0.4107,
     "all_time_close_high_date": "2026-06-18",
-    "all_time_close_high": 11557.0,
+    "all_time_close_high": 11883.0,
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 4404,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:41+00:00"
+    "generated_at_utc": "2026-06-18T20:54:40+00:00"
   },
   {
     "n": 47,
@@ -928,16 +928,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 2105.5,
+    "latest_close": 2071.25,
     "all_time_high_date": "2011-01-06",
     "all_time_high": 4117.5,
-    "drawdown_from_high_pct": -48.8646,
+    "drawdown_from_high_pct": -49.6964,
     "all_time_close_high_date": "2011-01-05",
     "all_time_close_high": 4089.25,
-    "drawdown_from_close_high_pct": -48.5113,
+    "drawdown_from_close_high_pct": -49.3489,
     "rows_used": 4408,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:41+00:00"
+    "generated_at_utc": "2026-06-18T20:54:40+00:00"
   },
   {
     "n": 48,
@@ -948,16 +948,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 65.410004,
+    "latest_close": 64.629997,
     "all_time_high_date": "2026-02-19",
     "all_time_high": 70.150002,
-    "drawdown_from_high_pct": -6.7569,
+    "drawdown_from_high_pct": -7.8689,
     "all_time_close_high_date": "2026-02-16",
     "all_time_close_high": 69.949997,
-    "drawdown_from_close_high_pct": -6.4903,
+    "drawdown_from_close_high_pct": -7.6054,
     "rows_used": 4293,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:42+00:00"
+    "generated_at_utc": "2026-06-18T20:54:41+00:00"
   },
   {
     "n": 49,
@@ -968,16 +968,16 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 6.607,
+    "latest_close": 6.489,
     "all_time_high_date": "2026-03-30",
     "all_time_high": 7.78,
-    "drawdown_from_high_pct": -15.0771,
+    "drawdown_from_high_pct": -16.5938,
     "all_time_close_high_date": "2026-03-30",
     "all_time_close_high": 7.731,
-    "drawdown_from_close_high_pct": -14.5389,
+    "drawdown_from_close_high_pct": -16.0652,
     "rows_used": 999,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:42+00:00"
+    "generated_at_utc": "2026-06-18T20:54:41+00:00"
   },
   {
     "n": 50,
@@ -988,15 +988,15 @@
     "status": "ok",
     "source": "yfinance.download",
     "latest_date": "2026-06-18",
-    "latest_close": 6233.224121,
+    "latest_close": 6203.0,
     "all_time_high_date": "2026-03-02",
     "all_time_high": 7810.0,
-    "drawdown_from_high_pct": -20.1892,
+    "drawdown_from_high_pct": -20.5762,
     "all_time_close_high_date": "2026-03-02",
     "all_time_close_high": 7690.0,
-    "drawdown_from_close_high_pct": -18.9438,
+    "drawdown_from_close_high_pct": -19.3368,
     "rows_used": 3836,
     "error": null,
-    "generated_at_utc": "2026-06-18T11:36:42+00:00"
+    "generated_at_utc": "2026-06-18T20:54:41+00:00"
   }
 ]
