@@ -17,7 +17,7 @@
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 4280,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:44:52+00:00"
+    "generated_at_utc": "2026-06-18T21:46:12+00:00"
   },
   {
     "n": 2,
@@ -37,7 +37,7 @@
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 1750,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:44:52+00:00"
+    "generated_at_utc": "2026-06-18T21:46:12+00:00"
   },
   {
     "n": 3,
@@ -57,7 +57,7 @@
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 3699,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:44:52+00:00"
+    "generated_at_utc": "2026-06-18T21:46:12+00:00"
   },
   {
     "n": 4,
@@ -77,7 +77,7 @@
     "drawdown_from_close_high_pct": -86.3158,
     "rows_used": 3831,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:44:52+00:00"
+    "generated_at_utc": "2026-06-18T21:46:12+00:00"
   },
   {
     "n": 5,
@@ -97,7 +97,7 @@
     "drawdown_from_close_high_pct": -0.2939,
     "rows_used": 2998,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:44:52+00:00"
+    "generated_at_utc": "2026-06-18T21:46:12+00:00"
   },
   {
     "n": 6,
@@ -117,7 +117,7 @@
     "drawdown_from_close_high_pct": -5.4531,
     "rows_used": 3421,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:44:52+00:00"
+    "generated_at_utc": "2026-06-18T21:46:13+00:00"
   },
   {
     "n": 7,
@@ -137,7 +137,7 @@
     "drawdown_from_close_high_pct": -1.1245,
     "rows_used": 2956,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:44:52+00:00"
+    "generated_at_utc": "2026-06-18T21:46:13+00:00"
   },
   {
     "n": 8,
@@ -157,7 +157,7 @@
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 2956,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:44:53+00:00"
+    "generated_at_utc": "2026-06-18T21:46:13+00:00"
   },
   {
     "n": 9,
@@ -177,7 +177,7 @@
     "drawdown_from_close_high_pct": -1.349,
     "rows_used": 2956,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:44:53+00:00"
+    "generated_at_utc": "2026-06-18T21:46:13+00:00"
   },
   {
     "n": 10,
@@ -197,7 +197,7 @@
     "drawdown_from_close_high_pct": -1.0253,
     "rows_used": 2077,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:44:53+00:00"
+    "generated_at_utc": "2026-06-18T21:46:13+00:00"
   },
   {
     "n": 11,
@@ -217,7 +217,7 @@
     "drawdown_from_close_high_pct": -1.6921,
     "rows_used": 3978,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:44:53+00:00"
+    "generated_at_utc": "2026-06-18T21:46:14+00:00"
   },
   {
     "n": 12,
@@ -237,7 +237,7 @@
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 1311,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:44:53+00:00"
+    "generated_at_utc": "2026-06-18T21:46:14+00:00"
   },
   {
     "n": 13,
@@ -257,7 +257,7 @@
     "drawdown_from_close_high_pct": null,
     "rows_used": 0,
     "error": "{\"IQUF.L/rows_from_yfinance\": \"empty yfinance result\", \"IQUF.L/rows_from_yahoo_chart\": \"query1.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}; query2.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}\"}",
-    "generated_at_utc": "2026-06-18T21:45:00+00:00"
+    "generated_at_utc": "2026-06-18T21:46:21+00:00"
   },
   {
     "n": 14,
@@ -277,7 +277,7 @@
     "drawdown_from_close_high_pct": -0.8795,
     "rows_used": 2444,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:01+00:00"
+    "generated_at_utc": "2026-06-18T21:46:21+00:00"
   },
   {
     "n": 15,
@@ -297,7 +297,7 @@
     "drawdown_from_close_high_pct": null,
     "rows_used": 0,
     "error": "{\"IUMV.L/rows_from_yfinance\": \"empty yfinance result\", \"IUMV.L/rows_from_yahoo_chart\": \"query1.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}; query2.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}\"}",
-    "generated_at_utc": "2026-06-18T21:45:07+00:00"
+    "generated_at_utc": "2026-06-18T21:46:27+00:00"
   },
   {
     "n": 16,
@@ -317,7 +317,7 @@
     "drawdown_from_close_high_pct": -0.1755,
     "rows_used": 301,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:07+00:00"
+    "generated_at_utc": "2026-06-18T21:46:27+00:00"
   },
   {
     "n": 17,
@@ -337,7 +337,7 @@
     "drawdown_from_close_high_pct": null,
     "rows_used": 0,
     "error": "{\"ISP6.DE/rows_from_yfinance\": \"empty yfinance result\", \"ISP6.DE/rows_from_yahoo_chart\": \"query1.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}; query2.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}\"}",
-    "generated_at_utc": "2026-06-18T21:45:13+00:00"
+    "generated_at_utc": "2026-06-18T21:46:33+00:00"
   },
   {
     "n": 18,
@@ -357,7 +357,7 @@
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 4598,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:13+00:00"
+    "generated_at_utc": "2026-06-18T21:46:34+00:00"
   },
   {
     "n": 19,
@@ -377,7 +377,7 @@
     "drawdown_from_close_high_pct": -1.1489,
     "rows_used": 3973,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:14+00:00"
+    "generated_at_utc": "2026-06-18T21:46:34+00:00"
   },
   {
     "n": 20,
@@ -397,7 +397,7 @@
     "drawdown_from_close_high_pct": null,
     "rows_used": 0,
     "error": "{\"EQAC.DE/rows_from_yfinance\": \"empty yfinance result\", \"EQAC.DE/rows_from_yahoo_chart\": \"query1.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}; query2.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}\"}",
-    "generated_at_utc": "2026-06-18T21:45:20+00:00"
+    "generated_at_utc": "2026-06-18T21:46:40+00:00"
   },
   {
     "n": 21,
@@ -417,7 +417,7 @@
     "drawdown_from_close_high_pct": -0.9071,
     "rows_used": 4686,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:20+00:00"
+    "generated_at_utc": "2026-06-18T21:46:40+00:00"
   },
   {
     "n": 22,
@@ -437,7 +437,7 @@
     "drawdown_from_close_high_pct": -0.0434,
     "rows_used": 4408,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:21+00:00"
+    "generated_at_utc": "2026-06-18T21:46:41+00:00"
   },
   {
     "n": 23,
@@ -457,7 +457,7 @@
     "drawdown_from_close_high_pct": -0.8049,
     "rows_used": 2884,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:21+00:00"
+    "generated_at_utc": "2026-06-18T21:46:41+00:00"
   },
   {
     "n": 24,
@@ -477,7 +477,7 @@
     "drawdown_from_close_high_pct": -4.7119,
     "rows_used": 4686,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:21+00:00"
+    "generated_at_utc": "2026-06-18T21:46:41+00:00"
   },
   {
     "n": 25,
@@ -497,7 +497,7 @@
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 4519,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:21+00:00"
+    "generated_at_utc": "2026-06-18T21:46:41+00:00"
   },
   {
     "n": 26,
@@ -517,7 +517,7 @@
     "drawdown_from_close_high_pct": null,
     "rows_used": 0,
     "error": "{\"SX5EEX.DE/rows_from_yfinance\": \"empty yfinance result\", \"SX5EEX.DE/rows_from_yahoo_chart\": \"query1.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}; query2.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}\", \"EUEA.DE/rows_from_yfinance\": \"empty yfinance result\", \"EUEA.DE/rows_from_yahoo_chart\": \"query1.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}; query2.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}\"}",
-    "generated_at_utc": "2026-06-18T21:45:34+00:00"
+    "generated_at_utc": "2026-06-18T21:46:54+00:00"
   },
   {
     "n": 27,
@@ -537,7 +537,7 @@
     "drawdown_from_close_high_pct": -0.2052,
     "rows_used": 4538,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:34+00:00"
+    "generated_at_utc": "2026-06-18T21:46:54+00:00"
   },
   {
     "n": 28,
@@ -557,7 +557,7 @@
     "drawdown_from_close_high_pct": -5.2829,
     "rows_used": 4409,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:34+00:00"
+    "generated_at_utc": "2026-06-18T21:46:54+00:00"
   },
   {
     "n": 29,
@@ -577,7 +577,7 @@
     "drawdown_from_close_high_pct": -6.2622,
     "rows_used": 4409,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:35+00:00"
+    "generated_at_utc": "2026-06-18T21:46:55+00:00"
   },
   {
     "n": 30,
@@ -597,7 +597,7 @@
     "drawdown_from_close_high_pct": -6.4495,
     "rows_used": 2959,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:35+00:00"
+    "generated_at_utc": "2026-06-18T21:46:55+00:00"
   },
   {
     "n": 31,
@@ -617,7 +617,7 @@
     "drawdown_from_close_high_pct": -3.5844,
     "rows_used": 3977,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:35+00:00"
+    "generated_at_utc": "2026-06-18T21:46:55+00:00"
   },
   {
     "n": 32,
@@ -637,7 +637,7 @@
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 4719,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:35+00:00"
+    "generated_at_utc": "2026-06-18T21:46:55+00:00"
   },
   {
     "n": 33,
@@ -657,7 +657,7 @@
     "drawdown_from_close_high_pct": -1.972,
     "rows_used": 4686,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:35+00:00"
+    "generated_at_utc": "2026-06-18T21:46:55+00:00"
   },
   {
     "n": 34,
@@ -677,7 +677,7 @@
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 4059,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:36+00:00"
+    "generated_at_utc": "2026-06-18T21:46:56+00:00"
   },
   {
     "n": 35,
@@ -697,7 +697,7 @@
     "drawdown_from_close_high_pct": -14.0798,
     "rows_used": 7613,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:36+00:00"
+    "generated_at_utc": "2026-06-18T21:46:56+00:00"
   },
   {
     "n": 36,
@@ -717,7 +717,7 @@
     "drawdown_from_close_high_pct": -1.158,
     "rows_used": 4639,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:36+00:00"
+    "generated_at_utc": "2026-06-18T21:46:56+00:00"
   },
   {
     "n": 37,
@@ -737,7 +737,7 @@
     "drawdown_from_close_high_pct": -8.4023,
     "rows_used": 3243,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:36+00:00"
+    "generated_at_utc": "2026-06-18T21:46:56+00:00"
   },
   {
     "n": 38,
@@ -757,7 +757,7 @@
     "drawdown_from_close_high_pct": -7.9662,
     "rows_used": 4224,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:37+00:00"
+    "generated_at_utc": "2026-06-18T21:46:57+00:00"
   },
   {
     "n": 39,
@@ -777,7 +777,7 @@
     "drawdown_from_close_high_pct": -99.2151,
     "rows_used": 2708,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:37+00:00"
+    "generated_at_utc": "2026-06-18T21:46:57+00:00"
   },
   {
     "n": 40,
@@ -797,7 +797,7 @@
     "drawdown_from_close_high_pct": -3.5939,
     "rows_used": 3965,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:37+00:00"
+    "generated_at_utc": "2026-06-18T21:46:57+00:00"
   },
   {
     "n": 41,
@@ -817,7 +817,7 @@
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 3046,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:37+00:00"
+    "generated_at_utc": "2026-06-18T21:46:57+00:00"
   },
   {
     "n": 42,
@@ -837,7 +837,7 @@
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 1767,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:37+00:00"
+    "generated_at_utc": "2026-06-18T21:46:57+00:00"
   },
   {
     "n": 43,
@@ -857,7 +857,7 @@
     "drawdown_from_close_high_pct": -17.2108,
     "rows_used": 2036,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:37+00:00"
+    "generated_at_utc": "2026-06-18T21:46:57+00:00"
   },
   {
     "n": 44,
@@ -877,7 +877,7 @@
     "drawdown_from_close_high_pct": null,
     "rows_used": 0,
     "error": "{\"ICHN.L/rows_from_yfinance\": \"empty yfinance result\", \"ICHN.L/rows_from_yahoo_chart\": \"query1.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}; query2.finance.yahoo.com HTTP 404: {\\\"chart\\\":{\\\"result\\\":null,\\\"error\\\":{\\\"code\\\":\\\"Not Found\\\",\\\"description\\\":\\\"No data found, symbol may be delisted\\\"}}}\"}",
-    "generated_at_utc": "2026-06-18T21:45:44+00:00"
+    "generated_at_utc": "2026-06-18T21:47:04+00:00"
   },
   {
     "n": 45,
@@ -897,7 +897,7 @@
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 4408,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:44+00:00"
+    "generated_at_utc": "2026-06-18T21:47:04+00:00"
   },
   {
     "n": 46,
@@ -917,7 +917,7 @@
     "drawdown_from_close_high_pct": 0.0,
     "rows_used": 4404,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:44+00:00"
+    "generated_at_utc": "2026-06-18T21:47:04+00:00"
   },
   {
     "n": 47,
@@ -937,7 +937,7 @@
     "drawdown_from_close_high_pct": -23.8613,
     "rows_used": 4617,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:44+00:00"
+    "generated_at_utc": "2026-06-18T21:47:05+00:00"
   },
   {
     "n": 48,
@@ -957,7 +957,7 @@
     "drawdown_from_close_high_pct": -7.6054,
     "rows_used": 4293,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:44+00:00"
+    "generated_at_utc": "2026-06-18T21:47:05+00:00"
   },
   {
     "n": 49,
@@ -977,7 +977,7 @@
     "drawdown_from_close_high_pct": -16.0652,
     "rows_used": 999,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:45+00:00"
+    "generated_at_utc": "2026-06-18T21:47:05+00:00"
   },
   {
     "n": 50,
@@ -997,6 +997,6 @@
     "drawdown_from_close_high_pct": -19.3368,
     "rows_used": 3836,
     "error": null,
-    "generated_at_utc": "2026-06-18T21:45:45+00:00"
+    "generated_at_utc": "2026-06-18T21:47:05+00:00"
   }
 ]
