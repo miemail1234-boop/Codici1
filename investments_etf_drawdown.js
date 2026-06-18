@@ -57,6 +57,10 @@
     }[ch]));
   }
 
+  function primaryDrawdown(row) {
+    return num(row.drawdown_from_52w_high_pct) ?? num(row.drawdown_from_high_pct);
+  }
+
   function computedStatus(row) {
     if (row.status !== 'ok') return 'failed';
     const ddHigh = num(row.drawdown_from_high_pct);
@@ -166,8 +170,8 @@
     rows = rows.slice().sort((a, b) => {
       if (state.sort === 'name') return String(a.asset).localeCompare(String(b.asset), 'it');
       if (state.sort === 'number') return a.n - b.n;
-      if (state.sort === 'drawdown_desc') return (num(b.drawdown_from_high_pct) ?? -9999) - (num(a.drawdown_from_high_pct) ?? -9999);
-      return (num(a.drawdown_from_high_pct) ?? 9999) - (num(b.drawdown_from_high_pct) ?? 9999);
+      if (state.sort === 'drawdown_desc') return (primaryDrawdown(b) ?? -9999) - (primaryDrawdown(a) ?? -9999);
+      return (primaryDrawdown(a) ?? 9999) - (primaryDrawdown(b) ?? 9999);
     });
 
     return rows;
@@ -178,16 +182,16 @@
     const okRows = state.rows.filter((r) => r._computedStatus === 'ok');
     const failed = state.rows.filter((r) => r._computedStatus === 'failed').length;
     const suspicious = state.rows.filter((r) => ['outlier', 'suspicious'].includes(r._computedStatus)).length;
-    const nearHigh = okRows.filter((r) => (num(r.drawdown_from_high_pct) ?? -999) >= -1).length;
-    const drawdowns = okRows.map((r) => num(r.drawdown_from_high_pct)).filter((v) => v !== null).sort((a, b) => a - b);
+    const nearHigh = okRows.filter((r) => (primaryDrawdown(r) ?? -999) >= -1).length;
+    const drawdowns = okRows.map(primaryDrawdown).filter((v) => v !== null).sort((a, b) => a - b);
     const median = drawdowns.length ? drawdowns[Math.floor(drawdowns.length / 2)] : null;
     const updated = latestGeneratedAt();
 
     els.summary.innerHTML = `
       <div class="etf-card"><span>Totale</span><strong>${total}</strong><small>asset monitorati</small></div>
       <div class="etf-card"><span>Ok</span><strong>${okRows.length}</strong><small>dati validi</small></div>
-      <div class="etf-card"><span>Vicini ai massimi</span><strong>${nearHigh}</strong><small>entro -1%</small></div>
-      <div class="etf-card"><span>Mediana drawdown</span><strong>${fmtPct(median)}</strong><small>solo asset ok</small></div>
+      <div class="etf-card"><span>Vicini ai massimi</span><strong>${nearHigh}</strong><small>entro -1% da ATH 52 sett.</small></div>
+      <div class="etf-card"><span>Mediana drawdown</span><strong>${fmtPct(median)}</strong><small>da ATH 52 sett., se disponibile</small></div>
       <div class="etf-card"><span>Da verificare</span><strong>${suspicious}</strong><small>outlier/sospetti</small></div>
       <div class="etf-card"><span>Falliti</span><strong>${failed}</strong><small>ticker non risolti</small></div>
     `;
@@ -205,6 +209,7 @@
     const body = rows.map((row) => {
       const status = row._computedStatus;
       const dd = row.drawdown_from_high_pct;
+      const dd52 = row.drawdown_from_52w_high_pct;
       const expanded = state.expanded === row.n;
       const quote = row.yahoo_ticker ? `https://finance.yahoo.com/quote/${encodeURIComponent(row.yahoo_ticker)}` : '';
       return `
@@ -214,16 +219,20 @@
             <span class="etf-name"><strong>${esc(row.asset)}</strong><small>${esc(row.isin || 'ISIN n/d')}</small></span>
             <span class="etf-ticker">${row.yahoo_ticker ? `<code>${esc(row.yahoo_ticker)}</code>` : '—'}</span>
             <span class="etf-status badge ${status}">${statusLabel(status)}</span>
-            <span class="etf-price">${fmtNum(row.latest_close, 4)}<small>${fmtDate(row.latest_date)}</small></span>
-            <span class="etf-dd ${ddClass(dd, status)}">${fmtPct(dd)}<small>da max intraday</small></span>
-            <span class="etf-dd ${ddClass(row.drawdown_from_close_high_pct, status)}">${fmtPct(row.drawdown_from_close_high_pct)}<small>da max close</small></span>
+            <span class="etf-price">${fmtNum(row.latest_close, 4)}<small>ultimo ${fmtDate(row.latest_date)}</small></span>
+            <span class="etf-price">${fmtNum(row.all_time_high, 4)}<small>ATH assoluto ${fmtDate(row.all_time_high_date)}</small></span>
+            <span class="etf-price">${fmtNum(row.week_52_high, 4)}<small>ATH 52 sett. ${fmtDate(row.week_52_high_date)}</small></span>
+            <span class="etf-dd ${ddClass(dd52, status)}">${fmtPct(dd52)}<small>da ATH 52 sett.</small></span>
+            <span class="etf-dd ${ddClass(dd, status)}">${fmtPct(dd)}<small>da ATH assoluto</small></span>
           </button>
           ${expanded ? `
             <div class="etf-detail">
               <div><b>Ticker provati:</b> ${esc(row.tickers_tried || '—')}</div>
               <div><b>Fonte:</b> ${esc(row.source || '—')}</div>
-              <div><b>Massimo intraday:</b> ${fmtNum(row.all_time_high, 4)} il ${fmtDate(row.all_time_high_date)}</div>
-              <div><b>Massimo close:</b> ${fmtNum(row.all_time_close_high, 4)} il ${fmtDate(row.all_time_close_high_date)}</div>
+              <div><b>Ultimo close:</b> ${fmtNum(row.latest_close, 4)} il ${fmtDate(row.latest_date)}</div>
+              <div><b>ATH assoluto intraday:</b> ${fmtNum(row.all_time_high, 4)} il ${fmtDate(row.all_time_high_date)} (${fmtPct(row.drawdown_from_high_pct)})</div>
+              <div><b>ATH 52 settimane intraday:</b> ${fmtNum(row.week_52_high, 4)} il ${fmtDate(row.week_52_high_date)} (${fmtPct(row.drawdown_from_52w_high_pct)})</div>
+              <div><b>ATH close assoluto:</b> ${fmtNum(row.all_time_close_high, 4)} il ${fmtDate(row.all_time_close_high_date)} (${fmtPct(row.drawdown_from_close_high_pct)})</div>
               <div><b>Righe storiche usate:</b> ${fmtNum(row.rows_used, 0)}</div>
               ${row.error ? `<div><b>Errore:</b> <span class="small">${esc(row.error)}</span></div>` : ''}
               ${status !== 'ok' ? `<div class="small"><b>Nota:</b> dato escluso dai riepiloghi aggregati finché non viene verificato il ticker o la serie storica.</div>` : ''}
