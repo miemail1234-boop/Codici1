@@ -1,6 +1,6 @@
 # ETF drawdowns
 
-Generato UTC: 2026-06-18T20:54:41+00:00
+Generato UTC: 2026-06-18T21:22:19+00:00
 
 Asset riusciti: 44 / 50
 
