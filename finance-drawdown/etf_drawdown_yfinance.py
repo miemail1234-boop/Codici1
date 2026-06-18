@@ -6,7 +6,7 @@ import json
 import math
 import time
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
@@ -85,6 +85,9 @@ class Result:
     all_time_close_high_date: str | None
     all_time_close_high: float | None
     drawdown_from_close_high_pct: float | None
+    week_52_high_date: str | None
+    week_52_high: float | None
+    drawdown_from_52w_high_pct: float | None
     rows_used: int
     error: str | None
     generated_at_utc: str
@@ -98,10 +101,18 @@ def fnum(x):
     return y if math.isfinite(y) else None
 
 
-def dstr(x):
+def to_dt(x):
+    if hasattr(x, "to_pydatetime"):
+        x = x.to_pydatetime()
+    if isinstance(x, datetime):
+        return x if x.tzinfo else x.replace(tzinfo=timezone.utc)
     if hasattr(x, "date"):
-        return x.date().isoformat()
-    return datetime.fromtimestamp(int(x), timezone.utc).date().isoformat()
+        return datetime.combine(x.date(), datetime.min.time(), tzinfo=timezone.utc)
+    return datetime.fromtimestamp(int(x), timezone.utc)
+
+
+def dstr(x):
+    return to_dt(x).date().isoformat()
 
 
 def col(df, name):
@@ -174,8 +185,12 @@ def rows_from_yahoo_chart(ticker):
 
 def calc(asset, ticker, rows, source):
     latest_i, _, latest_close = rows[-1]
+    latest_dt = to_dt(latest_i)
     max_high_i, max_high, _ = max(rows, key=lambda r: r[1])
     max_close_i, _, max_close = max(rows, key=lambda r: r[2])
+    cutoff = latest_dt - timedelta(days=365)
+    rows_52w = [r for r in rows if to_dt(r[0]) >= cutoff] or rows
+    max_52w_i, max_52w, _ = max(rows_52w, key=lambda r: r[1])
     return Result(
         n=asset["n"],
         asset=asset["asset"],
@@ -192,6 +207,9 @@ def calc(asset, ticker, rows, source):
         all_time_close_high_date=dstr(max_close_i),
         all_time_close_high=round(max_close, 6),
         drawdown_from_close_high_pct=round((latest_close / max_close - 1) * 100, 4),
+        week_52_high_date=dstr(max_52w_i),
+        week_52_high=round(max_52w, 6),
+        drawdown_from_52w_high_pct=round((latest_close / max_52w - 1) * 100, 4),
         rows_used=len(rows),
         error=None,
         generated_at_utc=datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -204,7 +222,8 @@ def fail(asset, errors):
         tickers_tried=", ".join(asset["tickers"]), yahoo_ticker="", status="failed", source="",
         latest_date=None, latest_close=None, all_time_high_date=None, all_time_high=None,
         drawdown_from_high_pct=None, all_time_close_high_date=None, all_time_close_high=None,
-        drawdown_from_close_high_pct=None, rows_used=0,
+        drawdown_from_close_high_pct=None, week_52_high_date=None, week_52_high=None,
+        drawdown_from_52w_high_pct=None, rows_used=0,
         error=json.dumps(errors, ensure_ascii=False)[:2000],
         generated_at_utc=datetime.now(timezone.utc).isoformat(timespec="seconds"),
     )
@@ -240,13 +259,14 @@ def write(results):
         "# ETF drawdowns", "",
         f"Generato UTC: {datetime.now(timezone.utc).isoformat(timespec='seconds')}", "",
         f"Asset riusciti: {len(ok)} / {len(results)}", "",
-        "| # | Asset | Ticker | Ultimo close | Data | Max intraday | Data max | Drawdown high | Max close | Drawdown close |",
-        "|---:|---|---|---:|---|---:|---|---:|---:|---:|",
+        "| # | Asset | Ticker | Ultimo close | Data | ATH assoluto | Data ATH | DD ATH | ATH 52w | Data ATH 52w | DD 52w | ATH close | DD close |",
+        "|---:|---|---|---:|---|---:|---|---:|---:|---|---:|---:|---:|",
     ]
     for r in sorted(ok, key=lambda x: (x.drawdown_from_high_pct if x.drawdown_from_high_pct is not None else 999)):
         lines.append(
             f"| {r.n} | {r.asset} | `{r.yahoo_ticker}` | {r.latest_close} | {r.latest_date} | "
             f"{r.all_time_high} | {r.all_time_high_date} | {r.drawdown_from_high_pct}% | "
+            f"{r.week_52_high} | {r.week_52_high_date} | {r.drawdown_from_52w_high_pct}% | "
             f"{r.all_time_close_high} | {r.drawdown_from_close_high_pct}% |"
         )
     if failed:
