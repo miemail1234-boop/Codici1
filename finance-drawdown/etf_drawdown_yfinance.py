@@ -61,7 +61,7 @@ ASSETS = [
     {"n": 44, "asset": "MSCI China", "tickers": ["ICHN.L"], "isin": "da verificare"},
     {"n": 45, "asset": "MSCI Taiwan", "tickers": ["ITWN.L"], "isin": "da verificare"},
     {"n": 46, "asset": "MSCI Korea", "tickers": ["IKOR.L"], "isin": "da verificare"},
-    {"n": 47, "asset": "MSCI Brazil", "tickers": ["IBZL.L"], "isin": "da verificare"},
+    {"n": 47, "asset": "iShares MSCI Brazil UCITS ETF", "tickers": ["IBZL.L"], "isin": "IE00B0M63516"},
     {"n": 48, "asset": "MSCI World Health Care", "tickers": ["WHEA.L", "XDWH.DE"], "isin": "da verificare"},
     {"n": 49, "asset": "World Energy / Oil & Gas", "tickers": ["WENS.L", "EXH1.DE"], "isin": "da verificare"},
     {"n": 50, "asset": "Oro fisico ETC", "tickers": ["SGLN.L", "4GLD.DE"], "isin": "da verificare"},
