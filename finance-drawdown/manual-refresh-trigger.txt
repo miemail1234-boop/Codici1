@@ -1,0 +1,5 @@
+Manual ETF drawdown refresh requested from ChatGPT.
+
+Last requested at: 2026-06-18T00:00:00Z
+
+This file exists only to trigger the etf-drawdown GitHub Action via the workflow's finance-drawdown/** push path.
