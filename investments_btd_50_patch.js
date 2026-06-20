@@ -1,14 +1,13 @@
 (() => {
   'use strict';
-  const scripts = [
-    'investments_btd_correct_render.js?v=1',
-    'investments_entry_undo_patch.js?v=4',
-    'investments_entry_asset_name_patch.js?v=1'
-  ];
-  for (const src of scripts) {
+  function load(src) {
     const s = document.createElement('script');
-    s.src = `${src}&t=${Date.now()}`;
+    s.src = src;
     s.defer = true;
     document.head.appendChild(s);
   }
+  load('investments_overview_chart.js?v=3');
+  load('investments_btd_correct_render.js?v=1');
+  load('investments_entry_undo_patch.js?v=4');
+  load('investments_entry_asset_name_patch.js?v=1');
 })();
