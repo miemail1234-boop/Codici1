@@ -1,7 +1,13 @@
 (() => {
   'use strict';
-  const s = document.createElement('script');
-  s.src = 'investments_btd_correct_render.js?v=1&t=' + Date.now();
-  s.defer = true;
-  document.head.appendChild(s);
+  const scripts = [
+    'investments_btd_correct_render.js?v=1',
+    'investments_entry_undo_patch.js?v=1'
+  ];
+  for (const src of scripts) {
+    const s = document.createElement('script');
+    s.src = src + '&t=' + Date.now();
+    s.defer = true;
+    document.head.appendChild(s);
+  }
 })();
