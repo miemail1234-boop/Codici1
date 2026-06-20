@@ -2,59 +2,22 @@
 <html lang="it">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#101820">
-  <title>Life Tracker 3.1</title>
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=41">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Codici1</title>
+  <style>
+    body{margin:0;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f4f1eb;color:#101820;display:grid;place-items:center;padding:24px}main{width:min(860px,100%)}h1{font-size:3rem;margin:0 0 8px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.card{display:block;background:white;border:1px solid rgba(16,24,32,.12);border-radius:22px;padding:20px;text-decoration:none;color:inherit}.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-weight:800;font-size:.72rem;color:#0f766e}p{color:#68717a;line-height:1.5}
+  </style>
 </head>
 <body>
-  <div class="app-shell">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow" id="todayLabel"></p>
-        <h1>Life Tracker 3.1</h1>
-      </div>
-      <div class="top-actions">
-        <button class="secondary top-home" id="homeButton" data-screen="home">Home</button>
-        <button class="secondary top-sync" id="cloudSyncQuick" title="Scarica gli ultimi dati dal cloud">Sync</button>
-        <button class="icon-button" id="exportQuick" title="Esporta backup">Export</button>
-      </div>
-    </header>
-
-    <main>
-      <section class="screen active" id="screen-home" data-screen-panel="home"></section>
-      <section class="screen" id="screen-todo" data-screen-panel="todo"></section>
-      <section class="screen" id="screen-dashboard" data-screen-panel="dashboard"></section>
-      <section class="screen" id="screen-workout" data-screen-panel="workout"></section>
-      <section class="screen" id="screen-nutrition" data-screen-panel="nutrition"></section>
-      <section class="screen" id="screen-investments" data-screen-panel="investments"></section>
-      <section class="screen" id="screen-links" data-screen-panel="links"></section>
-      <section class="screen" id="screen-foods" data-screen-panel="foods"></section>
-      <section class="screen" id="screen-diary" data-screen-panel="diary"></section>
-      <section class="screen" id="screen-relationships" data-screen-panel="relationships"></section>
-      <section class="screen" id="screen-data" data-screen-panel="data"></section>
-      <section class="screen" id="screen-charts" data-screen-panel="charts"></section>
-      <section class="screen" id="screen-revisions" data-screen-panel="revisions"></section>
-    </main>
-  </div>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <script src="vendor/supabase.js?v=21"></script>
-  <script src="https://unpkg.com/mammoth@1.8.0/mammoth.browser.min.js"></script>
-  <script src="investment_seed.js?v=41"></script>
-  <script src="app.js?v=41"></script>
-  <script src="investment_price_fix_patch.js?v=1"></script>
-  <script src="ui_patch.js?v=42"></script>
-  <script src="todo_edit_patch.js?v=44"></script>
-  <script src="app_name_patch.js?v=2"></script>
-  <script src="workout_abs_patch.js?v=2"></script>
-  <script src="revision_review_patch.js?v=2"></script>
-  <script src="revision_atlas_selection_fix.js?v=1"></script>
-  <script src="revision_editor_patch.js?v=1"></script>
-  <script src="investment_snapshot_patch.js?v=1"></script>
-  <script src="hide_portfolio_blocks_patch.js?v=2"></script>
-  <script src="keep_scroll_patch.js?v=1"></script>
+  <main>
+    <p class="eyebrow">App hub</p>
+    <h1>Codici1</h1>
+    <p>Seleziona una delle app disponibili in questa repository.</p>
+    <section class="grid">
+      <a class="card" href="life-tracker/"><span class="eyebrow">Life</span><h2>Life Tracker</h2><p>Workout, nutrizione, todo, revisioni e dashboard.</p></a>
+      <a class="card" href="invest-tracker/"><span class="eyebrow">Finance</span><h2>Invest Tracker</h2><p>Portafoglio, movimenti, watchlist e BTD Radar.</p></a>
+      <a class="card" href="activity-timer/"><span class="eyebrow">Time</span><h2>Activity Timer</h2><p>Budget giornaliero, timer attività e sincronizzazione Supabase.</p></a>
+    </section>
+  </main>
 </body>
 </html>
