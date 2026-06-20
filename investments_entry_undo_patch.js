@@ -1,11 +1,12 @@
 (() => {
   'use strict';
 
-  if (window.__investmentEntryUndoPatchV3Loaded) return;
-  window.__investmentEntryUndoPatchV3Loaded = true;
+  if (window.__investmentEntryUndoPatchV4Loaded) return;
+  window.__investmentEntryUndoPatchV4Loaded = true;
 
   const SUPABASE_URL = 'https://kujyowhezihjambhpahe.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_VBzZaA3NAIvqMxJcZZTwPg_4_GEi1a3';
+  const LAST_UNDONE_KEY = 'life-tracker-last-undone-price-update-v1';
   const client = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_KEY);
   let booted = false;
 
@@ -30,6 +31,48 @@
 
   function entryLabel(row) {
     return `${row.date || ''} · ${row.characteristic || 'Aggiornamento'} · valore ${n(row.current_value).toLocaleString('it-IT', { maximumFractionDigits: 2 })} €`;
+  }
+
+  function lastUndoneSnapshot() {
+    try { return JSON.parse(localStorage.getItem(LAST_UNDONE_KEY) || 'null'); }
+    catch (_) { return null; }
+  }
+
+  function saveLastUndoneSnapshot(snapshot) {
+    localStorage.setItem(LAST_UNDONE_KEY, JSON.stringify({ ...snapshot, saved_at: new Date().toISOString() }));
+    updateRestoreButton();
+  }
+
+  function clearLastUndoneSnapshot() {
+    localStorage.removeItem(LAST_UNDONE_KEY);
+    updateRestoreButton();
+  }
+
+  function updateRestoreButton() {
+    const button = document.getElementById('restoreLastPriceUpdateBtn');
+    if (!button) return;
+    const snapshot = lastUndoneSnapshot();
+    button.disabled = !snapshot?.entry;
+    button.textContent = snapshot?.entry ? 'Ripristina ultimo annullato' : 'Ripristina aggiornamento';
+    button.title = snapshot?.entry ? `Ripristina: ${entryLabel(snapshot.entry)}` : 'Nessun aggiornamento annullato da ripristinare';
+  }
+
+  function ensureGlobalRestoreButton() {
+    const actions = document.querySelector('.top .actions');
+    if (!actions || document.getElementById('restoreLastPriceUpdateBtn')) {
+      updateRestoreButton();
+      return;
+    }
+    const button = document.createElement('button');
+    button.className = 'btn';
+    button.type = 'button';
+    button.id = 'restoreLastPriceUpdateBtn';
+    button.textContent = 'Ripristina aggiornamento';
+    button.disabled = true;
+    const undoBtn = document.getElementById('undoBtn');
+    if (undoBtn?.parentElement === actions) undoBtn.insertAdjacentElement('afterend', button);
+    else actions.appendChild(button);
+    updateRestoreButton();
   }
 
   async function getUserId() {
@@ -68,26 +111,36 @@
       .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) || String(b.created_at || '').localeCompare(String(a.created_at || '')))[0] || null;
   }
 
-  async function restoreEntryPrice(entryId) {
+  async function restoreLastUndoneUpdate() {
     if (!client) return toast('Supabase non disponibile');
+    const snapshot = lastUndoneSnapshot();
+    if (!snapshot?.entry) return toast('Nessun aggiornamento annullato da ripristinare');
+
     const userId = await getUserId();
     if (!userId) return toast('Sessione Supabase non trovata');
 
-    const { entries, assets } = await fetchInvestmentData(userId);
-    const entry = entries.find((row) => row.id === entryId);
-    if (!entry || !n(entry.current_price)) return toast('Aggiornamento non valido');
+    const entry = { ...snapshot.entry, user_id: userId };
+    if (!n(entry.current_price)) return toast('Aggiornamento non valido');
+    if (!confirm(`Ripristinare l'ultimo aggiornamento annullato?\n\n${entryLabel(entry)}`)) return;
+
+    const { assets } = await fetchInvestmentData(userId);
     const asset = assetForEntry(entry, assets);
     if (!asset) return toast('Asset collegato non trovato');
-    if (!confirm(`Ripristinare questo aggiornamento come prezzo attuale?\n\n${entryLabel(entry)}`)) return;
 
-    const update = await client
+    const upsertEntry = await client
+      .from('investment_entries')
+      .upsert(entry, { onConflict: 'user_id,id' });
+    if (upsertEntry.error) throw upsertEntry.error;
+
+    const updateAsset = await client
       .from('investment_assets')
       .update({ current_price: n(entry.current_price), current_price_date: entry.date || null, updated_at: new Date().toISOString() })
       .eq('user_id', userId)
       .eq('id', asset.id);
-    if (update.error) throw update.error;
+    if (updateAsset.error) throw updateAsset.error;
 
-    toast('Aggiornamento ripristinato');
+    clearLastUndoneSnapshot();
+    toast('Ultimo aggiornamento annullato ripristinato');
     setTimeout(() => document.getElementById('reloadBtn')?.click(), 250);
   }
 
@@ -107,6 +160,8 @@
     const shouldRestoreAssetPrice = asset && latestBeforeDelete?.id === entry.id;
     const previousEntry = latestPriceEntryForBlock(entries, entry.generic_option, entry.id);
     const previousTrade = asset ? fallbackTradePrice(asset, trades) : null;
+
+    saveLastUndoneSnapshot({ entry, asset_id: asset?.id || '', asset_name: asset?.name || '' });
 
     const deletion = await client
       .from('investment_entries')
@@ -135,23 +190,15 @@
     setTimeout(() => document.getElementById('reloadBtn')?.click(), 250);
   }
 
-  function ensureActionButtons(item, row) {
-    let actions = item.querySelector('.actions[data-entry-update-actions]') || item.querySelector('[data-delete-entry-update]')?.closest('.actions') || item.querySelector('[data-restore-entry-update]')?.closest('.actions');
+  function ensureCancelButton(item, row) {
+    item.querySelectorAll('[data-restore-entry-update]').forEach((button) => button.remove());
+    let actions = item.querySelector('.actions[data-entry-update-actions]') || item.querySelector('[data-delete-entry-update]')?.closest('.actions');
     if (!actions) {
       actions = document.createElement('div');
       actions.className = 'actions';
       actions.dataset.entryUpdateActions = '1';
       actions.style.marginTop = '8px';
       item.appendChild(actions);
-    }
-
-    if (!actions.querySelector('[data-restore-entry-update]')) {
-      const restore = document.createElement('button');
-      restore.className = 'btn';
-      restore.type = 'button';
-      restore.dataset.restoreEntryUpdate = row.id;
-      restore.textContent = 'Ripristina';
-      actions.prepend(restore);
     }
 
     if (!actions.querySelector('[data-delete-entry-update]')) {
@@ -165,6 +212,7 @@
   }
 
   async function attachUndoButtons() {
+    ensureGlobalRestoreButton();
     const holder = document.getElementById('entryLog');
     if (!holder || holder.dataset.undoPatchBusy === '1') return;
     if (!client) return;
@@ -178,26 +226,28 @@
       items.forEach((item, index) => {
         const row = rows[index];
         if (!row || row.transaction_type === 'buy' || !n(row.current_price)) return;
-        ensureActionButtons(item, row);
+        ensureCancelButton(item, row);
       });
     } catch (error) {
       console.error(error);
     } finally {
       holder.dataset.undoPatchBusy = '0';
+      updateRestoreButton();
     }
   }
 
   document.addEventListener('click', async (event) => {
-    const restoreButton = event.target.closest('[data-restore-entry-update]');
-    if (restoreButton) {
+    const globalRestore = event.target.closest('#restoreLastPriceUpdateBtn');
+    if (globalRestore) {
       event.preventDefault();
-      restoreButton.disabled = true;
+      globalRestore.disabled = true;
       try {
-        await restoreEntryPrice(restoreButton.dataset.restoreEntryUpdate);
+        await restoreLastUndoneUpdate();
       } catch (error) {
         console.error(error);
-        toast('Errore durante ripristino aggiornamento');
-        restoreButton.disabled = false;
+        toast('Errore durante ripristino ultimo aggiornamento');
+      } finally {
+        updateRestoreButton();
       }
       return;
     }
@@ -219,6 +269,7 @@
     if (booted) return;
     booted = true;
     const installObserver = () => {
+      ensureGlobalRestoreButton();
       const holder = document.getElementById('entryLog');
       if (holder && !holder.dataset.undoPatchObserver) {
         holder.dataset.undoPatchObserver = '1';
