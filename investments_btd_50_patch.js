@@ -6,7 +6,7 @@
     s.defer = true;
     document.head.appendChild(s);
   }
-  load('investments_overview_chart.js?v=3');
+  load('investments_overview_chart.js?v=4');
   load('investments_full_history_charts.js?v=2');
   load('investments_btd_correct_render.js?v=1');
   load('investments_entry_undo_patch.js?v=4');
