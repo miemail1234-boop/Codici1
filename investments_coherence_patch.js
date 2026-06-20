@@ -6,17 +6,6 @@
   const SUPABASE_KEY = "sb_publishable_VBzZaA3NAIvqMxJcZZTwPg_4_GEi1a3";
   const TAX_RATE = 0.26;
   const SCREENSHOT_CASH = 33096.52 + 8963 + 1825.39;
-  const SCREENSHOT_VALUES = {
-    "Nasdaq": 52081.97,
-    "Occidente ex-USA": 11860.47,
-    "Stoxx healthcare": 9850.13,
-    "Physical Gold": 7115.14,
-    "21share ETH Core ETP": 4886,
-    "Berkshire H": 22587,
-    "Franklin INDIA": 18811,
-    "Ishare Bitcoin ETP": 5195,
-    "MSCI World minimum volatility": 20351
-  };
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const $ = id => document.getElementById(id);
   const n = value => {
@@ -64,6 +53,12 @@
     return blocks.find(block => block.id === id)?.name || blocks.find(block => block.id === id)?.title || "Altro";
   }
 
+  function latestPriceEntry(asset, entries) {
+    return entries
+      .filter(entry => entry.generic_option === asset.block_id && n(entry.current_value) > 0 && (n(entry.current_price) > 0 || entry.date))
+      .sort((a, b) => String(b.date).localeCompare(String(a.date)) || n(b.created_at_ms) - n(a.created_at_ms) || String(b.id || "").localeCompare(String(a.id || "")))[0];
+  }
+
   function computePosition(asset, trades, entries) {
     const rows = trades.filter(row => row.asset_id === asset.id);
     const buyQty = rows.filter(row => row.side === "buy").reduce((sum, row) => sum + n(row.quantity), 0);
@@ -73,11 +68,10 @@
     const avgCost = buyQty > 0 ? buyAmount / buyQty : 0;
     const openQty = Math.max(0, buyQty - sellQty);
     const openCost = openQty * avgCost;
-    const latestEntry = entries.filter(entry => entry.generic_option === asset.block_id && n(entry.current_value) > 0).sort((a, b) => String(b.date).localeCompare(String(a.date)))[0];
-    const fallbackPrice = n(asset.current_price) || (openQty > 0 ? n(latestEntry?.current_value) / openQty : 0);
-    const screenshotValue = SCREENSHOT_VALUES[asset.name];
-    const price = screenshotValue && openQty > 0 ? screenshotValue / openQty : fallbackPrice;
-    const marketValue = screenshotValue && openQty > 0 ? screenshotValue : openQty * price;
+    const latestEntry = latestPriceEntry(asset, entries);
+    const latestPrice = n(latestEntry?.current_price) || (openQty > 0 ? n(latestEntry?.current_value) / openQty : 0);
+    const price = latestPrice || n(asset.current_price);
+    const marketValue = openQty * price;
     const realizedGain = sellAmount - sellQty * avgCost;
     const unrealizedGain = marketValue - openCost;
     return { asset, openQty, openCost, avgCost, price, marketValue, realizedGain, unrealizedGain, sellAmount, buyAmount };
@@ -142,18 +136,17 @@
     $("dashboard").innerHTML = metricCards(totals).filter(card => visible.has(card.key)).map(card => `<div class="card"><h3>${safe(card.title)}</h3><div class="value">${card.value}</div><div class="small">${safe(card.hint)}</div></div>`).join("");
   }
 
-  function assetHistory(asset, entries, currentValue) {
+  function assetHistory(asset, entries) {
     const byDate = new Map();
     entries
       .filter(entry => entry.generic_option === asset.block_id && n(entry.current_value) > 0 && entry.date)
       .sort((a, b) => String(a.date).localeCompare(String(b.date)) || n(a.created_at_ms) - n(b.created_at_ms))
       .forEach(entry => byDate.set(entry.date, n(entry.current_value)));
-    if (currentValue > 0) byDate.set("2026-06-15", currentValue);
     return [...byDate.entries()].sort((a, b) => String(a[0]).localeCompare(String(b[0]))).map(([date, value]) => ({ date, value })).slice(-12);
   }
 
-  function lineChartHtml(asset, entries, currentValue) {
-    const rows = assetHistory(asset, entries, currentValue);
+  function lineChartHtml(asset, entries) {
+    const rows = assetHistory(asset, entries);
     if (rows.length < 2) return `<p class="small">Grafico valore: servono almeno due aggiornamenti prezzo.</p>`;
     const w = 520;
     const h = 120;
@@ -186,7 +179,7 @@
   function renderPositions(totals, blocks, entries) {
     $("positions").innerHTML = totals.openPositions.sort((a, b) => b.marketValue - a.marketValue).map(pos => {
       const allocation = totals.marketValue > 0 ? pos.marketValue / totals.marketValue * 100 : 0;
-      return `<div class="asset"><div class="asset-head"><div><h3>${safe(pos.asset.name)}</h3><p class="small">Altro · Altro · ${safe(blockName(blocks, pos.asset.block_id))} · valori screenshot Trade Republic</p></div><div class="actions"><button class="btn" data-sellall="${safe(pos.asset.id)}">Vendi tutto</button></div></div><div class="metrics"><span class="pill">Quantità ${fmt4(pos.openQty)}</span><span class="pill">Costo medio ${eur(pos.avgCost)}</span><span class="pill">Valore aperto ${eur(pos.marketValue)}</span><span class="pill ${pos.unrealizedGain >= 0 ? "pos" : "neg"}">Guadagno ${eur(pos.unrealizedGain)}</span></div><p class="small">Realizzato ${eur(pos.realizedGain)} · aperto ${eur(pos.unrealizedGain)} · costo residuo ${eur(pos.openCost)} · allocazione ${pct(allocation)}</p>${lineChartHtml(pos.asset, entries, pos.marketValue)}</div>`;
+      return `<div class="asset"><div class="asset-head"><div><h3>${safe(pos.asset.name)}</h3><p class="small">Altro · Altro · ${safe(blockName(blocks, pos.asset.block_id))} · ultimo aggiornamento prezzo</p></div><div class="actions"><button class="btn" data-sellall="${safe(pos.asset.id)}">Vendi tutto</button></div></div><div class="metrics"><span class="pill">Quantità ${fmt4(pos.openQty)}</span><span class="pill">Costo medio ${eur(pos.avgCost)}</span><span class="pill">Valore aperto ${eur(pos.marketValue)}</span><span class="pill ${pos.unrealizedGain >= 0 ? "pos" : "neg"}">Guadagno ${eur(pos.unrealizedGain)}</span></div><p class="small">Realizzato ${eur(pos.realizedGain)} · aperto ${eur(pos.unrealizedGain)} · costo residuo ${eur(pos.openCost)} · allocazione ${pct(allocation)}</p>${lineChartHtml(pos.asset, entries)}</div>`;
     }).join("");
   }
 
