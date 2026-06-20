@@ -20,7 +20,7 @@
     "drawdown_from_52w_high_pct": -0.2876,
     "rows_used": 4281,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:17+00:00"
+    "generated_at_utc": "2026-06-20T08:07:01+00:00"
   },
   {
     "n": 2,
@@ -43,7 +43,7 @@
     "drawdown_from_52w_high_pct": -0.3013,
     "rows_used": 1751,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:17+00:00"
+    "generated_at_utc": "2026-06-20T08:07:01+00:00"
   },
   {
     "n": 3,
@@ -66,7 +66,7 @@
     "drawdown_from_52w_high_pct": -0.3686,
     "rows_used": 3700,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:17+00:00"
+    "generated_at_utc": "2026-06-20T08:07:01+00:00"
   },
   {
     "n": 4,
@@ -89,7 +89,7 @@
     "drawdown_from_52w_high_pct": -0.3493,
     "rows_used": 3832,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:18+00:00"
+    "generated_at_utc": "2026-06-20T08:07:01+00:00"
   },
   {
     "n": 5,
@@ -112,7 +112,7 @@
     "drawdown_from_52w_high_pct": -0.6249,
     "rows_used": 2999,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:18+00:00"
+    "generated_at_utc": "2026-06-20T08:07:02+00:00"
   },
   {
     "n": 6,
@@ -135,7 +135,7 @@
     "drawdown_from_52w_high_pct": -7.4371,
     "rows_used": 3422,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:18+00:00"
+    "generated_at_utc": "2026-06-20T08:07:02+00:00"
   },
   {
     "n": 7,
@@ -158,7 +158,7 @@
     "drawdown_from_52w_high_pct": -1.674,
     "rows_used": 2957,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:18+00:00"
+    "generated_at_utc": "2026-06-20T08:07:02+00:00"
   },
   {
     "n": 8,
@@ -181,7 +181,7 @@
     "drawdown_from_52w_high_pct": -0.5497,
     "rows_used": 2957,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:18+00:00"
+    "generated_at_utc": "2026-06-20T08:07:02+00:00"
   },
   {
     "n": 9,
@@ -204,7 +204,7 @@
     "drawdown_from_52w_high_pct": -1.8324,
     "rows_used": 2957,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:19+00:00"
+    "generated_at_utc": "2026-06-20T08:07:02+00:00"
   },
   {
     "n": 10,
@@ -227,7 +227,7 @@
     "drawdown_from_52w_high_pct": -1.8978,
     "rows_used": 2078,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:19+00:00"
+    "generated_at_utc": "2026-06-20T08:07:02+00:00"
   },
   {
     "n": 11,
@@ -250,7 +250,7 @@
     "drawdown_from_52w_high_pct": -9.232,
     "rows_used": 3979,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:19+00:00"
+    "generated_at_utc": "2026-06-20T08:07:03+00:00"
   },
   {
     "n": 12,
@@ -273,7 +273,7 @@
     "drawdown_from_52w_high_pct": -0.2181,
     "rows_used": 1312,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:19+00:00"
+    "generated_at_utc": "2026-06-20T08:07:03+00:00"
   },
   {
     "n": 13,
@@ -296,7 +296,7 @@
     "drawdown_from_52w_high_pct": null,
     "rows_used": 0,
     "error": "{\"IQUF.L/rows_from_yfinance\": \"empty yfinance result\"}",
-    "generated_at_utc": "2026-06-20T07:49:26+00:00"
+    "generated_at_utc": "2026-06-20T08:07:09+00:00"
   },
   {
     "n": 14,
@@ -319,7 +319,7 @@
     "drawdown_from_52w_high_pct": -2.0338,
     "rows_used": 2445,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:26+00:00"
+    "generated_at_utc": "2026-06-20T08:07:09+00:00"
   },
   {
     "n": 15,
@@ -342,7 +342,7 @@
     "drawdown_from_52w_high_pct": null,
     "rows_used": 0,
     "error": "{\"IUMV.L/rows_from_yfinance\": \"empty yfinance result\"}",
-    "generated_at_utc": "2026-06-20T07:49:32+00:00"
+    "generated_at_utc": "2026-06-20T08:07:15+00:00"
   },
   {
     "n": 16,
@@ -365,7 +365,7 @@
     "drawdown_from_52w_high_pct": -0.0971,
     "rows_used": 302,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:32+00:00"
+    "generated_at_utc": "2026-06-20T08:07:16+00:00"
   },
   {
     "n": 17,
@@ -388,7 +388,7 @@
     "drawdown_from_52w_high_pct": null,
     "rows_used": 0,
     "error": "{\"ISP6.DE/rows_from_yfinance\": \"empty yfinance result\"}",
-    "generated_at_utc": "2026-06-20T07:49:38+00:00"
+    "generated_at_utc": "2026-06-20T08:07:22+00:00"
   },
   {
     "n": 18,
@@ -411,7 +411,7 @@
     "drawdown_from_52w_high_pct": -0.2556,
     "rows_used": 4599,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:39+00:00"
+    "generated_at_utc": "2026-06-20T08:07:22+00:00"
   },
   {
     "n": 19,
@@ -434,7 +434,7 @@
     "drawdown_from_52w_high_pct": -0.0789,
     "rows_used": 4028,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:39+00:00"
+    "generated_at_utc": "2026-06-20T08:07:22+00:00"
   },
   {
     "n": 20,
@@ -457,7 +457,7 @@
     "drawdown_from_52w_high_pct": null,
     "rows_used": 0,
     "error": "{\"EQAC.DE/rows_from_yfinance\": \"empty yfinance result\"}",
-    "generated_at_utc": "2026-06-20T07:49:45+00:00"
+    "generated_at_utc": "2026-06-20T08:07:28+00:00"
   },
   {
     "n": 21,
@@ -480,7 +480,7 @@
     "drawdown_from_52w_high_pct": -1.265,
     "rows_used": 4687,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:45+00:00"
+    "generated_at_utc": "2026-06-20T08:07:28+00:00"
   },
   {
     "n": 22,
@@ -501,9 +501,9 @@
     "week_52_high_date": "2026-06-19",
     "week_52_high": 3467.5,
     "drawdown_from_52w_high_pct": -0.6345,
-    "rows_used": 4408,
+    "rows_used": 4409,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:46+00:00"
+    "generated_at_utc": "2026-06-20T08:07:29+00:00"
   },
   {
     "n": 23,
@@ -526,7 +526,7 @@
     "drawdown_from_52w_high_pct": -1.895,
     "rows_used": 2885,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:46+00:00"
+    "generated_at_utc": "2026-06-20T08:07:29+00:00"
   },
   {
     "n": 24,
@@ -549,7 +549,7 @@
     "drawdown_from_52w_high_pct": -0.419,
     "rows_used": 4687,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:46+00:00"
+    "generated_at_utc": "2026-06-20T08:07:29+00:00"
   },
   {
     "n": 25,
@@ -572,7 +572,7 @@
     "drawdown_from_52w_high_pct": -0.727,
     "rows_used": 4520,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:46+00:00"
+    "generated_at_utc": "2026-06-20T08:07:29+00:00"
   },
   {
     "n": 26,
@@ -595,7 +595,7 @@
     "drawdown_from_52w_high_pct": null,
     "rows_used": 0,
     "error": "{\"SX5EEX.DE/rows_from_yfinance\": \"empty yfinance result\", \"EUEA.DE/rows_from_yfinance\": \"empty yfinance result\"}",
-    "generated_at_utc": "2026-06-20T07:49:59+00:00"
+    "generated_at_utc": "2026-06-20T08:07:42+00:00"
   },
   {
     "n": 27,
@@ -618,7 +618,7 @@
     "drawdown_from_52w_high_pct": -0.8307,
     "rows_used": 4539,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:59+00:00"
+    "generated_at_utc": "2026-06-20T08:07:42+00:00"
   },
   {
     "n": 28,
@@ -639,9 +639,9 @@
     "week_52_high_date": "2026-02-25",
     "week_52_high": 1148.400024,
     "drawdown_from_52w_high_pct": -12.2257,
-    "rows_used": 4409,
+    "rows_used": 4410,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:59+00:00"
+    "generated_at_utc": "2026-06-20T08:07:42+00:00"
   },
   {
     "n": 29,
@@ -662,9 +662,9 @@
     "week_52_high_date": "2026-06-15",
     "week_52_high": 2212.0,
     "drawdown_from_52w_high_pct": -3.3454,
-    "rows_used": 4409,
+    "rows_used": 4410,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:49:59+00:00"
+    "generated_at_utc": "2026-06-20T08:07:42+00:00"
   },
   {
     "n": 30,
@@ -687,7 +687,7 @@
     "drawdown_from_52w_high_pct": -3.3301,
     "rows_used": 2960,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:00+00:00"
+    "generated_at_utc": "2026-06-20T08:07:42+00:00"
   },
   {
     "n": 31,
@@ -708,9 +708,9 @@
     "week_52_high_date": "2026-02-27",
     "week_52_high": 22090.0,
     "drawdown_from_52w_high_pct": -4.1648,
-    "rows_used": 3977,
+    "rows_used": 3978,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:00+00:00"
+    "generated_at_utc": "2026-06-20T08:07:43+00:00"
   },
   {
     "n": 32,
@@ -733,7 +733,7 @@
     "drawdown_from_52w_high_pct": -1.0877,
     "rows_used": 4720,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:00+00:00"
+    "generated_at_utc": "2026-06-20T08:07:43+00:00"
   },
   {
     "n": 33,
@@ -756,7 +756,7 @@
     "drawdown_from_52w_high_pct": -2.4852,
     "rows_used": 4687,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:00+00:00"
+    "generated_at_utc": "2026-06-20T08:07:43+00:00"
   },
   {
     "n": 34,
@@ -779,7 +779,7 @@
     "drawdown_from_52w_high_pct": -0.6061,
     "rows_used": 4060,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:00+00:00"
+    "generated_at_utc": "2026-06-20T08:07:43+00:00"
   },
   {
     "n": 35,
@@ -789,20 +789,20 @@
     "yahoo_ticker": "EWP",
     "status": "ok",
     "source": "yfinance.download",
-    "latest_date": "2026-06-17",
-    "latest_close": 58.849998,
+    "latest_date": "2026-06-18",
+    "latest_close": 59.009998,
     "all_time_high_date": "2007-11-14",
     "all_time_high": 71.849998,
-    "drawdown_from_high_pct": -18.0933,
+    "drawdown_from_high_pct": -17.8706,
     "all_time_close_high_date": "2007-12-10",
     "all_time_close_high": 68.68,
-    "drawdown_from_close_high_pct": -14.3128,
+    "drawdown_from_close_high_pct": -14.0798,
     "week_52_high_date": "2026-06-17",
     "week_52_high": 59.880001,
-    "drawdown_from_52w_high_pct": -1.7201,
-    "rows_used": 7612,
+    "drawdown_from_52w_high_pct": -1.4529,
+    "rows_used": 7613,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:01+00:00"
+    "generated_at_utc": "2026-06-20T08:07:43+00:00"
   },
   {
     "n": 36,
@@ -825,7 +825,7 @@
     "drawdown_from_52w_high_pct": -1.5516,
     "rows_used": 4640,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:01+00:00"
+    "generated_at_utc": "2026-06-20T08:07:44+00:00"
   },
   {
     "n": 37,
@@ -848,7 +848,7 @@
     "drawdown_from_52w_high_pct": -3.8788,
     "rows_used": 3244,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:01+00:00"
+    "generated_at_utc": "2026-06-20T08:07:44+00:00"
   },
   {
     "n": 38,
@@ -869,9 +869,9 @@
     "week_52_high_date": "2025-10-24",
     "week_52_high": 6767.080078,
     "drawdown_from_52w_high_pct": -8.0105,
-    "rows_used": 4224,
+    "rows_used": 4225,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:02+00:00"
+    "generated_at_utc": "2026-06-20T08:07:44+00:00"
   },
   {
     "n": 39,
@@ -894,7 +894,7 @@
     "drawdown_from_52w_high_pct": -99.2187,
     "rows_used": 2709,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:02+00:00"
+    "generated_at_utc": "2026-06-20T08:07:44+00:00"
   },
   {
     "n": 40,
@@ -917,7 +917,7 @@
     "drawdown_from_52w_high_pct": -6.6759,
     "rows_used": 3966,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:02+00:00"
+    "generated_at_utc": "2026-06-20T08:07:45+00:00"
   },
   {
     "n": 41,
@@ -940,7 +940,7 @@
     "drawdown_from_52w_high_pct": -5.6978,
     "rows_used": 3047,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:02+00:00"
+    "generated_at_utc": "2026-06-20T08:07:45+00:00"
   },
   {
     "n": 42,
@@ -963,7 +963,7 @@
     "drawdown_from_52w_high_pct": -1.2367,
     "rows_used": 1768,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:02+00:00"
+    "generated_at_utc": "2026-06-20T08:07:45+00:00"
   },
   {
     "n": 43,
@@ -986,7 +986,7 @@
     "drawdown_from_52w_high_pct": -15.687,
     "rows_used": 2037,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:03+00:00"
+    "generated_at_utc": "2026-06-20T08:07:45+00:00"
   },
   {
     "n": 44,
@@ -1009,7 +1009,7 @@
     "drawdown_from_52w_high_pct": null,
     "rows_used": 0,
     "error": "{\"ICHN.L/rows_from_yfinance\": \"empty yfinance result\"}",
-    "generated_at_utc": "2026-06-20T07:50:09+00:00"
+    "generated_at_utc": "2026-06-20T08:07:51+00:00"
   },
   {
     "n": 45,
@@ -1024,15 +1024,15 @@
     "all_time_high_date": "2026-06-19",
     "all_time_high": 15754.0,
     "drawdown_from_high_pct": -1.7519,
-    "all_time_close_high_date": "2026-06-19",
-    "all_time_close_high": 15478.0,
-    "drawdown_from_close_high_pct": 0.0,
+    "all_time_close_high_date": "2026-06-18",
+    "all_time_close_high": 15531.0,
+    "drawdown_from_close_high_pct": -0.3413,
     "week_52_high_date": "2026-06-19",
     "week_52_high": 15754.0,
     "drawdown_from_52w_high_pct": -1.7519,
-    "rows_used": 4408,
+    "rows_used": 4409,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:09+00:00"
+    "generated_at_utc": "2026-06-20T08:07:51+00:00"
   },
   {
     "n": 46,
@@ -1044,18 +1044,18 @@
     "source": "yfinance.download",
     "latest_date": "2026-06-19",
     "latest_close": 11653.75,
-    "all_time_high_date": "2026-06-19",
-    "all_time_high": 11729.25,
-    "drawdown_from_high_pct": -0.6437,
-    "all_time_close_high_date": "2026-06-19",
-    "all_time_close_high": 11653.75,
-    "drawdown_from_close_high_pct": 0.0,
-    "week_52_high_date": "2026-06-19",
-    "week_52_high": 11729.25,
-    "drawdown_from_52w_high_pct": -0.6437,
-    "rows_used": 4404,
+    "all_time_high_date": "2026-06-18",
+    "all_time_high": 11932.0,
+    "drawdown_from_high_pct": -2.332,
+    "all_time_close_high_date": "2026-06-18",
+    "all_time_close_high": 11883.0,
+    "drawdown_from_close_high_pct": -1.9292,
+    "week_52_high_date": "2026-06-18",
+    "week_52_high": 11932.0,
+    "drawdown_from_52w_high_pct": -2.332,
+    "rows_used": 4405,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:09+00:00"
+    "generated_at_utc": "2026-06-20T08:07:52+00:00"
   },
   {
     "n": 47,
@@ -1078,7 +1078,7 @@
     "drawdown_from_52w_high_pct": -16.1735,
     "rows_used": 4618,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:09+00:00"
+    "generated_at_utc": "2026-06-20T08:07:52+00:00"
   },
   {
     "n": 48,
@@ -1101,7 +1101,7 @@
     "drawdown_from_52w_high_pct": -7.6408,
     "rows_used": 4294,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:10+00:00"
+    "generated_at_utc": "2026-06-20T08:07:52+00:00"
   },
   {
     "n": 49,
@@ -1124,7 +1124,7 @@
     "drawdown_from_52w_high_pct": -15.8676,
     "rows_used": 1000,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:10+00:00"
+    "generated_at_utc": "2026-06-20T08:07:52+00:00"
   },
   {
     "n": 50,
@@ -1145,8 +1145,8 @@
     "week_52_high_date": "2026-03-02",
     "week_52_high": 7810.0,
     "drawdown_from_52w_high_pct": -21.9974,
-    "rows_used": 3836,
+    "rows_used": 3837,
     "error": null,
-    "generated_at_utc": "2026-06-20T07:50:10+00:00"
+    "generated_at_utc": "2026-06-20T08:07:52+00:00"
   }
 ]
