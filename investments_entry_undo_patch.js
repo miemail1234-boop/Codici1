@@ -1,6 +1,9 @@
 (() => {
   'use strict';
 
+  if (window.__investmentEntryUndoPatchV3Loaded) return;
+  window.__investmentEntryUndoPatchV3Loaded = true;
+
   const SUPABASE_URL = 'https://kujyowhezihjambhpahe.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_VBzZaA3NAIvqMxJcZZTwPg_4_GEi1a3';
   const client = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_KEY);
@@ -65,6 +68,29 @@
       .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) || String(b.created_at || '').localeCompare(String(a.created_at || '')))[0] || null;
   }
 
+  async function restoreEntryPrice(entryId) {
+    if (!client) return toast('Supabase non disponibile');
+    const userId = await getUserId();
+    if (!userId) return toast('Sessione Supabase non trovata');
+
+    const { entries, assets } = await fetchInvestmentData(userId);
+    const entry = entries.find((row) => row.id === entryId);
+    if (!entry || !n(entry.current_price)) return toast('Aggiornamento non valido');
+    const asset = assetForEntry(entry, assets);
+    if (!asset) return toast('Asset collegato non trovato');
+    if (!confirm(`Ripristinare questo aggiornamento come prezzo attuale?\n\n${entryLabel(entry)}`)) return;
+
+    const update = await client
+      .from('investment_assets')
+      .update({ current_price: n(entry.current_price), current_price_date: entry.date || null, updated_at: new Date().toISOString() })
+      .eq('user_id', userId)
+      .eq('id', asset.id);
+    if (update.error) throw update.error;
+
+    toast('Aggiornamento ripristinato');
+    setTimeout(() => document.getElementById('reloadBtn')?.click(), 250);
+  }
+
   async function deleteEntryAndRestore(entryId) {
     if (!client) return toast('Supabase non disponibile');
     const userId = await getUserId();
@@ -109,6 +135,35 @@
     setTimeout(() => document.getElementById('reloadBtn')?.click(), 250);
   }
 
+  function ensureActionButtons(item, row) {
+    let actions = item.querySelector('.actions[data-entry-update-actions]') || item.querySelector('[data-delete-entry-update]')?.closest('.actions') || item.querySelector('[data-restore-entry-update]')?.closest('.actions');
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.className = 'actions';
+      actions.dataset.entryUpdateActions = '1';
+      actions.style.marginTop = '8px';
+      item.appendChild(actions);
+    }
+
+    if (!actions.querySelector('[data-restore-entry-update]')) {
+      const restore = document.createElement('button');
+      restore.className = 'btn';
+      restore.type = 'button';
+      restore.dataset.restoreEntryUpdate = row.id;
+      restore.textContent = 'Ripristina';
+      actions.prepend(restore);
+    }
+
+    if (!actions.querySelector('[data-delete-entry-update]')) {
+      const cancel = document.createElement('button');
+      cancel.className = 'btn danger';
+      cancel.type = 'button';
+      cancel.dataset.deleteEntryUpdate = row.id;
+      cancel.textContent = 'Annulla aggiornamento';
+      actions.appendChild(cancel);
+    }
+  }
+
   async function attachUndoButtons() {
     const holder = document.getElementById('entryLog');
     if (!holder || holder.dataset.undoPatchBusy === '1') return;
@@ -122,12 +177,8 @@
       const items = [...holder.querySelectorAll('.log-item')];
       items.forEach((item, index) => {
         const row = rows[index];
-        if (!row || row.transaction_type === 'buy' || !n(row.current_price) || item.querySelector('[data-delete-entry-update]')) return;
-        const actions = document.createElement('div');
-        actions.className = 'actions';
-        actions.style.marginTop = '8px';
-        actions.innerHTML = `<button class="btn danger" type="button" data-delete-entry-update="${row.id}">Annulla aggiornamento</button>`;
-        item.appendChild(actions);
+        if (!row || row.transaction_type === 'buy' || !n(row.current_price)) return;
+        ensureActionButtons(item, row);
       });
     } catch (error) {
       console.error(error);
@@ -137,16 +188,30 @@
   }
 
   document.addEventListener('click', async (event) => {
-    const button = event.target.closest('[data-delete-entry-update]');
-    if (!button) return;
+    const restoreButton = event.target.closest('[data-restore-entry-update]');
+    if (restoreButton) {
+      event.preventDefault();
+      restoreButton.disabled = true;
+      try {
+        await restoreEntryPrice(restoreButton.dataset.restoreEntryUpdate);
+      } catch (error) {
+        console.error(error);
+        toast('Errore durante ripristino aggiornamento');
+        restoreButton.disabled = false;
+      }
+      return;
+    }
+
+    const deleteButton = event.target.closest('[data-delete-entry-update]');
+    if (!deleteButton) return;
     event.preventDefault();
-    button.disabled = true;
+    deleteButton.disabled = true;
     try {
-      await deleteEntryAndRestore(button.dataset.deleteEntryUpdate);
+      await deleteEntryAndRestore(deleteButton.dataset.deleteEntryUpdate);
     } catch (error) {
       console.error(error);
       toast('Errore durante annullamento aggiornamento');
-      button.disabled = false;
+      deleteButton.disabled = false;
     }
   });
 
