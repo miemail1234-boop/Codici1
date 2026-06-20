@@ -1,6 +1,6 @@
 # BTD radar drawdowns
 
-Generato UTC: 2026-06-20T13:37:06+00:00
+Generato UTC: 2026-06-20T13:41:50+00:00
 
 Asset riusciti: 1 / 1
 
