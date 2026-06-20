@@ -23,6 +23,32 @@
     "drawdown_from_52w_high_pct": -2.2982,
     "rows_used": 1793,
     "error": null,
-    "generated_at_utc": "2026-06-20T13:41:50+00:00"
+    "generated_at_utc": "2026-06-20T13:46:07+00:00"
+  },
+  {
+    "n": 41,
+    "asset": "DAX / Germania",
+    "isin": "DE0005933931",
+    "role": "leader",
+    "category": "Europa paese",
+    "note": "iShares Core DAX® UCITS ETF (DE) - DAX® Index",
+    "tickers_tried": "EXS1.DE",
+    "yahoo_ticker": "EXS1.DE",
+    "status": "ok",
+    "source": "yfinance.download",
+    "latest_date": "2026-06-19",
+    "latest_close": 206.0,
+    "all_time_high_date": "2026-01-13",
+    "all_time_high": 211.25,
+    "drawdown_from_high_pct": -2.4852,
+    "all_time_close_high_date": "2026-01-13",
+    "all_time_close_high": 210.449997,
+    "drawdown_from_close_high_pct": -2.1145,
+    "week_52_high_date": "2026-01-13",
+    "week_52_high": 211.25,
+    "drawdown_from_52w_high_pct": -2.4852,
+    "rows_used": 4687,
+    "error": null,
+    "generated_at_utc": "2026-06-20T13:46:07+00:00"
   }
 ]
