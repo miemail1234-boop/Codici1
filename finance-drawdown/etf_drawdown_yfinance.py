@@ -4,67 +4,81 @@ from __future__ import annotations
 import csv
 import json
 import math
+import os
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import requests
 import yfinance as yf
 
 OUT = Path("finance-drawdown/results")
 
-ASSETS = [
-    {"n": 1, "asset": "MSCI World", "tickers": ["IWDA.AS", "SWDA.L"], "isin": "IE00B4L5Y983"},
-    {"n": 2, "asset": "FTSE All-World", "tickers": ["VWCE.DE"], "isin": "IE00BK5BQT80"},
-    {"n": 3, "asset": "MSCI ACWI", "tickers": ["SSAC.L"], "isin": "IE00B6R52259"},
-    {"n": 4, "asset": "MSCI ACWI IMI", "tickers": ["SPYI.DE"], "isin": "IE00B3YLTY66"},
-    {"n": 5, "asset": "MSCI World Equal Weighted", "tickers": ["XDEW.DE"], "isin": "IE00BLNMYC90"},
-    {"n": 6, "asset": "MSCI World Minimum Volatility", "tickers": ["MVOL.L"], "isin": "IE00B8FHGS14"},
-    {"n": 7, "asset": "MSCI World Quality", "tickers": ["IWQU.L"], "isin": "IE00BP3QZ601"},
-    {"n": 8, "asset": "MSCI World Momentum", "tickers": ["IWMO.L"], "isin": "IE00BP3QZ825"},
-    {"n": 9, "asset": "MSCI World Value", "tickers": ["IWVL.L"], "isin": "IE00BP3QZB59"},
-    {"n": 10, "asset": "MSCI World Small Cap", "tickers": ["WSML.L"], "isin": "IE00BF4RFH31"},
-    {"n": 11, "asset": "S&P 500", "tickers": ["CSPX.L", "VUAA.DE"], "isin": "IE00B5BMR087"},
-    {"n": 12, "asset": "S&P 500 Equal Weight", "tickers": ["SPES.L"], "isin": "da verificare"},
-    {"n": 13, "asset": "S&P 500 Quality", "tickers": ["IQUF.L"], "isin": "da verificare"},
-    {"n": 14, "asset": "MSCI USA Value", "tickers": ["IUVL.L"], "isin": "da verificare"},
-    {"n": 15, "asset": "MSCI USA Minimum Volatility", "tickers": ["IUMV.L"], "isin": "da verificare"},
-    {"n": 16, "asset": "S&P MidCap 400", "tickers": ["SPY4.DE"], "isin": "da verificare"},
-    {"n": 17, "asset": "S&P SmallCap 600", "tickers": ["ISP6.DE"], "isin": "da verificare"},
-    {"n": 18, "asset": "Russell 2000", "tickers": ["IUS3.DE", "RTWO.L"], "isin": "da verificare"},
-    {"n": 19, "asset": "Nasdaq 100", "tickers": ["SXRV.DE", "CNDX.L"], "isin": "IE00B53SZB19"},
-    {"n": 20, "asset": "Nasdaq 100 Equal Weight", "tickers": ["EQAC.DE"], "isin": "da verificare"},
-    {"n": 21, "asset": "STOXX Europe 600", "tickers": ["EXSA.DE"], "isin": "DE0002635307"},
-    {"n": 22, "asset": "MSCI Europe", "tickers": ["IMEU.L"], "isin": "da verificare"},
-    {"n": 23, "asset": "MSCI Europe Value", "tickers": ["IEVL.L"], "isin": "da verificare"},
-    {"n": 24, "asset": "STOXX Europe 600 Value", "tickers": ["EXV1.DE"], "isin": "da verificare"},
-    {"n": 25, "asset": "STOXX Europe 600 Equal Weight", "tickers": ["XESC.DE"], "isin": "da verificare"},
-    {"n": 26, "asset": "Euro STOXX 50", "tickers": ["SX5EEX.DE", "EUEA.DE"], "isin": "da verificare"},
-    {"n": 27, "asset": "MSCI EMU", "tickers": ["CEU.PA", "EMEU.MI"], "isin": "da verificare"},
-    {"n": 28, "asset": "FTSE 100", "tickers": ["ISF.L"], "isin": "IE0005042456"},
-    {"n": 29, "asset": "FTSE 250", "tickers": ["MIDD.L"], "isin": "IE00B00FV128"},
-    {"n": 30, "asset": "FTSE All-Share", "tickers": ["VMID.L"], "isin": "da verificare"},
-    {"n": 31, "asset": "MSCI UK", "tickers": ["CUKX.L", "IUKD.L"], "isin": "da verificare"},
-    {"n": 32, "asset": "CAC 40 / Francia", "tickers": ["C40.PA"], "isin": "FR0013380607"},
-    {"n": 33, "asset": "DAX / Germania", "tickers": ["EXS1.DE"], "isin": "DE0005933931"},
-    {"n": 34, "asset": "FTSE MIB / Italia", "tickers": ["CSMIB.MI"], "isin": "da verificare"},
-    {"n": 35, "asset": "IBEX 35 / Spagna", "tickers": ["EWP"], "isin": "proxy US / da verificare"},
-    {"n": 36, "asset": "SMI / Svizzera", "tickers": ["CSSMI.SW"], "isin": "da verificare"},
-    {"n": 37, "asset": "Nordic Countries", "tickers": ["XDN0.DE"], "isin": "da verificare"},
-    {"n": 38, "asset": "MSCI Japan", "tickers": ["SJPA.L", "IJPA.L"], "isin": "da verificare"},
-    {"n": 39, "asset": "TOPIX", "tickers": ["TPXU.L", "XTPX.DE"], "isin": "da verificare"},
-    {"n": 40, "asset": "Pacific ex Japan", "tickers": ["CPXJ.L"], "isin": "da verificare"},
-    {"n": 41, "asset": "MSCI Emerging Markets", "tickers": ["EIMI.L", "IS3N.DE"], "isin": "IE00BKM4GZ66"},
-    {"n": 42, "asset": "Emerging Markets ex China", "tickers": ["EMXC.L"], "isin": "da verificare"},
-    {"n": 43, "asset": "MSCI India", "tickers": ["NDIA.L", "FLXI.MI"], "isin": "da verificare"},
-    {"n": 44, "asset": "MSCI China", "tickers": ["ICHN.L"], "isin": "da verificare"},
-    {"n": 45, "asset": "MSCI Taiwan", "tickers": ["ITWN.L"], "isin": "da verificare"},
-    {"n": 46, "asset": "MSCI Korea", "tickers": ["IKOR.L"], "isin": "da verificare"},
-    {"n": 47, "asset": "Rio Tinto", "tickers": ["RIO.PA"], "isin": "da verificare"},
-    {"n": 48, "asset": "MSCI World Health Care", "tickers": ["WHEA.L", "XDWH.DE"], "isin": "da verificare"},
-    {"n": 49, "asset": "World Energy / Oil & Gas", "tickers": ["WENS.L", "EXH1.DE"], "isin": "da verificare"},
-    {"n": 50, "asset": "Oro fisico ETC", "tickers": ["SGLN.L", "4GLD.DE"], "isin": "da verificare"},
+DEFAULT_ASSETS = [
+    {"n": 1, "asset": "FTSE All-World / MSCI ACWI", "tickers": ["VWCE.DE"], "isin": "da verificare", "role": "leader", "category": "Globale core", "note": "Mercato globale"},
+    {"n": 2, "asset": "S&P 500", "tickers": ["VUAA.DE"], "isin": "da verificare", "role": "leader", "category": "USA core", "note": "Large cap USA"},
+    {"n": 3, "asset": "Nasdaq 100", "tickers": ["SXRV.DE"], "isin": "da verificare", "role": "leader", "category": "USA growth", "note": "Growth/tech"},
+    {"n": 4, "asset": "Russell 2000", "tickers": ["IUS3.DE"], "isin": "da verificare", "role": "leader", "category": "USA small cap", "note": "Small cap USA"},
+    {"n": 5, "asset": "MSCI World Value", "tickers": ["IWVL.L"], "isin": "da verificare", "role": "leader", "category": "World factor", "note": "Value globale"},
+    {"n": 6, "asset": "MSCI World Quality", "tickers": ["IWQU.L"], "isin": "da verificare", "role": "leader", "category": "World factor", "note": "Quality globale"},
+    {"n": 7, "asset": "MSCI World Minimum Volatility", "tickers": ["MVOL.L"], "isin": "da verificare", "role": "leader", "category": "World factor", "note": "Difensivo globale"},
+    {"n": 8, "asset": "STOXX Europe 600", "tickers": ["EXSA.DE"], "isin": "da verificare", "role": "leader", "category": "Europa core", "note": "Europa ampia"},
+    {"n": 9, "asset": "STOXX Europe 600 Value", "tickers": ["EXV1.DE"], "isin": "da verificare", "role": "leader", "category": "Europa value", "note": "Value europeo"},
+    {"n": 10, "asset": "FTSE 100", "tickers": ["ISF.L"], "isin": "da verificare", "role": "leader", "category": "UK", "note": "UK large cap"},
+    {"n": 11, "asset": "FTSE 250", "tickers": ["MIDD.L"], "isin": "da verificare", "role": "leader", "category": "UK", "note": "UK mid cap"},
+    {"n": 12, "asset": "DAX", "tickers": ["EXS1.DE"], "isin": "da verificare", "role": "leader", "category": "Europa paese", "note": "Germania"},
+    {"n": 13, "asset": "FTSE MIB", "tickers": ["CSMIB.MI"], "isin": "da verificare", "role": "leader", "category": "Europa paese", "note": "Italia"},
+    {"n": 14, "asset": "SMI", "tickers": ["CSSMI.SW"], "isin": "da verificare", "role": "leader", "category": "Europa difensivo", "note": "Svizzera"},
+    {"n": 15, "asset": "TOPIX / MSCI Japan", "tickers": ["XTPX.DE"], "isin": "da verificare", "role": "leader", "category": "Giappone", "note": "Giappone ampio"},
+    {"n": 16, "asset": "MSCI Emerging Markets", "tickers": ["EIMI.L"], "isin": "da verificare", "role": "leader", "category": "Emergenti", "note": "EM globale"},
+    {"n": 17, "asset": "Emerging Markets ex China", "tickers": ["EMXC.L"], "isin": "da verificare", "role": "leader", "category": "Emergenti", "note": "EM senza Cina"},
+    {"n": 18, "asset": "MSCI India", "tickers": ["NDIA.L"], "isin": "da verificare", "role": "leader", "category": "Emergenti paese", "note": "India"},
+    {"n": 19, "asset": "MSCI China", "tickers": ["ICHN.L"], "isin": "da verificare", "role": "leader", "category": "Emergenti paese", "note": "Cina"},
+    {"n": 20, "asset": "MSCI Taiwan", "tickers": ["ITWN.L"], "isin": "da verificare", "role": "leader", "category": "Asia tech", "note": "Semiconduttori Asia"},
+    {"n": 21, "asset": "MSCI Korea", "tickers": ["IKOR.L"], "isin": "da verificare", "role": "leader", "category": "Asia tech", "note": "Corea"},
+    {"n": 22, "asset": "World Health Care", "tickers": ["WHEA.L"], "isin": "da verificare", "role": "leader", "category": "Settore difensivo", "note": "Healthcare globale"},
+    {"n": 23, "asset": "World Energy", "tickers": ["WENS.L"], "isin": "da verificare", "role": "leader", "category": "Settore ciclico", "note": "Energia"},
+    {"n": 24, "asset": "Rio Tinto / Materials", "tickers": ["RIO.PA"], "isin": "da verificare", "role": "leader", "category": "Materials", "note": "Mining/materiali"},
+    {"n": 25, "asset": "Oro", "tickers": ["SGLN.L"], "isin": "da verificare", "role": "leader", "category": "Real asset", "note": "Gold ETC"},
+    {"n": 26, "asset": "Bitcoin", "tickers": ["BTC-EUR"], "isin": "da verificare", "role": "leader", "category": "Crypto", "note": "Proxy Bitcoin"},
+    {"n": 27, "asset": "Ethereum", "tickers": ["ETH-EUR"], "isin": "da verificare", "role": "leader", "category": "Crypto", "note": "Proxy Ethereum"},
 ]
+
+
+def clean_assets(raw_assets):
+    assets = []
+    for idx, item in enumerate(raw_assets or [], start=1):
+        ticker = str((item.get("tickers") or [item.get("yahoo_ticker") or item.get("ticker") or ""])[0]).strip().upper()
+        asset = str(item.get("asset") or f"Asset {idx}").strip()
+        if not ticker or not asset:
+            continue
+        assets.append({
+            "n": int(item.get("n") or idx),
+            "asset": asset,
+            "tickers": [ticker],
+            "isin": str(item.get("isin") or "da verificare").strip() or "da verificare",
+            "role": str(item.get("role") or "leader").strip() or "leader",
+            "category": str(item.get("category") or "").strip(),
+            "note": str(item.get("note") or "").strip(),
+        })
+    return sorted(assets, key=lambda x: x["n"])
+
+
+def load_assets():
+    override = os.environ.get("ASSETS_JSON", "").strip()
+    if override:
+        try:
+            assets = clean_assets(json.loads(override))
+            if assets:
+                print(f"Using {len(assets)} assets from ASSETS_JSON")
+                return assets
+        except Exception as e:
+            print(f"Invalid ASSETS_JSON, falling back to defaults: {e}")
+    return DEFAULT_ASSETS
+
+
+ASSETS = load_assets()
 
 
 @dataclass
@@ -72,6 +86,9 @@ class Result:
     n: int
     asset: str
     isin: str
+    role: str
+    category: str
+    note: str
     tickers_tried: str
     yahoo_ticker: str
     status: str
@@ -151,6 +168,37 @@ def rows_from_yfinance(ticker):
     raise RuntimeError(last or "empty yfinance result")
 
 
+def rows_from_yahoo_chart(ticker):
+    headers = {"User-Agent": "Mozilla/5.0"}
+    errors = []
+    for host in ("query1.finance.yahoo.com", "query2.finance.yahoo.com"):
+        url = f"https://{host}/v8/finance/chart/{ticker}"
+        params = {"range": "max", "interval": "1d", "events": "history", "includeAdjustedClose": "true"}
+        try:
+            r = requests.get(url, params=params, headers=headers, timeout=30)
+            if r.status_code != 200:
+                errors.append(f"{host} HTTP {r.status_code}: {r.text[:180]}")
+                continue
+            data = r.json()
+            chart = data.get("chart", {})
+            if chart.get("error"):
+                errors.append(f"{host} chart error: {chart['error']}")
+                continue
+            res = chart["result"][0]
+            ts = res["timestamp"]
+            q = res["indicators"]["quote"][0]
+            rows = []
+            for t, h, c in zip(ts, q.get("high", []), q.get("close", [])):
+                h2, c2 = fnum(h), fnum(c)
+                if h2 is not None and c2 is not None:
+                    rows.append((t, h2, c2))
+            if rows:
+                return rows, f"yahoo_chart.{host}"
+        except Exception as e:
+            errors.append(f"{host}: {repr(e)}")
+    raise RuntimeError("; ".join(errors))
+
+
 def calc(asset, ticker, rows, source):
     latest_i, _, latest_close = rows[-1]
     latest_dt = to_dt(latest_i)
@@ -160,23 +208,37 @@ def calc(asset, ticker, rows, source):
     rows_52w = [r for r in rows if to_dt(r[0]) >= cutoff] or rows
     max_52w_i, max_52w, _ = max(rows_52w, key=lambda r: r[1])
     return Result(
-        n=asset["n"], asset=asset["asset"], isin=asset["isin"],
-        tickers_tried=", ".join(asset["tickers"]), yahoo_ticker=ticker, status="ok", source=source,
-        latest_date=dstr(latest_i), latest_close=round(latest_close, 6),
-        all_time_high_date=dstr(max_high_i), all_time_high=round(max_high, 6),
+        n=asset["n"],
+        asset=asset["asset"],
+        isin=asset.get("isin", "da verificare"),
+        role=asset.get("role", "leader"),
+        category=asset.get("category", ""),
+        note=asset.get("note", ""),
+        tickers_tried=", ".join(asset["tickers"]),
+        yahoo_ticker=ticker,
+        status="ok",
+        source=source,
+        latest_date=dstr(latest_i),
+        latest_close=round(latest_close, 6),
+        all_time_high_date=dstr(max_high_i),
+        all_time_high=round(max_high, 6),
         drawdown_from_high_pct=round((latest_close / max_high - 1) * 100, 4),
-        all_time_close_high_date=dstr(max_close_i), all_time_close_high=round(max_close, 6),
+        all_time_close_high_date=dstr(max_close_i),
+        all_time_close_high=round(max_close, 6),
         drawdown_from_close_high_pct=round((latest_close / max_close - 1) * 100, 4),
-        week_52_high_date=dstr(max_52w_i), week_52_high=round(max_52w, 6),
+        week_52_high_date=dstr(max_52w_i),
+        week_52_high=round(max_52w, 6),
         drawdown_from_52w_high_pct=round((latest_close / max_52w - 1) * 100, 4),
-        rows_used=len(rows), error=None,
+        rows_used=len(rows),
+        error=None,
         generated_at_utc=datetime.now(timezone.utc).isoformat(timespec="seconds"),
     )
 
 
 def fail(asset, errors):
     return Result(
-        n=asset["n"], asset=asset["asset"], isin=asset["isin"],
+        n=asset["n"], asset=asset["asset"], isin=asset.get("isin", "da verificare"),
+        role=asset.get("role", "leader"), category=asset.get("category", ""), note=asset.get("note", ""),
         tickers_tried=", ".join(asset["tickers"]), yahoo_ticker="", status="failed", source="",
         latest_date=None, latest_close=None, all_time_high_date=None, all_time_high=None,
         drawdown_from_high_pct=None, all_time_close_high_date=None, all_time_close_high=None,
@@ -190,12 +252,13 @@ def fail(asset, errors):
 def process(asset):
     errors = {}
     for ticker in asset["tickers"]:
-        try:
-            rows, source = rows_from_yfinance(ticker)
-            return calc(asset, ticker, rows, source)
-        except Exception as e:
-            errors[f"{ticker}/rows_from_yfinance"] = str(e)
-            print(f"FAILED {asset['n']} {asset['asset']} {ticker}: {e}")
+        for loader in (rows_from_yfinance, rows_from_yahoo_chart):
+            try:
+                rows, source = loader(ticker)
+                return calc(asset, ticker, rows, source)
+            except Exception as e:
+                errors[f"{ticker}/{loader.__name__}"] = str(e)
+                print(f"FAILED {asset['n']} {asset['asset']} {ticker} {loader.__name__}: {e}")
     return fail(asset, errors)
 
 
@@ -212,18 +275,16 @@ def write(results):
     ok = [r for r in results if r.status == "ok"]
     failed = [r for r in results if r.status != "ok"]
     lines = [
-        "# ETF drawdowns", "",
+        "# BTD radar drawdowns", "",
         f"Generato UTC: {datetime.now(timezone.utc).isoformat(timespec='seconds')}", "",
         f"Asset riusciti: {len(ok)} / {len(results)}", "",
-        "| # | Asset | Ticker | Ultimo close | Data | ATH assoluto | Data ATH | DD ATH | ATH 52w | Data ATH 52w | DD 52w | ATH close | DD close |",
-        "|---:|---|---|---:|---|---:|---|---:|---:|---|---:|---:|---:|",
+        "| # | Asset | Categoria | Ticker | ISIN | Ultimo close | Data | ATH 52w | DD 52w | ATH assoluto | DD assoluto |",
+        "|---:|---|---|---|---|---:|---|---:|---:|---:|---:|",
     ]
-    for r in sorted(ok, key=lambda x: (x.drawdown_from_high_pct if x.drawdown_from_high_pct is not None else 999)):
+    for r in sorted(ok, key=lambda x: (x.drawdown_from_52w_high_pct if x.drawdown_from_52w_high_pct is not None else 999)):
         lines.append(
-            f"| {r.n} | {r.asset} | `{r.yahoo_ticker}` | {r.latest_close} | {r.latest_date} | "
-            f"{r.all_time_high} | {r.all_time_high_date} | {r.drawdown_from_high_pct}% | "
-            f"{r.week_52_high} | {r.week_52_high_date} | {r.drawdown_from_52w_high_pct}% | "
-            f"{r.all_time_close_high} | {r.drawdown_from_close_high_pct}% |"
+            f"| {r.n} | {r.asset} | {r.category} | `{r.yahoo_ticker}` | {r.isin} | {r.latest_close} | {r.latest_date} | "
+            f"{r.week_52_high} | {r.drawdown_from_52w_high_pct}% | {r.all_time_high} | {r.drawdown_from_high_pct}% |"
         )
     if failed:
         lines += ["", "## Falliti", "", "| # | Asset | Ticker provati | Errore |", "|---:|---|---|---|"]
@@ -236,8 +297,9 @@ def write(results):
 
 def main():
     results = []
+    total = len(ASSETS)
     for asset in ASSETS:
-        print(f"Processing {asset['n']}/50: {asset['asset']} ({', '.join(asset['tickers'])})")
+        print(f"Processing {asset['n']}/{total}: {asset['asset']} ({', '.join(asset['tickers'])})")
         results.append(process(asset))
     write(results)
     print(json.dumps([asdict(r) for r in results], indent=2, ensure_ascii=False))
