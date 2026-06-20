@@ -2,6 +2,11 @@ name: ETF drawdown via yfinance
 
 on:
   workflow_dispatch:
+    inputs:
+      assets_json:
+        description: 'BTD assets configuration JSON from the app'
+        required: false
+        type: string
   push:
     paths:
       - 'finance-drawdown/**'
@@ -34,6 +39,8 @@ jobs:
           python -m pip install yfinance pandas requests
 
       - name: Calculate drawdown
+        env:
+          ASSETS_JSON: ${{ github.event.inputs.assets_json }}
         run: |
           python finance-drawdown/etf_drawdown_yfinance.py
 
