@@ -4,6 +4,7 @@
   const SUPABASE_URL = 'https://kujyowhezihjambhpahe.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_VBzZaA3NAIvqMxJcZZTwPg_4_GEi1a3';
   const client = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_KEY);
+  let booted = false;
 
   const n = (value) => {
     const parsed = Number(String(value ?? 0).replace(',', '.'));
@@ -149,12 +150,25 @@
     }
   });
 
-  window.addEventListener('load', () => {
-    const holder = document.getElementById('entryLog');
-    if (holder) {
-      new MutationObserver(() => setTimeout(attachUndoButtons, 50)).observe(holder, { childList: true, subtree: true });
-    }
-    setTimeout(attachUndoButtons, 800);
-    setTimeout(attachUndoButtons, 2200);
-  });
+  function boot() {
+    if (booted) return;
+    booted = true;
+    const installObserver = () => {
+      const holder = document.getElementById('entryLog');
+      if (holder && !holder.dataset.undoPatchObserver) {
+        holder.dataset.undoPatchObserver = '1';
+        new MutationObserver(() => setTimeout(attachUndoButtons, 50)).observe(holder, { childList: true, subtree: true });
+      }
+    };
+    installObserver();
+    setTimeout(installObserver, 500);
+    setTimeout(attachUndoButtons, 200);
+    setTimeout(attachUndoButtons, 1000);
+    setTimeout(attachUndoButtons, 2500);
+    setInterval(attachUndoButtons, 5000);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+  window.addEventListener('load', boot);
 })();
