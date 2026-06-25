@@ -12,9 +12,12 @@
   let inlineEditingId = "";
   let draggedId = "";
   let pointerDrag = null;
+  let pendingDrag = null;
 
   const labels = { today: "Oggi", urgent: "Urgente", later: "Più avanti", done: "Completati" };
   const listTargets = { today: "todayList", urgent: "urgentList", later: "laterList", done: "doneList" };
+  const DRAG_THRESHOLD = 8;
+  const LONG_PRESS_MS = 260;
 
   function toast(message) {
     const node = $("toast");
@@ -36,9 +39,9 @@
 
   function itemHtml(item) {
     const due = item.due_date ? ` · scadenza ${safe(item.due_date)}` : "";
-    return `<div class="todo ${item.completed ? "done" : ""}" data-item="${safe(item.id)}" draggable="true" aria-grabbed="false">
-      <div class="todo-title"><span class="drag-handle" title="Trascina per spostare o riordinare" aria-hidden="true">☰</span><input type="checkbox" data-toggle="${safe(item.id)}" ${item.completed ? "checked" : ""}><div class="todo-main"><strong class="task-text" data-title-id="${safe(item.id)}" title="Doppio clic per modificare">${safe(item.title)}</strong><div class="small">${safe(labels[item.list] || item.list)}${due}</div>${item.note ? `<p class="small">${safe(item.note)}</p>` : ""}</div></div>
-      <div class="actions" style="margin-top:10px"><button class="btn danger" data-delete="${safe(item.id)}">Elimina</button></div>
+    return `<div class="todo ${item.completed ? "done" : ""}" data-item="${safe(item.id)}" aria-grabbed="false">
+      <button class="delete-mini" data-delete="${safe(item.id)}" title="Elimina" aria-label="Elimina task">×</button>
+      <div class="todo-title"><input type="checkbox" data-toggle="${safe(item.id)}" ${item.completed ? "checked" : ""}><div class="todo-main"><strong class="task-text" data-title-id="${safe(item.id)}" title="Doppio clic per modificare">${safe(item.title)}</strong><div class="small">${safe(labels[item.list] || item.list)}${due}</div>${item.note ? `<p class="small">${safe(item.note)}</p>` : ""}</div></div>
     </div>`;
   }
 
@@ -138,7 +141,7 @@
   function startInlineEdit(node) {
     const id = node.dataset.titleId;
     const item = items.find(row => row.id === id);
-    if (!item || inlineEditingId) return;
+    if (!item || inlineEditingId || pointerDrag || pendingDrag) return;
     inlineEditingId = id;
     const input = document.createElement("input");
     input.className = "inline-title-input";
@@ -262,7 +265,23 @@
     if (beforeId) target.querySelector(`[data-item="${CSS.escape(beforeId)}"]`)?.classList.add("drop-before");
   }
 
+  function clearPendingDrag() {
+    if (pendingDrag?.timer) clearTimeout(pendingDrag.timer);
+    pendingDrag = null;
+  }
+
+  function beginDrag(candidate) {
+    if (!candidate || pointerDrag || inlineEditingId) return;
+    clearPendingDrag();
+    draggedId = candidate.id;
+    pointerDrag = { id: candidate.id, card: candidate.card };
+    candidate.card.classList.add("dragging");
+    candidate.card.setAttribute("aria-grabbed", "true");
+    markDropPosition(candidate.x, candidate.y, candidate.id);
+  }
+
   function finishPointerDrag(event, cancelled = false) {
+    clearPendingDrag();
     if (!pointerDrag) return;
     const { id, card } = pointerDrag;
     const target = cancelled ? null : dropListFromPoint(event.clientX, event.clientY);
@@ -309,18 +328,28 @@
   });
 
   document.addEventListener("pointerdown", event => {
-    const handle = event.target.closest(".drag-handle");
+    if (event.button !== undefined && event.button !== 0) return;
+    if (event.target.closest("button,input,select,textarea,a,[data-inline-edit]")) return;
     const card = event.target.closest("[data-item]");
-    if (!handle || !card) return;
-    draggedId = card.dataset.item || "";
-    pointerDrag = { id: draggedId, card };
-    card.classList.add("dragging");
-    card.setAttribute("aria-grabbed", "true");
-    handle.setPointerCapture?.(event.pointerId);
-    event.preventDefault();
+    if (!card) return;
+    const id = card.dataset.item || "";
+    pendingDrag = {
+      id,
+      card,
+      x: event.clientX,
+      y: event.clientY,
+      pointerId: event.pointerId,
+      timer: setTimeout(() => beginDrag(pendingDrag), LONG_PRESS_MS)
+    };
+    card.setPointerCapture?.(event.pointerId);
   });
 
   document.addEventListener("pointermove", event => {
+    if (pendingDrag && pendingDrag.pointerId === event.pointerId) {
+      const dx = Math.abs(event.clientX - pendingDrag.x);
+      const dy = Math.abs(event.clientY - pendingDrag.y);
+      if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) beginDrag(pendingDrag);
+    }
     if (!pointerDrag) return;
     event.preventDefault();
     markDropPosition(event.clientX, event.clientY, pointerDrag.id);
@@ -328,46 +357,6 @@
 
   document.addEventListener("pointerup", event => finishPointerDrag(event));
   document.addEventListener("pointercancel", event => finishPointerDrag(event, true));
-
-  document.addEventListener("dragstart", event => {
-    const card = event.target.closest("[data-item]");
-    if (!card || event.target.closest("button,input,select,textarea,a")) return;
-    draggedId = card.dataset.item || "";
-    card.classList.add("dragging");
-    card.setAttribute("aria-grabbed", "true");
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", draggedId);
-  });
-
-  document.addEventListener("dragend", event => {
-    event.target.closest("[data-item]")?.classList.remove("dragging");
-    event.target.closest("[data-item]")?.setAttribute("aria-grabbed", "false");
-    draggedId = "";
-    clearDropState();
-  });
-
-  document.addEventListener("dragover", event => {
-    const target = event.target.closest("[data-drop-list]");
-    if (!target || !draggedId) return;
-    event.preventDefault();
-    markDropPosition(event.clientX, event.clientY, draggedId);
-    event.dataTransfer.dropEffect = "move";
-  });
-
-  document.addEventListener("dragleave", event => {
-    const target = event.target.closest("[data-drop-list]");
-    if (target && !target.contains(event.relatedTarget)) clearDropState();
-  });
-
-  document.addEventListener("drop", event => {
-    const target = event.target.closest("[data-drop-list]") || dropListFromPoint(event.clientX, event.clientY);
-    const id = event.dataTransfer.getData("text/plain") || draggedId;
-    if (!target || !id) return;
-    const beforeId = beforeIdFromPoint(event.clientX, event.clientY, id);
-    event.preventDefault();
-    clearDropState();
-    persistMove(id, target.dataset.dropList, beforeId);
-  });
 
   $("addBtn").addEventListener("click", addOrUpdate);
   $("taskTitle").addEventListener("keydown", event => {
