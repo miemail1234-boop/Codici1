@@ -160,6 +160,27 @@
     render();
   }
 
+  function draggedCard() {
+    return draggedId ? document.querySelector(`[data-item="${CSS.escape(draggedId)}"]`) : null;
+  }
+
+  function elementsAtPoint(x, y) {
+    if (document.elementsFromPoint) return document.elementsFromPoint(x, y);
+    const element = document.elementFromPoint(x, y);
+    return element ? [element] : [];
+  }
+
+  function dropListFromPoint(x, y) {
+    const activeCard = draggedCard();
+    for (const element of elementsAtPoint(x, y)) {
+      if (!element?.closest) continue;
+      if (activeCard && (element === activeCard || activeCard.contains(element))) continue;
+      const list = element.closest("[data-drop-list]");
+      if (list) return list;
+    }
+    return null;
+  }
+
   function beforeIdFromPoint(x, y, dragged) {
     const targetList = dropListFromPoint(x, y);
     if (!targetList) return "";
@@ -178,7 +199,7 @@
     const completed = targetList === "done";
     const now = new Date().toISOString();
     const targetRows = sorted(targetList).filter(row => row.id !== id);
-    const insertAt = beforeId ? Math.max(0, targetRows.findIndex(row => row.id === beforeId)) : targetRows.length;
+    const insertAt = beforeId ? targetRows.findIndex(row => row.id === beforeId) : targetRows.length;
     const normalizedInsertAt = insertAt < 0 ? targetRows.length : insertAt;
     const movedRow = { ...moving, list: targetList, completed, completed_at: completed ? now : null, updated_at: now };
     const ordered = [...targetRows];
@@ -230,10 +251,6 @@
   function clearDropState() {
     Object.values(listTargets).forEach(id => $(id)?.classList.remove("drop-over"));
     document.querySelectorAll(".drop-before").forEach(node => node.classList.remove("drop-before"));
-  }
-
-  function dropListFromPoint(x, y) {
-    return document.elementFromPoint(x, y)?.closest("[data-drop-list]") || null;
   }
 
   function markDropPosition(x, y, id) {
@@ -343,7 +360,7 @@
   });
 
   document.addEventListener("drop", event => {
-    const target = event.target.closest("[data-drop-list]");
+    const target = event.target.closest("[data-drop-list]") || dropListFromPoint(event.clientX, event.clientY);
     const id = event.dataTransfer.getData("text/plain") || draggedId;
     if (!target || !id) return;
     const beforeId = beforeIdFromPoint(event.clientX, event.clientY, id);
