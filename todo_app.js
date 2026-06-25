@@ -9,6 +9,7 @@
   let userId = "";
   let items = [];
   let editingId = "";
+  let inlineEditingId = "";
   let draggedId = "";
   let pointerDrag = null;
 
@@ -36,8 +37,8 @@
   function itemHtml(item) {
     const due = item.due_date ? ` · scadenza ${safe(item.due_date)}` : "";
     return `<div class="todo ${item.completed ? "done" : ""}" data-item="${safe(item.id)}" draggable="true" aria-grabbed="false">
-      <div class="todo-title"><span class="drag-handle" title="Trascina in un'altra lista" aria-hidden="true">☰</span><input type="checkbox" data-toggle="${safe(item.id)}" ${item.completed ? "checked" : ""}><div><strong>${safe(item.title)}</strong><div class="small">${safe(labels[item.list] || item.list)}${due}</div>${item.note ? `<p class="small">${safe(item.note)}</p>` : ""}</div></div>
-      <div class="actions" style="margin-top:10px"><button class="btn" data-edit="${safe(item.id)}">Modifica</button><button class="btn danger" data-delete="${safe(item.id)}">Elimina</button></div>
+      <div class="todo-title"><span class="drag-handle" title="Trascina per spostare o riordinare" aria-hidden="true">☰</span><input type="checkbox" data-toggle="${safe(item.id)}" ${item.completed ? "checked" : ""}><div class="todo-main"><strong class="task-text" data-title-id="${safe(item.id)}" title="Doppio clic per modificare">${safe(item.title)}</strong><div class="small">${safe(labels[item.list] || item.list)}${due}</div>${item.note ? `<p class="small">${safe(item.note)}</p>` : ""}</div></div>
+      <div class="actions" style="margin-top:10px"><button class="btn danger" data-delete="${safe(item.id)}">Elimina</button></div>
     </div>`;
   }
 
@@ -118,45 +119,99 @@
     toast("Task salvato");
   }
 
-  function editItem(id) {
+  async function saveInlineTitle(id, title) {
     const item = items.find(row => row.id === id);
-    if (!item) return;
-    editingId = id;
-    $("taskTitle").value = item.title || "";
-    $("taskList").value = item.list === "done" ? "today" : item.list;
-    $("taskDue").value = item.due_date || "";
-    $("taskNote").value = item.note || "";
-    $("taskTitle").focus();
+    const cleanTitle = title.trim();
+    if (!item || !cleanTitle || cleanTitle === item.title) return;
+    const result = await client.from("todo_standalone_items").update({ title: cleanTitle, updated_at: new Date().toISOString() }).eq("user_id", userId).eq("id", id);
+    if (result.error) {
+      console.error(result.error);
+      toast("Errore modifica task");
+      await loadCloud();
+      return;
+    }
+    item.title = cleanTitle;
+    item.updated_at = new Date().toISOString();
+    toast("Task modificato");
+  }
+
+  function startInlineEdit(node) {
+    const id = node.dataset.titleId;
+    const item = items.find(row => row.id === id);
+    if (!item || inlineEditingId) return;
+    inlineEditingId = id;
+    const input = document.createElement("input");
+    input.className = "inline-title-input";
+    input.value = item.title || "";
+    input.dataset.inlineEdit = id;
+    input.dataset.originalTitle = item.title || "";
+    node.replaceWith(input);
+    input.focus();
+    input.select();
+  }
+
+  async function finishInlineEdit(input, save = true) {
+    if (!input?.dataset?.inlineEdit) return;
+    const id = input.dataset.inlineEdit;
+    const original = input.dataset.originalTitle || "";
+    const value = save ? input.value.trim() : original;
+    inlineEditingId = "";
+    await saveInlineTitle(id, value || original);
     render();
   }
 
-  function nextSortOrder(list) {
-    return Math.max(0, ...items.filter(item => item.list === list).map(item => Number(item.sort_order || 0))) + 1;
+  function beforeIdFromPoint(x, y, dragged) {
+    const targetList = dropListFromPoint(x, y);
+    if (!targetList) return "";
+    const cards = [...targetList.querySelectorAll("[data-item]")].filter(card => card.dataset.item !== dragged);
+    for (const card of cards) {
+      const rect = card.getBoundingClientRect();
+      if (y < rect.top + rect.height / 2) return card.dataset.item || "";
+    }
+    return "";
   }
 
-  async function moveItem(id, list) {
-    const item = items.find(row => row.id === id);
-    if (!item || !labels[list]) return;
-    if (item.list === list) return;
-    const completed = list === "done";
-    const result = await client.from("todo_standalone_items").update({
-      list,
+  async function persistMove(id, targetList, beforeId = "") {
+    const moving = items.find(row => row.id === id);
+    if (!moving || !labels[targetList]) return;
+
+    const completed = targetList === "done";
+    const now = new Date().toISOString();
+    const targetRows = sorted(targetList).filter(row => row.id !== id);
+    const insertAt = beforeId ? Math.max(0, targetRows.findIndex(row => row.id === beforeId)) : targetRows.length;
+    const normalizedInsertAt = insertAt < 0 ? targetRows.length : insertAt;
+    const movedRow = { ...moving, list: targetList, completed, completed_at: completed ? now : null, updated_at: now };
+    const ordered = [...targetRows];
+    ordered.splice(normalizedInsertAt, 0, movedRow);
+
+    if (moving.list === targetList) {
+      const currentOrder = sorted(targetList).map(row => row.id).join("|");
+      const nextOrder = ordered.map(row => row.id).join("|");
+      if (currentOrder === nextOrder) return;
+    }
+
+    const updates = ordered.map((row, index) => client.from("todo_standalone_items").update({
+      list: targetList,
       completed,
-      sort_order: nextSortOrder(list),
-      completed_at: completed ? new Date().toISOString() : null,
-      updated_at: new Date().toISOString()
-    }).eq("user_id", userId).eq("id", id);
-    if (result.error) {
-      console.error(result.error);
-      toast("Errore spostamento task");
+      sort_order: index + 1,
+      completed_at: completed ? (row.completed_at || now) : null,
+      updated_at: row.id === id ? now : (row.updated_at || now)
+    }).eq("user_id", userId).eq("id", row.id));
+
+    const results = await Promise.all(updates);
+    const error = results.find(result => result.error)?.error;
+    if (error) {
+      console.error(error);
+      toast("Errore ordinamento task");
+      await loadCloud();
       return;
     }
     await loadCloud();
-    toast(`Task spostato in ${labels[list]}`);
+    toast(moving.list === targetList ? "Ordine aggiornato" : `Task spostato in ${labels[targetList]}`);
   }
 
   async function toggleItem(id, checked) {
-    await moveItem(id, checked ? "done" : "today");
+    await persistMove(id, checked ? "done" : "today");
   }
 
   async function deleteItem(id) {
@@ -174,29 +229,61 @@
 
   function clearDropState() {
     Object.values(listTargets).forEach(id => $(id)?.classList.remove("drop-over"));
+    document.querySelectorAll(".drop-before").forEach(node => node.classList.remove("drop-before"));
   }
 
   function dropListFromPoint(x, y) {
     return document.elementFromPoint(x, y)?.closest("[data-drop-list]") || null;
   }
 
+  function markDropPosition(x, y, id) {
+    clearDropState();
+    const target = dropListFromPoint(x, y);
+    if (!target) return;
+    target.classList.add("drop-over");
+    const beforeId = beforeIdFromPoint(x, y, id);
+    if (beforeId) target.querySelector(`[data-item="${CSS.escape(beforeId)}"]`)?.classList.add("drop-before");
+  }
+
   function finishPointerDrag(event, cancelled = false) {
     if (!pointerDrag) return;
     const { id, card } = pointerDrag;
     const target = cancelled ? null : dropListFromPoint(event.clientX, event.clientY);
+    const beforeId = cancelled ? "" : beforeIdFromPoint(event.clientX, event.clientY, id);
     card.classList.remove("dragging");
     card.setAttribute("aria-grabbed", "false");
     draggedId = "";
     pointerDrag = null;
     clearDropState();
-    if (target) moveItem(id, target.dataset.dropList);
+    if (target) persistMove(id, target.dataset.dropList, beforeId);
   }
 
   document.addEventListener("click", event => {
-    const edit = event.target.dataset.edit;
-    if (edit) editItem(edit);
     const del = event.target.dataset.delete;
     if (del) deleteItem(del);
+  });
+
+  document.addEventListener("dblclick", event => {
+    const title = event.target.closest("[data-title-id]");
+    if (title) startInlineEdit(title);
+  });
+
+  document.addEventListener("focusout", event => {
+    const input = event.target.closest("[data-inline-edit]");
+    if (input) finishInlineEdit(input, true);
+  });
+
+  document.addEventListener("keydown", event => {
+    const input = event.target.closest("[data-inline-edit]");
+    if (!input) return;
+    if (event.key === "Enter") {
+      event.preventDefault();
+      input.blur();
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      finishInlineEdit(input, false);
+    }
   });
 
   document.addEventListener("change", event => {
@@ -219,8 +306,7 @@
   document.addEventListener("pointermove", event => {
     if (!pointerDrag) return;
     event.preventDefault();
-    clearDropState();
-    dropListFromPoint(event.clientX, event.clientY)?.classList.add("drop-over");
+    markDropPosition(event.clientX, event.clientY, pointerDrag.id);
   }, { passive: false });
 
   document.addEventListener("pointerup", event => finishPointerDrag(event));
@@ -247,23 +333,23 @@
     const target = event.target.closest("[data-drop-list]");
     if (!target || !draggedId) return;
     event.preventDefault();
-    clearDropState();
-    target.classList.add("drop-over");
+    markDropPosition(event.clientX, event.clientY, draggedId);
     event.dataTransfer.dropEffect = "move";
   });
 
   document.addEventListener("dragleave", event => {
     const target = event.target.closest("[data-drop-list]");
-    if (target && !target.contains(event.relatedTarget)) target.classList.remove("drop-over");
+    if (target && !target.contains(event.relatedTarget)) clearDropState();
   });
 
   document.addEventListener("drop", event => {
     const target = event.target.closest("[data-drop-list]");
     const id = event.dataTransfer.getData("text/plain") || draggedId;
     if (!target || !id) return;
+    const beforeId = beforeIdFromPoint(event.clientX, event.clientY, id);
     event.preventDefault();
     clearDropState();
-    moveItem(id, target.dataset.dropList);
+    persistMove(id, target.dataset.dropList, beforeId);
   });
 
   $("addBtn").addEventListener("click", addOrUpdate);
