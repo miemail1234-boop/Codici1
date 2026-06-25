@@ -10,6 +10,7 @@
   let items = [];
   let editingId = "";
   let draggedId = "";
+  let pointerDrag = null;
 
   const labels = { today: "Oggi", urgent: "Urgente", later: "Più avanti", done: "Completati" };
   const listTargets = { today: "todayList", urgent: "urgentList", later: "laterList", done: "doneList" };
@@ -175,6 +176,22 @@
     Object.values(listTargets).forEach(id => $(id)?.classList.remove("drop-over"));
   }
 
+  function dropListFromPoint(x, y) {
+    return document.elementFromPoint(x, y)?.closest("[data-drop-list]") || null;
+  }
+
+  function finishPointerDrag(event, cancelled = false) {
+    if (!pointerDrag) return;
+    const { id, card } = pointerDrag;
+    const target = cancelled ? null : dropListFromPoint(event.clientX, event.clientY);
+    card.classList.remove("dragging");
+    card.setAttribute("aria-grabbed", "false");
+    draggedId = "";
+    pointerDrag = null;
+    clearDropState();
+    if (target) moveItem(id, target.dataset.dropList);
+  }
+
   document.addEventListener("click", event => {
     const edit = event.target.dataset.edit;
     if (edit) editItem(edit);
@@ -186,6 +203,28 @@
     const toggle = event.target.dataset.toggle;
     if (toggle) toggleItem(toggle, event.target.checked);
   });
+
+  document.addEventListener("pointerdown", event => {
+    const handle = event.target.closest(".drag-handle");
+    const card = event.target.closest("[data-item]");
+    if (!handle || !card) return;
+    draggedId = card.dataset.item || "";
+    pointerDrag = { id: draggedId, card };
+    card.classList.add("dragging");
+    card.setAttribute("aria-grabbed", "true");
+    handle.setPointerCapture?.(event.pointerId);
+    event.preventDefault();
+  });
+
+  document.addEventListener("pointermove", event => {
+    if (!pointerDrag) return;
+    event.preventDefault();
+    clearDropState();
+    dropListFromPoint(event.clientX, event.clientY)?.classList.add("drop-over");
+  }, { passive: false });
+
+  document.addEventListener("pointerup", event => finishPointerDrag(event));
+  document.addEventListener("pointercancel", event => finishPointerDrag(event, true));
 
   document.addEventListener("dragstart", event => {
     const card = event.target.closest("[data-item]");
