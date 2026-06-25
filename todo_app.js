@@ -38,10 +38,10 @@
   }
 
   function itemHtml(item) {
-    const due = item.due_date ? ` · scadenza ${safe(item.due_date)}` : "";
+    const due = item.due_date ? `<div class="small">Scadenza ${safe(item.due_date)}</div>` : "";
     return `<div class="todo ${item.completed ? "done" : ""}" data-item="${safe(item.id)}" aria-grabbed="false">
       <button class="delete-mini" data-delete="${safe(item.id)}" title="Elimina" aria-label="Elimina task">×</button>
-      <div class="todo-title"><input type="checkbox" data-toggle="${safe(item.id)}" ${item.completed ? "checked" : ""}><div class="todo-main"><strong class="task-text" data-title-id="${safe(item.id)}" title="Doppio clic per modificare">${safe(item.title)}</strong><div class="small">${safe(labels[item.list] || item.list)}${due}</div>${item.note ? `<p class="small">${safe(item.note)}</p>` : ""}</div></div>
+      <div class="todo-title"><input type="checkbox" data-toggle="${safe(item.id)}" ${item.completed ? "checked" : ""}><div class="todo-main"><strong class="task-text" data-title-id="${safe(item.id)}" title="Doppio clic per modificare">${safe(item.title)}</strong>${due}${item.note ? `<p class="small">${safe(item.note)}</p>` : ""}</div></div>
     </div>`;
   }
 
