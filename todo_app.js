@@ -4,14 +4,15 @@
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const $ = id => document.getElementById(id);
   const uid = prefix => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-  const today = () => new Date().toISOString().slice(0, 10);
   const safe = value => String(value ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]));
 
   let userId = "";
   let items = [];
   let editingId = "";
+  let draggedId = "";
 
   const labels = { today: "Oggi", urgent: "Urgente", later: "Più avanti", done: "Completati" };
+  const listTargets = { today: "todayList", urgent: "urgentList", later: "laterList", done: "doneList" };
 
   function toast(message) {
     const node = $("toast");
@@ -33,15 +34,18 @@
 
   function itemHtml(item) {
     const due = item.due_date ? ` · scadenza ${safe(item.due_date)}` : "";
-    return `<div class="todo ${item.completed ? "done" : ""}" data-item="${safe(item.id)}">
-      <div class="todo-title"><input type="checkbox" data-toggle="${safe(item.id)}" ${item.completed ? "checked" : ""}><div><strong>${safe(item.title)}</strong><div class="small">${safe(labels[item.list] || item.list)}${due}</div>${item.note ? `<p class="small">${safe(item.note)}</p>` : ""}</div></div>
-      <div class="actions" style="margin-top:10px"><button class="btn" data-edit="${safe(item.id)}">Modifica</button><button class="btn" data-move="${safe(item.id)}:today">Oggi</button><button class="btn" data-move="${safe(item.id)}:urgent">Urgente</button><button class="btn" data-move="${safe(item.id)}:later">Più avanti</button><button class="btn danger" data-delete="${safe(item.id)}">Elimina</button></div>
+    return `<div class="todo ${item.completed ? "done" : ""}" data-item="${safe(item.id)}" draggable="true" aria-grabbed="false">
+      <div class="todo-title"><span class="drag-handle" title="Trascina in un'altra lista" aria-hidden="true">☰</span><input type="checkbox" data-toggle="${safe(item.id)}" ${item.completed ? "checked" : ""}><div><strong>${safe(item.title)}</strong><div class="small">${safe(labels[item.list] || item.list)}${due}</div>${item.note ? `<p class="small">${safe(item.note)}</p>` : ""}</div></div>
+      <div class="actions" style="margin-top:10px"><button class="btn" data-edit="${safe(item.id)}">Modifica</button><button class="btn danger" data-delete="${safe(item.id)}">Elimina</button></div>
     </div>`;
   }
 
   function renderList(list, targetId) {
     const rows = sorted(list);
-    $(targetId).innerHTML = rows.length ? rows.map(itemHtml).join("") : `<p class="small">Nessun task.</p>`;
+    const target = $(targetId);
+    target.classList.add("drop-list");
+    target.dataset.dropList = list;
+    target.innerHTML = rows.length ? rows.map(itemHtml).join("") : `<p class="small empty-drop">Trascina qui un task.</p>`;
   }
 
   function render() {
@@ -125,15 +129,29 @@
     render();
   }
 
+  function nextSortOrder(list) {
+    return Math.max(0, ...items.filter(item => item.list === list).map(item => Number(item.sort_order || 0))) + 1;
+  }
+
   async function moveItem(id, list) {
+    const item = items.find(row => row.id === id);
+    if (!item || !labels[list]) return;
+    if (item.list === list) return;
     const completed = list === "done";
-    const result = await client.from("todo_standalone_items").update({ list, completed, completed_at: completed ? new Date().toISOString() : null, updated_at: new Date().toISOString() }).eq("user_id", userId).eq("id", id);
+    const result = await client.from("todo_standalone_items").update({
+      list,
+      completed,
+      sort_order: nextSortOrder(list),
+      completed_at: completed ? new Date().toISOString() : null,
+      updated_at: new Date().toISOString()
+    }).eq("user_id", userId).eq("id", id);
     if (result.error) {
       console.error(result.error);
       toast("Errore spostamento task");
       return;
     }
     await loadCloud();
+    toast(`Task spostato in ${labels[list]}`);
   }
 
   async function toggleItem(id, checked) {
@@ -153,21 +171,60 @@
     toast("Task eliminato");
   }
 
+  function clearDropState() {
+    Object.values(listTargets).forEach(id => $(id)?.classList.remove("drop-over"));
+  }
+
   document.addEventListener("click", event => {
     const edit = event.target.dataset.edit;
     if (edit) editItem(edit);
     const del = event.target.dataset.delete;
     if (del) deleteItem(del);
-    const move = event.target.dataset.move;
-    if (move) {
-      const [id, list] = move.split(":");
-      moveItem(id, list);
-    }
   });
 
   document.addEventListener("change", event => {
     const toggle = event.target.dataset.toggle;
     if (toggle) toggleItem(toggle, event.target.checked);
+  });
+
+  document.addEventListener("dragstart", event => {
+    const card = event.target.closest("[data-item]");
+    if (!card || event.target.closest("button,input,select,textarea,a")) return;
+    draggedId = card.dataset.item || "";
+    card.classList.add("dragging");
+    card.setAttribute("aria-grabbed", "true");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", draggedId);
+  });
+
+  document.addEventListener("dragend", event => {
+    event.target.closest("[data-item]")?.classList.remove("dragging");
+    event.target.closest("[data-item]")?.setAttribute("aria-grabbed", "false");
+    draggedId = "";
+    clearDropState();
+  });
+
+  document.addEventListener("dragover", event => {
+    const target = event.target.closest("[data-drop-list]");
+    if (!target || !draggedId) return;
+    event.preventDefault();
+    clearDropState();
+    target.classList.add("drop-over");
+    event.dataTransfer.dropEffect = "move";
+  });
+
+  document.addEventListener("dragleave", event => {
+    const target = event.target.closest("[data-drop-list]");
+    if (target && !target.contains(event.relatedTarget)) target.classList.remove("drop-over");
+  });
+
+  document.addEventListener("drop", event => {
+    const target = event.target.closest("[data-drop-list]");
+    const id = event.dataTransfer.getData("text/plain") || draggedId;
+    if (!target || !id) return;
+    event.preventDefault();
+    clearDropState();
+    moveItem(id, target.dataset.dropList);
   });
 
   $("addBtn").addEventListener("click", addOrUpdate);
