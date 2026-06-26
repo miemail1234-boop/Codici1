@@ -31,7 +31,7 @@
   let entries = [];
   let currentDoc = null;
   let savedDocs = [];
-  const cacheKey = 'subtitleLearner.translationCache.v4.en-it';
+  const cacheKey = 'subtitleLearner.translationCache.v5.en-it';
   let cache = loadCache();
   let saveTimer = null;
 
@@ -75,26 +75,30 @@
       if (/^\d+$/.test(lines[0])) idx = Number(lines.shift());
       const timeLine = lines.find(line => line.includes('-->')) || '';
       const textLines = lines.filter(line => line !== timeLine);
-      return { id: idx, time: timeLine, text: normalizeText(textLines.join('\n')), translation: '', visible: false, loading: false, error: '' };
+      return {
+        id: idx,
+        time: timeLine,
+        text: normalizeText(textLines.join('\n')),
+        translation: '',
+        visible: false,
+        loading: false,
+        error: ''
+      };
     }).filter(entry => entry.text);
   }
 
   function detectSourceLang(text) {
-    const sample = String(text || '').toLowerCase();
-    const words = sample.match(/[a-zà-ÿ']+/g) || [];
+    const words = String(text || '').toLowerCase().match(/[a-zà-ÿ']+/g) || [];
     if (!words.length) return 'en';
-
-    const englishHits = words.filter(word => [
-      'the', 'and', 'you', 'that', 'this', 'what', 'with', 'for', 'are', 'not', 'have', 'just', 'like', 'okay', 'yeah', 'well', 'right', 'can', 'don', "don't", 'will', 'we', 'i', 'me', 'my', 'your', 'is', 'it', 'to', 'of', 'in', 'on'
-    ].includes(word)).length;
-    const italianHits = words.filter(word => [
-      'che', 'non', 'sono', 'sei', 'con', 'per', 'una', 'uno', 'gli', 'del', 'della', 'questo', 'questa', 'cosa', 'bene', 'allora', 'io', 'tu', 'mio', 'mia', 'sì', 'si'
-    ].includes(word)).length;
-    const spanishHits = words.filter(word => ['que', 'no', 'con', 'para', 'una', 'uno', 'los', 'las', 'del', 'esta', 'esto', 'bien', 'soy', 'eres', 'pero'].includes(word)).length;
-    const frenchHits = words.filter(word => ['que', 'pas', 'avec', 'pour', 'une', 'les', 'des', 'est', 'suis', 'vous', 'mais', 'bien'].includes(word)).length;
-    const germanHits = words.filter(word => ['ich', 'du', 'nicht', 'und', 'mit', 'für', 'der', 'die', 'das', 'ist', 'aber', 'gut'].includes(word)).length;
-    const portugueseHits = words.filter(word => ['que', 'não', 'com', 'para', 'uma', 'você', 'está', 'bem', 'mas', 'sou'].includes(word)).length;
-    const scores = { en: englishHits, it: italianHits, es: spanishHits, fr: frenchHits, de: germanHits, pt: portugueseHits };
+    const score = list => words.filter(word => list.includes(word)).length;
+    const scores = {
+      en: score(['the', 'and', 'you', 'that', 'this', 'what', 'with', 'for', 'are', 'not', 'have', 'just', 'like', 'okay', 'yeah', 'well', 'right', 'can', 'will', 'we', 'i', 'me', 'my', 'your', 'is', 'it', 'to', 'of', 'in', 'on']),
+      it: score(['che', 'non', 'sono', 'sei', 'con', 'per', 'una', 'uno', 'gli', 'del', 'della', 'questo', 'questa', 'cosa', 'bene', 'allora', 'io', 'tu', 'mio', 'mia', 'sì', 'si']),
+      es: score(['que', 'no', 'con', 'para', 'una', 'uno', 'los', 'las', 'del', 'esta', 'esto', 'bien', 'soy', 'eres', 'pero']),
+      fr: score(['que', 'pas', 'avec', 'pour', 'une', 'les', 'des', 'est', 'suis', 'vous', 'mais', 'bien']),
+      de: score(['ich', 'du', 'nicht', 'und', 'mit', 'für', 'der', 'die', 'das', 'ist', 'aber', 'gut']),
+      pt: score(['que', 'não', 'com', 'para', 'uma', 'você', 'está', 'bem', 'mas', 'sou'])
+    };
     const best = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
     return best && best[1] > 0 ? best[0] : 'en';
   }
@@ -224,13 +228,7 @@
       const card = document.createElement('article');
       card.className = 'doc-card';
       const updated = doc.updated_at ? new Date(doc.updated_at).toLocaleString('it-IT') : '';
-      card.innerHTML = `
-        <div>
-          <strong></strong>
-          <p></p>
-        </div>
-        <button type="button">Apri</button>
-      `;
+      card.innerHTML = '<div><strong></strong><p></p></div><button type="button">Apri</button>';
       card.querySelector('strong').textContent = doc.title || doc.original_filename || 'SRT senza titolo';
       card.querySelector('p').textContent = `${doc.entry_count || 0} righe · punto salvato: #${doc.last_entry_id || 1} · ${updated}`;
       card.querySelector('button').addEventListener('click', () => openSavedDoc(doc.id));
@@ -361,7 +359,7 @@
       const haystack = `${entry.text} ${entry.translation}`.toLowerCase();
       if (query && !haystack.includes(query)) row.classList.add('hidden-row');
       if (currentDoc && index === Number(currentDoc.last_entry_index || 0)) row.classList.add('progress-row');
-      row.querySelector('.meta').textContent = `#${entry.id}${entry.time ? ` · ${entry.time}` : ''}`;
+      row.querySelector('.meta').textContent = `#${entry.id}`;
       row.querySelector('.original-text').textContent = entry.text;
       const btn = row.querySelector('.translate-btn');
       const out = row.querySelector('.translation-text');
@@ -457,7 +455,14 @@
   els.jumpProgress.addEventListener('click', jumpToProgress);
   els.file.addEventListener('change', event => loadFile(event.target.files?.[0]));
   els.translateAll.addEventListener('click', translateAll);
-  els.clear.addEventListener('click', () => { entries = []; currentDoc = null; els.file.value = ''; els.search.value = ''; setStatus(user ? 'Carica un file .srt oppure aprine uno dalla libreria.' : 'Accedi e carica un file .srt per iniziare.'); render(); });
+  els.clear.addEventListener('click', () => {
+    entries = [];
+    currentDoc = null;
+    els.file.value = '';
+    els.search.value = '';
+    setStatus(user ? 'Carica un file .srt oppure aprine uno dalla libreria.' : 'Accedi e carica un file .srt per iniziare.');
+    render();
+  });
   els.showAll.addEventListener('click', () => { entries.forEach(entry => { entry.visible = true; }); render(); });
   els.hideAll.addEventListener('click', () => { entries.forEach(entry => { entry.visible = false; }); render(); });
   els.search.addEventListener('input', render);
