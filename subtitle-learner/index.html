@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Subtitle Learner</title>
+  <link rel="stylesheet" href="styles.css?v=1">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">English learning</p>
+      <h1>Subtitle Learner</h1>
+      <p class="subtitle">Carica un file .srt, leggi i sottotitoli originali e mostra la traduzione inglese quando ti serve.</p>
+    </div>
+    <a class="ghost-link" href="../">Codici1</a>
+  </header>
+
+  <main>
+    <section class="panel controls" aria-label="Caricamento sottotitoli">
+      <label class="file-box">
+        <span>File SRT</span>
+        <input id="fileInput" type="file" accept=".srt,text/plain">
+      </label>
+      <label>
+        Lingua originale
+        <select id="sourceLang">
+          <option value="auto">Auto</option>
+          <option value="it">Italiano</option>
+          <option value="es">Spagnolo</option>
+          <option value="fr">Francese</option>
+          <option value="de">Tedesco</option>
+          <option value="pt">Portoghese</option>
+          <option value="en">Inglese</option>
+        </select>
+      </label>
+      <button id="translateAllBtn" class="primary" type="button" disabled>Traduci tutto in inglese</button>
+      <button id="clearBtn" type="button" disabled>Pulisci</button>
+      <p id="status" class="status">Carica un file .srt per iniziare.</p>
+    </section>
+
+    <section class="panel toolbar" aria-label="Azioni rapide">
+      <button id="showAllBtn" type="button" disabled>Mostra tutte</button>
+      <button id="hideAllBtn" type="button" disabled>Nascondi traduzioni</button>
+      <label class="search-label">Cerca <input id="searchInput" type="search" placeholder="parola o frase" disabled></label>
+    </section>
+
+    <section class="subtitle-grid" aria-label="Sottotitoli e traduzioni">
+      <div class="column-head">Sottotitoli originali</div>
+      <div class="column-head">Traduzione inglese</div>
+      <div id="rows" class="rows empty">Nessun sottotitolo caricato.</div>
+    </section>
+  </main>
+
+  <template id="rowTemplate">
+    <article class="subtitle-row">
+      <div class="original-cell">
+        <div class="meta"></div>
+        <p class="original-text"></p>
+      </div>
+      <div class="translation-cell">
+        <button class="translate-btn" type="button">Mostra traduzione</button>
+        <p class="translation-text hidden"></p>
+      </div>
+    </article>
+  </template>
+
+  <script src="app.js?v=1"></script>
+</body>
+</html>
