@@ -14,8 +14,9 @@
     tpl: document.getElementById('rowTemplate'),
   };
 
+  const targetLang = 'it';
   let entries = [];
-  const cacheKey = 'subtitleLearner.translationCache.v2';
+  const cacheKey = 'subtitleLearner.translationCache.v3.en-it';
   let cache = loadCache();
 
   function loadCache() {
@@ -97,7 +98,7 @@
   }
 
   function langPairFor(text) {
-    return `${sourceLangFor(text)}|en`;
+    return `${sourceLangFor(text)}|${targetLang}`;
   }
 
   function cacheId(text) {
@@ -106,12 +107,12 @@
 
   async function translateText(text) {
     const source = sourceLangFor(text);
-    if (source === 'en') return text;
+    if (source === targetLang) return text;
 
     const key = cacheId(text);
     if (cache[key]) return cache[key];
 
-    const langPair = `${source}|en`;
+    const langPair = `${source}|${targetLang}`;
     const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${encodeURIComponent(langPair)}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
