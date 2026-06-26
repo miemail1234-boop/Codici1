@@ -15,7 +15,7 @@
   };
 
   let entries = [];
-  const cacheKey = 'subtitleLearner.translationCache.v1';
+  const cacheKey = 'subtitleLearner.translationCache.v2';
   let cache = loadCache();
 
   function loadCache() {
@@ -57,20 +57,62 @@
     }).filter(entry => entry.text);
   }
 
-  function langPair() {
-    const source = els.sourceLang.value || 'auto';
-    return `${source}|en`;
+  function detectSourceLang(text) {
+    const sample = String(text || '').toLowerCase();
+    const words = sample.match(/[a-zà-ÿ']+/g) || [];
+    if (!words.length) return 'en';
+
+    const englishHits = words.filter(word => [
+      'the', 'and', 'you', 'that', 'this', 'what', 'with', 'for', 'are', 'not', 'have', 'just', 'like', 'okay', 'yeah', 'well', 'right', 'can', 'don', "don't", 'will', 'we', 'i', 'me', 'my', 'your', 'is', 'it', 'to', 'of', 'in', 'on'
+    ].includes(word)).length;
+
+    const italianHits = words.filter(word => [
+      'che', 'non', 'sono', 'sei', 'con', 'per', 'una', 'uno', 'gli', 'del', 'della', 'questo', 'questa', 'cosa', 'bene', 'allora', 'io', 'tu', 'mio', 'mia', 'sì', 'si'
+    ].includes(word)).length;
+
+    const spanishHits = words.filter(word => [
+      'que', 'no', 'con', 'para', 'una', 'uno', 'los', 'las', 'del', 'esta', 'esto', 'bien', 'soy', 'eres', 'pero'
+    ].includes(word)).length;
+
+    const frenchHits = words.filter(word => [
+      'que', 'pas', 'avec', 'pour', 'une', 'les', 'des', 'est', 'suis', 'vous', 'mais', 'bien'
+    ].includes(word)).length;
+
+    const germanHits = words.filter(word => [
+      'ich', 'du', 'nicht', 'und', 'mit', 'für', 'der', 'die', 'das', 'ist', 'aber', 'gut'
+    ].includes(word)).length;
+
+    const portugueseHits = words.filter(word => [
+      'que', 'não', 'com', 'para', 'uma', 'você', 'está', 'bem', 'mas', 'sou'
+    ].includes(word)).length;
+
+    const scores = { en: englishHits, it: italianHits, es: spanishHits, fr: frenchHits, de: germanHits, pt: portugueseHits };
+    const best = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
+    return best && best[1] > 0 ? best[0] : 'en';
+  }
+
+  function sourceLangFor(text) {
+    const selected = els.sourceLang.value || 'auto';
+    return selected === 'auto' ? detectSourceLang(text) : selected;
+  }
+
+  function langPairFor(text) {
+    return `${sourceLangFor(text)}|en`;
   }
 
   function cacheId(text) {
-    return `${langPair()}::${text}`;
+    return `${langPairFor(text)}::${text}`;
   }
 
   async function translateText(text) {
+    const source = sourceLangFor(text);
+    if (source === 'en') return text;
+
     const key = cacheId(text);
     if (cache[key]) return cache[key];
 
-    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${encodeURIComponent(langPair())}`;
+    const langPair = `${source}|en`;
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${encodeURIComponent(langPair)}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
