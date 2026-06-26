@@ -4,23 +4,48 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Subtitle Learner</title>
-  <link rel="stylesheet" href="styles.css?v=1">
+  <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
   <header class="topbar">
     <div>
       <p class="eyebrow">English learning</p>
       <h1>Subtitle Learner</h1>
-      <p class="subtitle">Carica un file .srt, leggi i sottotitoli inglesi e mostra la traduzione italiana quando ti serve.</p>
+      <p class="subtitle">Carica un file .srt, salva i sottotitoli nel database e riprendi da dove eri arrivato.</p>
     </div>
     <a class="ghost-link" href="../">Codici1</a>
   </header>
 
   <main>
+    <section class="panel auth-panel" aria-label="Account Supabase">
+      <div>
+        <h2>Account</h2>
+        <p id="authStatus" class="status">Controllo accesso...</p>
+      </div>
+      <form id="loginForm" class="login-form">
+        <label>Email
+          <input id="emailInput" type="email" autocomplete="email" placeholder="miemail1234@gmail.com" required>
+        </label>
+        <button class="primary" type="submit">Accedi con magic link</button>
+      </form>
+      <button id="logoutBtn" type="button" hidden>Esci</button>
+    </section>
+
+    <section class="panel library-panel" aria-label="Sottotitoli salvati">
+      <div class="library-head">
+        <div>
+          <h2>Libreria salvata</h2>
+          <p class="status">Apri un SRT già salvato oppure caricane uno nuovo.</p>
+        </div>
+        <button id="refreshDocsBtn" type="button" disabled>Aggiorna libreria</button>
+      </div>
+      <div id="savedDocs" class="saved-docs empty">Accedi per vedere i file salvati.</div>
+    </section>
+
     <section class="panel controls" aria-label="Caricamento sottotitoli">
       <label class="file-box">
         <span>File SRT</span>
-        <input id="fileInput" type="file" accept=".srt,text/plain">
+        <input id="fileInput" type="file" accept=".srt,text/plain" disabled>
       </label>
       <label>
         Lingua originale
@@ -36,12 +61,13 @@
       </label>
       <button id="translateAllBtn" class="primary" type="button" disabled>Traduci tutto in italiano</button>
       <button id="clearBtn" type="button" disabled>Pulisci</button>
-      <p id="status" class="status">Carica un file .srt per iniziare.</p>
+      <p id="status" class="status">Accedi e carica un file .srt per iniziare.</p>
     </section>
 
     <section class="panel toolbar" aria-label="Azioni rapide">
       <button id="showAllBtn" type="button" disabled>Mostra tutte</button>
       <button id="hideAllBtn" type="button" disabled>Nascondi traduzioni</button>
+      <button id="jumpProgressBtn" type="button" disabled>Vai al punto salvato</button>
       <label class="search-label">Cerca <input id="searchInput" type="search" placeholder="parola o frase" disabled></label>
     </section>
 
@@ -65,6 +91,7 @@
     </article>
   </template>
 
-  <script src="app.js?v=3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>
