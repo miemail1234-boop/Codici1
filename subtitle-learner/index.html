@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Subtitle Learner</title>
-  <link rel="stylesheet" href="styles.css?v=4">
+  <link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
   <header class="topbar">
@@ -71,6 +71,19 @@
       <label class="search-label">Cerca <input id="searchInput" type="search" placeholder="parola o frase" disabled></label>
     </section>
 
+    <section class="panel jump-panel" aria-label="Selezione rapida minutaggio">
+      <div>
+        <h2>Vai rapidamente a</h2>
+        <p class="status">Salta ai blocchi da 5 minuti del file.</p>
+      </div>
+      <label class="jump-select-label">Minutaggio
+        <select id="jumpSelect" disabled>
+          <option value="">Carica un SRT</option>
+        </select>
+      </label>
+      <div id="jumpButtons" class="jump-buttons"></div>
+    </section>
+
     <section class="subtitle-grid" aria-label="Sottotitoli e traduzioni">
       <div class="column-head">Inglese</div>
       <div class="column-head">Italiano</div>
@@ -92,6 +105,6 @@
   </template>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>
