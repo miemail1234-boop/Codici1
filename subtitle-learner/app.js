@@ -31,7 +31,7 @@
   let entries = [];
   let currentDoc = null;
   let savedDocs = [];
-  const cacheKey = 'subtitleLearner.translationCache.v5.en-it';
+  const cacheKey = 'subtitleLearner.translationCache.v6.en-it';
   let cache = loadCache();
   let saveTimer = null;
 
@@ -85,6 +85,22 @@
         error: ''
       };
     }).filter(entry => entry.text);
+  }
+
+  function cueStartSeconds(timeLine) {
+    const match = String(timeLine || '').match(/^(\d{2}):(\d{2}):(\d{2})[,.](\d{3})/);
+    if (!match) return null;
+    const [, hh, mm, ss, ms] = match;
+    return Number(hh) * 3600 + Number(mm) * 60 + Number(ss) + Number(ms) / 1000;
+  }
+
+  function fiveMinuteMarker(index) {
+    const current = cueStartSeconds(entries[index]?.time);
+    if (current === null || current < 300) return '';
+    const previous = index > 0 ? cueStartSeconds(entries[index - 1]?.time) : null;
+    const currentBucket = Math.floor(current / 300);
+    const previousBucket = previous === null ? 0 : Math.floor(previous / 300);
+    return currentBucket > previousBucket ? `${currentBucket * 5} min` : '';
   }
 
   function detectSourceLang(text) {
@@ -230,7 +246,7 @@
       const updated = doc.updated_at ? new Date(doc.updated_at).toLocaleString('it-IT') : '';
       card.innerHTML = '<div><strong></strong><p></p></div><button type="button">Apri</button>';
       card.querySelector('strong').textContent = doc.title || doc.original_filename || 'SRT senza titolo';
-      card.querySelector('p').textContent = `${doc.entry_count || 0} righe · punto salvato: #${doc.last_entry_id || 1} · ${updated}`;
+      card.querySelector('p').textContent = `${doc.entry_count || 0} righe · punto salvato · ${updated}`;
       card.querySelector('button').addEventListener('click', () => openSavedDoc(doc.id));
       els.savedDocs.appendChild(card);
     });
@@ -266,7 +282,7 @@
     els.sourceLang.value = doc.source_lang || 'en';
     els.search.value = '';
     render();
-    setStatus(`Aperto ${doc.title || doc.original_filename}. Punto salvato: #${doc.last_entry_id || 1}.`);
+    setStatus(`Aperto ${doc.title || doc.original_filename}. Punto salvato ripristinato.`);
     setTimeout(jumpToProgress, 150);
   }
 
@@ -359,7 +375,10 @@
       const haystack = `${entry.text} ${entry.translation}`.toLowerCase();
       if (query && !haystack.includes(query)) row.classList.add('hidden-row');
       if (currentDoc && index === Number(currentDoc.last_entry_index || 0)) row.classList.add('progress-row');
-      row.querySelector('.meta').textContent = `#${entry.id}`;
+      const marker = fiveMinuteMarker(index);
+      const meta = row.querySelector('.meta');
+      meta.textContent = marker;
+      meta.hidden = !marker;
       row.querySelector('.original-text').textContent = entry.text;
       const btn = row.querySelector('.translate-btn');
       const out = row.querySelector('.translation-text');
