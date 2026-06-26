@@ -11,7 +11,7 @@
     <div>
       <p class="eyebrow">English learning</p>
       <h1>Subtitle Learner</h1>
-      <p class="subtitle">Carica un file .srt, leggi i sottotitoli originali e mostra la traduzione inglese quando ti serve.</p>
+      <p class="subtitle">Carica un file .srt, leggi i sottotitoli inglesi e mostra la traduzione italiana quando ti serve.</p>
     </div>
     <a class="ghost-link" href="../">Codici1</a>
   </header>
@@ -25,16 +25,16 @@
       <label>
         Lingua originale
         <select id="sourceLang">
+          <option value="en" selected>Inglese</option>
           <option value="auto">Auto</option>
           <option value="it">Italiano</option>
           <option value="es">Spagnolo</option>
           <option value="fr">Francese</option>
           <option value="de">Tedesco</option>
           <option value="pt">Portoghese</option>
-          <option value="en">Inglese</option>
         </select>
       </label>
-      <button id="translateAllBtn" class="primary" type="button" disabled>Traduci tutto in inglese</button>
+      <button id="translateAllBtn" class="primary" type="button" disabled>Traduci tutto in italiano</button>
       <button id="clearBtn" type="button" disabled>Pulisci</button>
       <p id="status" class="status">Carica un file .srt per iniziare.</p>
     </section>
@@ -46,8 +46,8 @@
     </section>
 
     <section class="subtitle-grid" aria-label="Sottotitoli e traduzioni">
-      <div class="column-head">Sottotitoli originali</div>
-      <div class="column-head">Traduzione inglese</div>
+      <div class="column-head">Inglese</div>
+      <div class="column-head">Italiano</div>
       <div id="rows" class="rows empty">Nessun sottotitolo caricato.</div>
     </section>
   </main>
@@ -65,6 +65,6 @@
     </article>
   </template>
 
-  <script src="app.js?v=2"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>
