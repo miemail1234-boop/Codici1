@@ -13,6 +13,8 @@
     showAll: document.getElementById('showAllBtn'),
     hideAll: document.getElementById('hideAllBtn'),
     jumpProgress: document.getElementById('jumpProgressBtn'),
+    jumpSelect: document.getElementById('jumpSelect'),
+    jumpButtons: document.getElementById('jumpButtons'),
     search: document.getElementById('searchInput'),
     status: document.getElementById('status'),
     rows: document.getElementById('rows'),
@@ -31,7 +33,7 @@
   let entries = [];
   let currentDoc = null;
   let savedDocs = [];
-  const cacheKey = 'subtitleLearner.translationCache.v6.en-it';
+  const cacheKey = 'subtitleLearner.translationCache.v7.en-it';
   let cache = loadCache();
   let saveTimer = null;
 
@@ -103,6 +105,61 @@
     return currentBucket > previousBucket ? `${currentBucket * 5} min` : '';
   }
 
+  function getJumpPoints() {
+    const points = [];
+    let lastBucket = 0;
+    entries.forEach((entry, index) => {
+      const seconds = cueStartSeconds(entry.time);
+      if (seconds === null || seconds < 300) return;
+      const bucket = Math.floor(seconds / 300);
+      if (bucket > lastBucket) {
+        points.push({ minutes: bucket * 5, index });
+        lastBucket = bucket;
+      }
+    });
+    return points;
+  }
+
+  function renderJumpControls() {
+    const points = getJumpPoints();
+    els.jumpSelect.innerHTML = '';
+    els.jumpButtons.innerHTML = '';
+    els.jumpSelect.disabled = !points.length;
+    if (!points.length) {
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = entries.length ? 'Nessun blocco da 5 min' : 'Carica un SRT';
+      els.jumpSelect.appendChild(option);
+      return;
+    }
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Scegli minutaggio';
+    els.jumpSelect.appendChild(placeholder);
+    points.forEach(point => {
+      const label = `${point.minutes} min`;
+      const option = document.createElement('option');
+      option.value = String(point.index);
+      option.textContent = label;
+      els.jumpSelect.appendChild(option);
+
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = label;
+      button.addEventListener('click', () => jumpToIndex(point.index));
+      els.jumpButtons.appendChild(button);
+    });
+  }
+
+  function jumpToIndex(index) {
+    const safeIndex = Number(index);
+    if (!Number.isFinite(safeIndex) || !entries[safeIndex]) return;
+    els.search.value = '';
+    queueProgressSave(safeIndex);
+    render();
+    document.getElementById(`entry-${safeIndex}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   function detectSourceLang(text) {
     const words = String(text || '').toLowerCase().match(/[a-zà-ÿ']+/g) || [];
     if (!words.length) return 'en';
@@ -148,6 +205,7 @@
 
   function setEnabled(enabled) {
     const hasEntries = enabled && entries.length > 0;
+    const hasJumps = hasEntries && getJumpPoints().length > 0;
     els.file.disabled = !enabled;
     els.refreshDocs.disabled = !enabled;
     els.translateAll.disabled = !hasEntries;
@@ -156,6 +214,7 @@
     els.hideAll.disabled = !hasEntries;
     els.jumpProgress.disabled = !hasEntries || !currentDoc;
     els.search.disabled = !hasEntries;
+    els.jumpSelect.disabled = !hasJumps;
   }
 
   async function initAuth() {
@@ -360,6 +419,7 @@
   }
 
   function render() {
+    renderJumpControls();
     if (!entries.length) {
       els.rows.className = 'rows empty';
       els.rows.textContent = 'Nessun sottotitolo caricato.';
@@ -472,6 +532,9 @@
   els.logout.addEventListener('click', logout);
   els.refreshDocs.addEventListener('click', loadSavedDocs);
   els.jumpProgress.addEventListener('click', jumpToProgress);
+  els.jumpSelect.addEventListener('change', event => {
+    if (event.target.value !== '') jumpToIndex(event.target.value);
+  });
   els.file.addEventListener('change', event => loadFile(event.target.files?.[0]));
   els.translateAll.addEventListener('click', translateAll);
   els.clear.addEventListener('click', () => {
