@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Subtitle Learner</title>
-  <link rel="stylesheet" href="styles.css?v=6">
+  <link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body>
   <header class="topbar">
@@ -84,6 +84,16 @@
       <div id="jumpButtons" class="jump-buttons"></div>
     </section>
 
+    <section class="panel review-panel" aria-label="Frasi da rivedere">
+      <div class="review-head">
+        <div>
+          <h2>Frasi da rivedere</h2>
+          <p class="status">Segna le frasi importanti e ritrovale qui.</p>
+        </div>
+      </div>
+      <div id="reviewList" class="review-list empty">Nessuna frase salvata per il ripasso.</div>
+    </section>
+
     <section class="subtitle-grid" aria-label="Sottotitoli e traduzioni">
       <div class="column-head">Inglese</div>
       <div class="column-head">Italiano</div>
@@ -99,12 +109,13 @@
       </div>
       <div class="translation-cell">
         <button class="translate-btn" type="button">Mostra traduzione</button>
+        <button class="review-btn" type="button">Segna da rivedere</button>
         <p class="translation-text hidden"></p>
       </div>
     </article>
   </template>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
