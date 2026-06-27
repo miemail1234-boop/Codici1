@@ -1,1 +1,1 @@
-console.log('ok');
+// temporary file intentionally empty
