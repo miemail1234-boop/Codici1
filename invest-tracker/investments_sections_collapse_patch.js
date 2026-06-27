@@ -1,102 +1,100 @@
 (() => {
   'use strict';
 
-  const TITLE_OVERRIDES = { 'Watchlist / Aggiornamenti prezzo': 'Aggiornamenti prezzo' };
-  const LABEL_OVERRIDES = { 'Watchlist / Aggiornamenti prezzo': 'Aggiornamenti prezzo' };
-  const DEFAULT_METRIC_KEYS = { netReturn: true, annualNet: true };
+  const DEFAULT_METRICS = { netReturn: true, annualNet: true };
+  const LABELS = { 'Watchlist / Aggiornamenti prezzo': 'Aggiornamenti prezzo' };
 
-  function h2(panel) { return panel ? panel.getElementsByTagName('h2')[0] : null; }
-  function title(panel) { const node = h2(panel); return node ? node.textContent.trim() : ''; }
   function emitInput(node) {
     if (!node) return;
-    try {
-      node.dispatchEvent(new Event('input', { bubbles: true }));
-    } catch (e) {
+    try { node.dispatchEvent(new Event('input', { bubbles: true })); }
+    catch (err) {
       const ev = document.createEvent('Event');
       ev.initEvent('input', true, true);
       node.dispatchEvent(ev);
     }
   }
-  function btnText(button, label, open) {
-    button.textContent = (open ? '▾ ' : '▸ ') + label;
-    button.setAttribute('aria-expanded', open ? 'true' : 'false');
+
+  function titleOf(panel) {
+    const h = panel ? panel.getElementsByTagName('h2')[0] : null;
+    return h ? h.textContent.trim() : '';
   }
-  function hideTrend() {
-    const panels = document.querySelectorAll('.panel');
-    for (let i = 0; i < panels.length; i++) {
-      if (title(panels[i]) === 'Andamento') panels[i].style.display = 'none';
+
+  function eachChild(panel, button, fn) {
+    const list = panel.children;
+    for (let i = 0; i < list.length; i += 1) {
+      if (list[i] !== button) fn(list[i]);
     }
   }
-  function collapse(panel) {
-    if (!panel || panel.id === 'authBox' || panel.dataset.collapseReady === '1') return;
-    const head = h2(panel);
-    if (!head) return;
-    const oldTitle = head.textContent.trim();
-    if (oldTitle === 'Andamento') return;
-    const visible = TITLE_OVERRIDES[oldTitle] || oldTitle;
-    const label = LABEL_OVERRIDES[oldTitle] || visible;
-    head.textContent = visible;
-    const content = document.createElement('div');
-    content.className = 'section-collapse-content';
-    content.style.display = 'none';
-    while (panel.firstChild) content.appendChild(panel.firstChild);
-    const movedTitle = h2(content);
-    if (movedTitle) movedTitle.style.display = 'none';
+
+  function setPanelOpen(panel, button, label, open) {
+    panel.dataset.open = open ? '1' : '0';
+    button.textContent = (open ? '▾ ' : '▸ ') + label;
+    button.setAttribute('aria-expanded', open ? 'true' : 'false');
+    eachChild(panel, button, function (child) {
+      child.style.display = open ? '' : 'none';
+    });
+  }
+
+  function preparePanel(panel) {
+    if (!panel || panel.id === 'authBox') return;
+    const rawTitle = titleOf(panel);
+    if (!rawTitle) return;
+    if (rawTitle === 'Andamento') {
+      panel.style.display = 'none';
+      return;
+    }
+    if (panel.dataset.mobileSafeCollapse === '1') {
+      const btn = panel.querySelector('.section-title-toggle');
+      if (btn && panel.dataset.open !== '1') setPanelOpen(panel, btn, btn.dataset.label || rawTitle, false);
+      return;
+    }
+    const label = LABELS[rawTitle] || rawTitle;
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'btn primary section-title-toggle';
+    button.dataset.label = label;
     button.style.width = '100%';
     button.style.justifyContent = 'flex-start';
     button.style.textAlign = 'left';
-    button.style.margin = '0 0 4px';
+    button.style.margin = '0 0 6px';
     button.style.fontWeight = '700';
-    btnText(button, label, false);
-    panel.appendChild(button);
-    panel.appendChild(content);
-    panel.dataset.collapseReady = '1';
-    panel.dataset.open = '0';
+    panel.insertBefore(button, panel.firstChild);
+    panel.dataset.mobileSafeCollapse = '1';
     button.addEventListener('click', function () {
-      const open = panel.dataset.open !== '1';
-      panel.dataset.open = open ? '1' : '0';
-      content.style.display = open ? 'block' : 'none';
-      btnText(button, label, open);
+      setPanelOpen(panel, button, label, panel.dataset.open !== '1');
     });
+    setPanelOpen(panel, button, label, false);
   }
-  function defaultMetrics() {
+
+  function defaultMetricsOnce() {
     const controls = document.getElementById('metricControls');
-    if (!controls || controls.dataset.defaultMetricsApplied === '1') return;
+    if (!controls || controls.dataset.defaultMetricsDone === '1') return;
     const checks = controls.querySelectorAll('[data-metric-check]');
     if (!checks.length) return;
-    for (let i = 0; i < checks.length; i++) {
-      checks[i].checked = !!DEFAULT_METRIC_KEYS[checks[i].value];
+    for (let i = 0; i < checks.length; i += 1) {
+      checks[i].checked = !!DEFAULT_METRICS[checks[i].value];
       checks[i].style.minWidth = '22px';
       checks[i].style.minHeight = '22px';
     }
     const monthly = document.getElementById('monthlyNetMetricCheck');
-    if (monthly) monthly.checked = true;
-    controls.dataset.defaultMetricsApplied = '1';
+    if (monthly) {
+      monthly.checked = true;
+      monthly.style.minWidth = '22px';
+      monthly.style.minHeight = '22px';
+    }
+    controls.dataset.defaultMetricsDone = '1';
     emitInput(checks[0]);
   }
-  function checkboxFix() {
-    const controls = document.getElementById('metricControls');
-    if (!controls || controls.dataset.androidMetricFix === '1') return;
-    controls.dataset.androidMetricFix = '1';
-    controls.addEventListener('change', function (event) {
-      const target = event.target;
-      if (target && target.matches && target.matches('[data-metric-check]')) setTimeout(function () { emitInput(target); }, 0);
-    }, true);
-  }
+
   function apply() {
-    hideTrend();
     const panels = document.querySelectorAll('.panel');
-    for (let i = 0; i < panels.length; i++) collapse(panels[i]);
-    defaultMetrics();
-    checkboxFix();
+    for (let i = 0; i < panels.length; i += 1) preparePanel(panels[i]);
+    defaultMetricsOnce();
   }
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply);
   else apply();
-  setTimeout(apply, 500);
-  setTimeout(apply, 1500);
-  setTimeout(apply, 3000);
-  setTimeout(apply, 5000);
+  setTimeout(apply, 600);
+  setTimeout(apply, 1800);
+  setTimeout(apply, 3500);
 })();
