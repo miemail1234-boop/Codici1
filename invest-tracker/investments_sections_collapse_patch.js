@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const DEFAULT_METRICS = { netReturn: true, annualNet: true };
+  const DEFAULT_METRICS = { portfolio: true, netReturn: true, annualNet: true };
   const LABELS = { 'Watchlist / Aggiornamenti prezzo': 'Aggiornamenti prezzo' };
 
   function emitInput(node) {
