@@ -1,11 +1,15 @@
 (() => {
   'use strict';
 
-  const SECTIONS = [
-    { match: 'Log movimenti asset', label: 'Log movimenti asset' },
-    { match: 'Allocazione attuale', label: 'Allocazione attuale' },
-    { match: 'Watchlist / Aggiornamenti prezzo', label: 'Aggiornamenti prezzo', title: 'Aggiornamenti prezzo' },
-  ];
+  const TITLE_OVERRIDES = {
+    'Watchlist / Aggiornamenti prezzo': 'Aggiornamenti prezzo',
+  };
+
+  const LABEL_OVERRIDES = {
+    'Watchlist / Aggiornamenti prezzo': 'Aggiornamenti prezzo',
+  };
+
+  const HIDDEN_TITLES = new Set(['Andamento']);
 
   function directH2(panel) {
     for (const child of panel.children) {
@@ -14,36 +18,42 @@
     return null;
   }
 
-  function panelByTitle(title) {
-    return Array.from(document.querySelectorAll('.panel')).find(panel => {
-      const h2 = directH2(panel);
-      return h2 && h2.textContent.trim() === title;
-    });
+  function isCollapsiblePanel(panel) {
+    if (!panel || panel.id === 'authBox') return false;
+    return Boolean(directH2(panel));
   }
 
   function hideTrendPanel() {
-    const panel = panelByTitle('Andamento');
-    if (panel) panel.style.display = 'none';
+    Array.from(document.querySelectorAll('.panel')).forEach(panel => {
+      const h2 = directH2(panel);
+      if (h2 && HIDDEN_TITLES.has(h2.textContent.trim())) panel.style.display = 'none';
+    });
   }
 
-  function makeCollapsible(config) {
-    const panel = panelByTitle(config.match);
-    if (!panel || panel.dataset.collapseReady === '1') return;
+  function moveContentAfterTitle(panel, h2, content) {
+    while (h2.nextSibling) content.appendChild(h2.nextSibling);
+  }
+
+  function makeCollapsible(panel) {
+    if (!isCollapsiblePanel(panel) || panel.dataset.collapseReady === '1') return;
 
     const h2 = directH2(panel);
-    if (!h2) return;
-    if (config.title) h2.textContent = config.title;
+    const originalTitle = h2.textContent.trim();
+    if (HIDDEN_TITLES.has(originalTitle)) return;
+
+    const visibleTitle = TITLE_OVERRIDES[originalTitle] || originalTitle;
+    const label = LABEL_OVERRIDES[originalTitle] || visibleTitle;
+    h2.textContent = visibleTitle;
 
     const content = document.createElement('div');
     content.className = 'section-collapse-content';
     content.style.display = 'none';
-
-    while (h2.nextSibling) content.appendChild(h2.nextSibling);
+    moveContentAfterTitle(panel, h2, content);
 
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'btn primary section-collapse-btn';
-    button.textContent = `Mostra ${config.label}`;
+    button.textContent = `Mostra ${label}`;
     button.style.margin = '8px 0 4px';
 
     panel.appendChild(button);
@@ -55,13 +65,13 @@
       const open = panel.dataset.open !== '1';
       panel.dataset.open = open ? '1' : '0';
       content.style.display = open ? '' : 'none';
-      button.textContent = `${open ? 'Nascondi' : 'Mostra'} ${config.label}`;
+      button.textContent = `${open ? 'Nascondi' : 'Mostra'} ${label}`;
     });
   }
 
   function apply() {
     hideTrendPanel();
-    SECTIONS.forEach(makeCollapsible);
+    Array.from(document.querySelectorAll('.panel')).forEach(makeCollapsible);
   }
 
   if (document.readyState === 'loading') {
