@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Fisco Tracker</title>
+  <link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-icon">⚖️</span><div><strong>Fisco Tracker</strong><small>Web app</small></div></div>
+      <nav>
+        <button class="nav active" data-view="dashboard">Dashboard</button>
+        <button class="nav" data-view="assets">Assets & Conti</button>
+        <button class="nav" data-view="timeline">Timeline</button>
+        <button class="nav" data-view="data">Dati</button>
+      </nav>
+      <a class="back" href="../">← Codici1</a>
+    </aside>
+
+    <main class="main">
+      <section id="dashboard" class="view active">
+        <header class="page-head"><div><p class="eyebrow">Panoramica</p><h1>Dashboard fiscale</h1><p id="todayLabel" class="muted"></p></div><button id="seedBtn" class="primary">Ripristina modello base</button></header>
+        <div class="cards">
+          <article class="card big"><span class="badge">Prossima scadenza</span><h2 id="nextTitle">—</h2><p id="nextDate" class="muted">—</p><p id="nextDesc"></p><div id="countdown" class="countdown">—</div></article>
+          <article class="card"><span class="badge">Versamenti</span><label>Anno <select id="yearPayments"></select></label><div class="amount">€ <span id="totalPayments">0,00</span></div><p class="muted">Totale importi registrati nell'anno.</p></article>
+          <article class="card"><span class="badge">Stato</span><div class="statline"><strong id="doneCount">0</strong><span>completate</span></div><div class="statline"><strong id="pendingCount">0</strong><span>da fare</span></div></article>
+        </div>
+      </section>
+
+      <section id="assets" class="view">
+        <header class="page-head"><div><p class="eyebrow">Configurazione</p><h1>Assets & Conti</h1><p class="muted">Elementi fiscalmente rilevanti monitorati dall'app.</p></div></header>
+        <div id="assetsGrid" class="asset-grid"></div>
+      </section>
+
+      <section id="timeline" class="view">
+        <header class="page-head"><div><p class="eyebrow">Calendario</p><h1>Timeline scadenze</h1><p class="muted">Spunta, importi, note e allegati restano nel browser.</p></div><div class="filters"><select id="yearFilter"></select><input id="search" type="search" placeholder="Cerca scadenza"></div></header>
+        <div id="timelineList" class="timeline"></div>
+      </section>
+
+      <section id="data" class="view">
+        <header class="page-head"><div><p class="eyebrow">Backup</p><h1>Dati locali</h1><p class="muted">Questa versione web non pubblica i tuoi dati: usa localStorage e backup JSON manuale.</p></div></header>
+        <div class="card data-card">
+          <div class="actions"><button id="exportBtn" class="primary">Esporta JSON</button><label class="file-btn">Importa JSON<input id="importInput" type="file" accept="application/json,.json"></label><button id="wipeBtn" class="danger">Cancella dati locali</button></div>
+          <p class="muted">Puoi importare il vecchio <code>data.json</code> dell'app locale: l'app riconosce completamenti, importi, note e allegati.</p>
+          <textarea id="rawData" readonly></textarea>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <template id="deadlineTpl">
+    <article class="deadline">
+      <div class="deadline-top"><div><span class="date"></span><h3></h3><p class="desc"></p></div><label class="check"><input type="checkbox"> completata</label></div>
+      <details><summary>Dettagli, note e documenti</summary><div class="detail-grid"><div><h4>Spiegazione</h4><p class="explanation"></p><h4>Pagamento</h4><p class="payment"></p></div><div><label>Importo pagato (€)<input class="amount-input" type="number" step="0.01" min="0"></label><label>Note<textarea class="note-input" rows="5"></textarea></label><label class="file-btn small">Allega documento<input class="file-input" type="file"></label><div class="file-box"></div></div></div></details>
+    </article>
+  </template>
+
+  <script src="app.js?v=1"></script>
+</body>
+</html>
