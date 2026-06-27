@@ -1,65 +1,67 @@
 (() => {
   'use strict';
 
-  const PATCH_ATTR = 'data-position-return-patched';
+  const ATTR = 'data-position-return-patched';
 
-  function parseEuro(text) {
-    const match = String(text || '').match(/-?\d[\d.]*,\d{2}/);
-    if (!match) return null;
-    const value = Number(match[0].replace(/\./g, '').replace(',', '.'));
+  function euroToNumber(text) {
+    const raw = String(text || '').split('€')[0].trim().split(' ').pop();
+    if (!raw) return null;
+    const value = Number(raw.replaceAll('.', '').replace(',', '.'));
     return Number.isFinite(value) ? value : null;
   }
 
-  function parseCost(text) {
-    const match = String(text || '').match(/costo residuo\s+(-?\d[\d.]*,\d{2})/i);
-    if (!match) return null;
-    const value = Number(match[1].replace(/\./g, '').replace(',', '.'));
-    return Number.isFinite(value) ? value : null;
+  function costToNumber(text) {
+    const part = String(text || '').split('costo residuo ')[1]?.split(' · ')[0];
+    if (!part) return null;
+    return euroToNumber(part);
   }
 
-  function formatPct(value) {
+  function pctText(value) {
     const sign = value > 0 ? '+' : '';
-    return `${sign}${new Intl.NumberFormat('it-IT', {
+    const formatted = new Intl.NumberFormat('it-IT', {
       maximumFractionDigits: 2,
       minimumFractionDigits: 2,
-    }).format(value)}%`;
+    }).format(value);
+    return `${sign}${formatted}%`;
   }
 
-  function patchPositionCard(card) {
+  function patchCard(card) {
     const metrics = card.querySelector('.metrics');
     if (!metrics) return;
+    const valuePill = [...metrics.querySelectorAll('.pill')].find(node => node.textContent.includes('Valore aperto'));
+    const detailLine = [...card.querySelectorAll('p.small')].find(node => node.textContent.includes('costo residuo'));
+    const market = euroToNumber(valuePill?.textContent);
+    const cost = costToNumber(detailLine?.textContent);
+    if (!market || !cost) return;
 
-    const oldPill = metrics.querySelector(`[${PATCH_ATTR}]`);
-    if (oldPill) oldPill.remove();
-
-    const valuePill = [...metrics.querySelectorAll('.pill')]
-      .find(node => node.textContent.includes('Valore aperto'));
-    const detailLine = [...card.querySelectorAll('p.small')]
-      .find(node => node.textContent.includes('costo residuo'));
-
-    const marketValue = parseEuro(valuePill?.textContent);
-    const openCost = parseCost(detailLine?.textContent);
-    if (!marketValue || !openCost) return;
-
-    const returnPct = ((marketValue / openCost) - 1) * 100;
-    const pill = document.createElement('span');
-    pill.className = `pill ${returnPct >= 0 ? 'pos' : 'neg'}`;
-    pill.setAttribute(PATCH_ATTR, '1');
-    pill.textContent = `Rendimento ${formatPct(returnPct)}`;
-    metrics.appendChild(pill);
+    const value = ((market / cost) - 1) * 100;
+    const text = `Rendimento ${pctText(value)}`;
+    const cls = `pill ${value >= 0 ? 'pos' : 'neg'}`;
+    let pill = metrics.querySelector(`[${ATTR}]`);
+    if (!pill) {
+      pill = document.createElement('span');
+      pill.setAttribute(ATTR, '1');
+      metrics.appendChild(pill);
+    }
+    if (pill.textContent !== text) pill.textContent = text;
+    if (pill.className !== cls) pill.className = cls;
   }
 
   function patchAll() {
     const holder = document.getElementById('positions');
     if (!holder) return;
-    holder.querySelectorAll('.asset').forEach(patchPositionCard);
+    holder.querySelectorAll('.asset').forEach(patchCard);
   }
 
-  const observer = new MutationObserver(() => patchAll());
+  let timer = 0;
+  function schedulePatch() {
+    clearTimeout(timer);
+    timer = setTimeout(patchAll, 50);
+  }
 
   function start() {
     const holder = document.getElementById('positions');
-    if (holder) observer.observe(holder, { childList: true, subtree: true });
+    if (holder) new MutationObserver(schedulePatch).observe(holder, { childList: true, subtree: true });
     patchAll();
   }
 
