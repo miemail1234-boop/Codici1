@@ -14,5 +14,6 @@
   load('investments_entry_asset_name_patch.js?v=1');
   load('investments_position_return_patch.js?v=2');
   load('investments_sections_collapse_patch.js?v=7');
+  load('investments_initial_metrics_patch.js?v=1');
   load('investments_strategy_buttons_patch.js?v=2');
 })();
