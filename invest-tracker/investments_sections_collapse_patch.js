@@ -7,28 +7,37 @@
     { match: 'Watchlist / Aggiornamenti prezzo', label: 'Aggiornamenti prezzo', title: 'Aggiornamenti prezzo' },
   ];
 
+  function directH2(panel) {
+    for (const child of panel.children) {
+      if (child.tagName && child.tagName.toLowerCase() === 'h2') return child;
+    }
+    return null;
+  }
+
   function panelByTitle(title) {
-    return [...document.querySelectorAll('.panel')].find(panel => {
-      const h2 = panel.querySelector(':scope > h2');
+    return Array.from(document.querySelectorAll('.panel')).find(panel => {
+      const h2 = directH2(panel);
       return h2 && h2.textContent.trim() === title;
     });
   }
 
   function hideTrendPanel() {
     const panel = panelByTitle('Andamento');
-    if (panel) panel.remove();
+    if (panel) panel.style.display = 'none';
   }
 
   function makeCollapsible(config) {
     const panel = panelByTitle(config.match);
     if (!panel || panel.dataset.collapseReady === '1') return;
 
-    const h2 = panel.querySelector(':scope > h2');
+    const h2 = directH2(panel);
     if (!h2) return;
     if (config.title) h2.textContent = config.title;
 
     const content = document.createElement('div');
-    content.className = 'section-collapse-content hidden';
+    content.className = 'section-collapse-content';
+    content.style.display = 'none';
+
     while (h2.nextSibling) content.appendChild(h2.nextSibling);
 
     const button = document.createElement('button');
@@ -45,7 +54,7 @@
     button.addEventListener('click', () => {
       const open = panel.dataset.open !== '1';
       panel.dataset.open = open ? '1' : '0';
-      content.classList.toggle('hidden', !open);
+      content.style.display = open ? '' : 'none';
       button.textContent = `${open ? 'Nascondi' : 'Mostra'} ${config.label}`;
     });
   }
@@ -63,4 +72,5 @@
 
   setTimeout(apply, 500);
   setTimeout(apply, 1500);
+  setTimeout(apply, 3000);
 })();
