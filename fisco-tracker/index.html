@@ -3,18 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Dashboard personale per monitorare scadenze fiscali, versamenti, note, documenti e backup cloud opzionale.">
   <title>Fisco Tracker</title>
-  <link rel="stylesheet" href="style.css?v=1">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
   <div class="shell">
     <aside class="sidebar">
-      <div class="brand"><span class="brand-icon">⚖️</span><div><strong>Fisco Tracker</strong><small>Web app</small></div></div>
-      <nav>
+      <div class="brand"><span class="brand-icon" aria-hidden="true">⚖️</span><div><strong>Fisco Tracker</strong><small>Locale + Cloud opzionale</small></div></div>
+      <nav aria-label="Sezioni principali">
         <button class="nav active" data-view="dashboard">Dashboard</button>
         <button class="nav" data-view="assets">Assets & Conti</button>
         <button class="nav" data-view="timeline">Timeline</button>
         <button class="nav" data-view="data">Dati</button>
+        <button class="nav" data-view="cloud">Cloud</button>
       </nav>
       <a class="back" href="../">← Codici1</a>
     </aside>
@@ -25,7 +27,7 @@
         <div class="cards">
           <article class="card big"><span class="badge">Prossima scadenza</span><h2 id="nextTitle">—</h2><p id="nextDate" class="muted">—</p><p id="nextDesc"></p><div id="countdown" class="countdown">—</div></article>
           <article class="card"><span class="badge">Versamenti</span><label>Anno <select id="yearPayments"></select></label><div class="amount">€ <span id="totalPayments">0,00</span></div><p class="muted">Totale importi registrati nell'anno.</p></article>
-          <article class="card"><span class="badge">Stato</span><div class="statline"><strong id="doneCount">0</strong><span>completate</span></div><div class="statline"><strong id="pendingCount">0</strong><span>da fare</span></div></article>
+          <article class="card"><span class="badge">Stato</span><div class="statline"><strong id="doneCount">0</strong><span>completate</span></div><div class="statline"><strong id="pendingCount">0</strong><span>da fare</span></div><p id="syncHint" class="muted compact"></p></article>
         </div>
       </section>
 
@@ -35,16 +37,33 @@
       </section>
 
       <section id="timeline" class="view">
-        <header class="page-head"><div><p class="eyebrow">Calendario</p><h1>Timeline scadenze</h1><p class="muted">Spunta, importi, note e allegati restano nel browser.</p></div><div class="filters"><select id="yearFilter"></select><input id="search" type="search" placeholder="Cerca scadenza"></div></header>
+        <header class="page-head"><div><p class="eyebrow">Calendario</p><h1>Timeline scadenze</h1><p class="muted">Spunta, importi, note e allegati restano nel browser. Il cloud è opzionale.</p></div><div class="filters"><select id="yearFilter"></select><input id="search" type="search" placeholder="Cerca scadenza" autocomplete="off"></div></header>
         <div id="timelineList" class="timeline"></div>
       </section>
 
       <section id="data" class="view">
-        <header class="page-head"><div><p class="eyebrow">Backup</p><h1>Dati locali</h1><p class="muted">Questa versione web non pubblica i tuoi dati: usa localStorage e backup JSON manuale.</p></div></header>
+        <header class="page-head"><div><p class="eyebrow">Backup</p><h1>Dati locali</h1><p class="muted">Questa versione funziona offline: usa localStorage, export/import JSON e, se vuoi, sincronizzazione Supabase.</p></div></header>
         <div class="card data-card">
           <div class="actions"><button id="exportBtn" class="primary">Esporta JSON</button><label class="file-btn">Importa JSON<input id="importInput" type="file" accept="application/json,.json"></label><button id="wipeBtn" class="danger">Cancella dati locali</button></div>
-          <p class="muted">Puoi importare il vecchio <code>data.json</code> dell'app locale: l'app riconosce completamenti, importi, note e allegati.</p>
-          <textarea id="rawData" readonly></textarea>
+          <p class="muted">Puoi importare il vecchio <code>data.json</code>: l'app riconosce completamenti, importi, note, assets e allegati salvati come data URL.</p>
+          <textarea id="rawData" readonly aria-label="Anteprima JSON dei dati locali"></textarea>
+        </div>
+      </section>
+
+      <section id="cloud" class="view">
+        <header class="page-head"><div><p class="eyebrow">Supabase</p><h1>Sincronizzazione cloud</h1><p class="muted">Login via magic link. I dati sono salvati in una riga privata protetta da Row Level Security.</p></div></header>
+        <div class="card data-card">
+          <p id="cloudStatus" class="status">Cloud non inizializzato.</p>
+          <div id="loginBox" class="cloud-form">
+            <label>Email<input id="emailInput" type="email" placeholder="nome@email.it" autocomplete="email"></label>
+            <button id="loginBtn" class="primary">Invia magic link</button>
+          </div>
+          <div id="syncBox" class="actions hidden">
+            <button id="pushCloudBtn" class="primary">Salva su cloud</button>
+            <button id="pullCloudBtn">Carica dal cloud</button>
+            <button id="logoutBtn" class="danger">Esci</button>
+          </div>
+          <p class="muted compact">Suggerimento: esporta un JSON prima di caricare dati dal cloud, così hai sempre un ripristino manuale.</p>
         </div>
       </section>
     </main>
@@ -57,6 +76,6 @@
     </article>
   </template>
 
-  <script src="app.js?v=1"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>
