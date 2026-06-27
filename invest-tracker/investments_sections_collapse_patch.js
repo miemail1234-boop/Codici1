@@ -13,13 +13,7 @@
     'Andamento': true,
   };
 
-  const ALLOWED_DASHBOARD_TITLES = {
-    'Rendimento totale netto': true,
-    'Media annua netta': true,
-    'Netto mensile stimato': true,
-  };
-
-  const ALLOWED_METRIC_KEYS = {
+  const DEFAULT_METRIC_KEYS = {
     netReturn: true,
     annualNet: true,
   };
@@ -83,7 +77,8 @@
     panel.dataset.collapseReady = '1';
     panel.dataset.open = '0';
 
-    button.addEventListener('click', function () {
+    button.addEventListener('click', function (event) {
+      event.preventDefault();
       const open = panel.dataset.open !== '1';
       panel.dataset.open = open ? '1' : '0';
       content.style.display = open ? 'block' : 'none';
@@ -96,32 +91,45 @@
     for (let i = 0; i < panels.length; i += 1) makeCollapsible(panels[i]);
   }
 
-  function enforceMetricInputs() {
-    const checks = document.querySelectorAll('[data-metric-check]');
+  function applyDefaultMetricsOnce() {
+    const controls = document.getElementById('metricControls');
+    if (!controls || controls.dataset.defaultMetricsApplied === '1') return;
+    const checks = controls.querySelectorAll('[data-metric-check]');
+    if (!checks.length) return;
     for (let i = 0; i < checks.length; i += 1) {
       const input = checks[i];
-      input.checked = !!ALLOWED_METRIC_KEYS[input.value];
+      input.checked = !!DEFAULT_METRIC_KEYS[input.value];
     }
     const monthly = document.getElementById('monthlyNetMetricCheck');
     if (monthly) monthly.checked = true;
+    controls.dataset.defaultMetricsApplied = '1';
+    const first = checks[0];
+    if (first) first.dispatchEvent(new Event('input', { bubbles: true }));
   }
 
-  function filterDashboardCards() {
-    const dashboard = document.getElementById('dashboard');
-    if (!dashboard) return;
-    const cards = dashboard.querySelectorAll('.card');
-    for (let i = 0; i < cards.length; i += 1) {
-      const titleNode = cards[i].getElementsByTagName('h3')[0];
-      const title = titleNode ? titleNode.textContent.trim() : '';
-      cards[i].style.display = ALLOWED_DASHBOARD_TITLES[title] ? '' : 'none';
+  function makeMetricLabelsMobileFriendly() {
+    const labels = document.querySelectorAll('#metricControls label.check');
+    for (let i = 0; i < labels.length; i += 1) {
+      const label = labels[i];
+      if (label.dataset.mobileCheckReady === '1') continue;
+      label.dataset.mobileCheckReady = '1';
+      label.style.cursor = 'pointer';
+      label.addEventListener('click', function (event) {
+        const input = label.querySelector('input');
+        if (!input || event.target === input) return;
+        event.preventDefault();
+        input.checked = !input.checked;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
     }
   }
 
   function apply() {
     hideTrendPanels();
     collapseAllPanels();
-    enforceMetricInputs();
-    filterDashboardCards();
+    applyDefaultMetricsOnce();
+    makeMetricLabelsMobileFriendly();
   }
 
   if (document.readyState === 'loading') {
@@ -130,21 +138,8 @@
     apply();
   }
 
-  const observer = new MutationObserver(function () {
-    enforceMetricInputs();
-    filterDashboardCards();
-  });
-
-  function observeDashboard() {
-    const dashboard = document.getElementById('dashboard');
-    if (dashboard && dashboard.dataset.keyMetricsObserver !== '1') {
-      dashboard.dataset.keyMetricsObserver = '1';
-      observer.observe(dashboard, { childList: true, subtree: true });
-    }
-  }
-
-  setTimeout(function () { apply(); observeDashboard(); }, 500);
-  setTimeout(function () { apply(); observeDashboard(); }, 1500);
-  setTimeout(function () { apply(); observeDashboard(); }, 3000);
-  setTimeout(function () { apply(); observeDashboard(); }, 5000);
+  setTimeout(apply, 500);
+  setTimeout(apply, 1500);
+  setTimeout(apply, 3000);
+  setTimeout(apply, 5000);
 })();
