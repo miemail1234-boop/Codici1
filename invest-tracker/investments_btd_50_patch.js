@@ -11,5 +11,5 @@
   load('investments_full_history_charts.js?v=2');
   load('investments_entry_undo_patch.js?v=4');
   load('investments_entry_asset_name_patch.js?v=1');
-  load('investments_position_return_patch.js?v=1');
+  load('investments_position_return_patch.js?v=2');
 })();
