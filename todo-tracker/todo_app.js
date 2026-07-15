@@ -8,8 +8,6 @@
 
   let userId = "";
   let items = [];
-  let editingId = "";
-  let inlineEditingId = "";
   let draggedId = "";
   let pointerDrag = null;
   let pendingDrag = null;
@@ -41,7 +39,7 @@
     const due = item.due_date ? `<div class="small">Scadenza ${safe(item.due_date)}</div>` : "";
     return `<div class="todo ${item.completed ? "done" : ""}" data-item="${safe(item.id)}" aria-grabbed="false">
       <button class="delete-mini" data-delete="${safe(item.id)}" title="Elimina" aria-label="Elimina task">×</button>
-      <div class="todo-title"><input type="checkbox" data-toggle="${safe(item.id)}" ${item.completed ? "checked" : ""}><div class="todo-main"><strong class="task-text" data-title-id="${safe(item.id)}" title="Clicca per modificare">${safe(item.title)}</strong>${due}${item.note ? `<p class="small">${safe(item.note)}</p>` : ""}</div></div>
+      <div class="todo-title"><input type="checkbox" data-toggle="${safe(item.id)}" ${item.completed ? "checked" : ""}><div class="todo-main"><input class="task-title-input" data-title-input="${safe(item.id)}" data-original-title="${safe(item.title)}" value="${safe(item.title)}" aria-label="Titolo task">${due}${item.note ? `<p class="small">${safe(item.note)}</p>` : ""}</div></div>
     </div>`;
   }
 
@@ -59,7 +57,6 @@
     renderList("urgent", "urgentList");
     renderList("later", "laterList");
     renderList("done", "doneList");
-    $("addBtn").textContent = editingId ? "Salva modifica" : "Aggiungi";
   }
 
   async function loadCloud() {
@@ -84,12 +81,10 @@
   }
 
   function clearForm() {
-    editingId = "";
     $("taskTitle").value = "";
     $("taskList").value = "today";
     $("taskDue").value = "";
     $("taskNote").value = "";
-    render();
   }
 
   async function addOrUpdate() {
@@ -101,13 +96,13 @@
     const list = $("taskList").value || "today";
     const row = {
       user_id: userId,
-      id: editingId || uid("todo"),
+      id: uid("todo"),
       title,
       list,
       completed: list === "done",
       note: $("taskNote").value || "",
       due_date: $("taskDue").value || null,
-      sort_order: editingId ? (items.find(item => item.id === editingId)?.sort_order || 0) : items.filter(item => item.list === list).length + 1,
+      sort_order: items.filter(item => item.list === list).length + 1,
       updated_at: new Date().toISOString(),
       completed_at: list === "done" ? new Date().toISOString() : null,
     };
@@ -122,11 +117,12 @@
     toast("Task salvato");
   }
 
-  async function saveInlineTitle(id, title) {
+  async function saveTitle(id, title) {
     const item = items.find(row => row.id === id);
     const cleanTitle = title.trim();
     if (!item || !cleanTitle || cleanTitle === item.title) return;
-    const result = await client.from("todo_standalone_items").update({ title: cleanTitle, updated_at: new Date().toISOString() }).eq("user_id", userId).eq("id", id);
+    const now = new Date().toISOString();
+    const result = await client.from("todo_standalone_items").update({ title: cleanTitle, updated_at: now }).eq("user_id", userId).eq("id", id);
     if (result.error) {
       console.error(result.error);
       toast("Errore modifica task");
@@ -134,33 +130,23 @@
       return;
     }
     item.title = cleanTitle;
-    item.updated_at = new Date().toISOString();
+    item.updated_at = now;
     toast("Task modificato");
   }
 
-  function startInlineEdit(node) {
-    const id = node.dataset.titleId;
-    const item = items.find(row => row.id === id);
-    if (!item || inlineEditingId || pointerDrag || pendingDrag) return;
-    inlineEditingId = id;
-    const input = document.createElement("input");
-    input.className = "inline-title-input";
-    input.value = item.title || "";
-    input.dataset.inlineEdit = id;
-    input.dataset.originalTitle = item.title || "";
-    node.replaceWith(input);
-    input.focus();
-    input.select();
-  }
-
-  async function finishInlineEdit(input, save = true) {
-    if (!input?.dataset?.inlineEdit) return;
-    const id = input.dataset.inlineEdit;
+  async function finishTitleInput(input, save = true) {
+    const id = input?.dataset?.titleInput;
+    if (!id) return;
     const original = input.dataset.originalTitle || "";
     const value = save ? input.value.trim() : original;
-    inlineEditingId = "";
-    await saveInlineTitle(id, value || original);
-    render();
+    if (!value) {
+      input.value = original;
+      toast("Titolo non vuoto");
+      return;
+    }
+    input.value = value;
+    input.dataset.originalTitle = value;
+    await saveTitle(id, value);
   }
 
   function draggedCard() {
@@ -271,7 +257,7 @@
   }
 
   function beginDrag(candidate) {
-    if (!candidate || pointerDrag || inlineEditingId) return;
+    if (!candidate || pointerDrag) return;
     clearPendingDrag();
     draggedId = candidate.id;
     pointerDrag = { id: candidate.id, card: candidate.card };
@@ -296,26 +282,16 @@
 
   document.addEventListener("click", event => {
     const del = event.target.dataset.delete;
-    if (del) {
-      deleteItem(del);
-      return;
-    }
-    const title = event.target.closest("[data-title-id]");
-    if (title) startInlineEdit(title);
-  });
-
-  document.addEventListener("dblclick", event => {
-    const title = event.target.closest("[data-title-id]");
-    if (title) startInlineEdit(title);
+    if (del) deleteItem(del);
   });
 
   document.addEventListener("focusout", event => {
-    const input = event.target.closest("[data-inline-edit]");
-    if (input) finishInlineEdit(input, true);
+    const input = event.target.closest("[data-title-input]");
+    if (input) finishTitleInput(input, true);
   });
 
   document.addEventListener("keydown", event => {
-    const input = event.target.closest("[data-inline-edit]");
+    const input = event.target.closest("[data-title-input]");
     if (!input) return;
     if (event.key === "Enter") {
       event.preventDefault();
@@ -323,18 +299,24 @@
     }
     if (event.key === "Escape") {
       event.preventDefault();
-      finishInlineEdit(input, false);
+      input.value = input.dataset.originalTitle || "";
+      input.blur();
     }
   });
 
   document.addEventListener("change", event => {
+    const titleInput = event.target.closest("[data-title-input]");
+    if (titleInput) {
+      finishTitleInput(titleInput, true);
+      return;
+    }
     const toggle = event.target.dataset.toggle;
     if (toggle) toggleItem(toggle, event.target.checked);
   });
 
   document.addEventListener("pointerdown", event => {
     if (event.button !== undefined && event.button !== 0) return;
-    if (event.target.closest("button,input,select,textarea,a,[data-inline-edit]")) return;
+    if (event.target.closest("button,input,select,textarea,a")) return;
     const card = event.target.closest("[data-item]");
     if (!card) return;
     const id = card.dataset.item || "";
