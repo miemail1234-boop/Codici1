@@ -76,29 +76,40 @@
     let buyAmount = 0;
     let sellQty = 0;
     let sellAmount = 0;
+    let cycleCount = 0;
+    let closedCycles = 0;
+    let currentCycleStart = "";
 
     ordered.forEach(row => {
       const quantity = n(row.quantity);
       const amount = n(row.amount);
+      const fee = Math.max(0, n(row.fee));
       if (row.side === "buy") {
+        if (openQty < 0.0000001) {
+          cycleCount += 1;
+          currentCycleStart = row.date || "";
+        }
         openQty += quantity;
-        openCost += amount;
+        openCost += amount + fee;
         buyQty += quantity;
-        buyAmount += amount;
+        buyAmount += amount + fee;
         return;
       }
       if (row.side === "sell" && openQty > 0) {
         const quantitySold = Math.min(quantity, openQty);
         const avgOpenCost = openCost / openQty;
-        const allocatedProceeds = quantity > 0 ? amount * (quantitySold / quantity) : 0;
+        const netProceeds = Math.max(0, amount - fee);
+        const allocatedProceeds = quantity > 0 ? netProceeds * (quantitySold / quantity) : 0;
         realizedGain += allocatedProceeds - quantitySold * avgOpenCost;
         openQty -= quantitySold;
         openCost -= quantitySold * avgOpenCost;
         sellQty += quantity;
-        sellAmount += amount;
+        sellAmount += netProceeds;
         if (openQty < 0.0000001) {
           openQty = 0;
           openCost = 0;
+          closedCycles += 1;
+          currentCycleStart = "";
         }
       }
     });
@@ -107,7 +118,9 @@
     const price = n(asset.current_price) || (openQty > 0 ? latestEntryValue(asset.block_id) / openQty : 0);
     const marketValue = openQty * price;
     const unrealizedGain = marketValue - openCost;
-    return { asset, rows, buyQty, buyAmount, sellQty, sellAmount, avgCost, openQty, openCost, price, marketValue, realizedGain, unrealizedGain };
+    const openReturn = openCost > 0 ? unrealizedGain / openCost * 100 : 0;
+    const cumulativeGain = realizedGain + unrealizedGain;
+    return { asset, rows, buyQty, buyAmount, sellQty, sellAmount, avgCost, openQty, openCost, price, marketValue, realizedGain, unrealizedGain, openReturn, cumulativeGain, cycleCount, closedCycles, currentCycleStart };
   }
 
   function firstTrackedDate() {
@@ -259,12 +272,14 @@
 
   function positionHtml(pos) {
     const gainClass = pos.unrealizedGain >= 0 ? "pos" : "neg";
+    const totalClass = pos.cumulativeGain >= 0 ? "pos" : "neg";
     const allocation = totals.marketValue > 0 ? pos.marketValue / totals.marketValue * 100 : 0;
+    const cycleLabel = pos.cycleCount > 1 ? `Ciclo attuale #${pos.cycleCount} · dal ${safe(pos.currentCycleStart)}` : `Posizione aperta dal ${safe(pos.currentCycleStart)}`;
     return `<div class="asset">
       <div class="asset-head"><div><h3>${safe(pos.asset.name)}</h3><p class="small">${safe(pos.asset.category || "Altro")} · ${safe(pos.asset.broker || "Altro")} · ${safe(blockName(pos.asset.block_id))} · prezzo ${safe(pos.asset.current_price_date || "")}</p></div><div class="actions"><button class="btn" data-sellall="${safe(pos.asset.id)}">Vendi tutto</button></div></div>
-      <div class="metrics"><span class="pill">Quantità ${fmt4(pos.openQty)}</span><span class="pill">Costo medio ${eur(pos.avgCost)}</span><span class="pill">Valore aperto ${eur(pos.marketValue)}</span><span class="pill ${gainClass}">Guadagno ${eur(pos.unrealizedGain)}</span></div>
+      <div class="metrics"><span class="pill">Quantità ${fmt4(pos.openQty)}</span><span class="pill">Costo medio ${eur(pos.avgCost)}</span><span class="pill">Valore aperto ${eur(pos.marketValue)}</span><span class="pill ${gainClass}">Rendimento attuale ${pct(pos.openReturn)}</span><span class="pill ${gainClass}">Guadagno aperto ${eur(pos.unrealizedGain)}</span></div>
       <div class="row"><div class="field" style="flex:1"><label>Prezzo attuale</label><input data-price="${safe(pos.asset.id)}" inputmode="decimal" value="${safe(pos.price)}"></div><div class="field" style="width:160px"><label>Data</label><input data-pricedate="${safe(pos.asset.id)}" type="date" value="${safe(pos.asset.current_price_date || today())}"></div><div class="field"><label>&nbsp;</label><button class="btn" data-saveprice="${safe(pos.asset.id)}">Salva prezzo</button></div></div>
-      <p class="small">Realizzato ${eur(pos.realizedGain)} · aperto ${eur(pos.unrealizedGain)} · costo residuo ${eur(pos.openCost)} · allocazione ${pct(allocation)}</p>
+      <p class="small">${cycleLabel} · costo ciclo ${eur(pos.openCost)} · realizzato storico ${eur(pos.realizedGain)} · <span class="${totalClass}">guadagno cumulato ${eur(pos.cumulativeGain)}</span> · allocazione ${pct(allocation)}</p>
     </div>`;
   }
 
@@ -283,8 +298,10 @@
   }
 
   function updateTradeTotal() {
-    const total = n($("tradeQty").value) * n($("tradePrice").value);
-    $("tradeTotal").textContent = `Valore calcolato ${eur(total)}`;
+    const gross = n($("tradeQty").value) * n($("tradePrice").value);
+    const fee = Math.max(0, n($("tradeFee")?.value));
+    const total = tradeSide === "sell" ? Math.max(0, gross - fee) : gross + fee;
+    $("tradeTotal").textContent = `${tradeSide === "sell" ? "Ricavo netto" : "Costo totale"} ${eur(total)} · commissione ${eur(fee)}`;
   }
 
   function renderAllocation() {
@@ -300,7 +317,7 @@
 
   function renderTradeLog() {
     const rows = trades.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)) || String(b.created_at || "").localeCompare(String(a.created_at || "")));
-    $("tradeLog").innerHTML = rows.length ? rows.map(row => `<div class="log-item"><div class="history-title"><div><strong>${safe(row.date)} · ${row.side === "sell" ? "Vendita" : "Acquisto"} · ${safe(assetName(row.asset_id))}</strong><div class="small">${fmt4(row.quantity)} × ${eur(row.price)} · controvalore ${eur(row.amount)}</div></div><div class="actions"><button class="btn" data-edittrade="${safe(row.id)}">Modifica</button><button class="btn danger" data-deletetrade="${safe(row.id)}">Elimina</button></div></div>${row.note ? `<p class="small">${safe(row.note)}</p>` : ""}</div>`).join("") : `<p class="small">Nessun movimento.</p>`;
+    $("tradeLog").innerHTML = rows.length ? rows.map(row => `<div class="log-item"><div class="history-title"><div><strong>${safe(row.date)} · ${row.side === "sell" ? "Vendita" : "Acquisto"} · ${safe(assetName(row.asset_id))}</strong><div class="small">${fmt4(row.quantity)} × ${eur(row.price)} · controvalore ${eur(row.amount)}${n(row.fee) ? ` · commissione ${eur(row.fee)}` : ""}</div></div><div class="actions"><button class="btn" data-edittrade="${safe(row.id)}">Modifica</button><button class="btn danger" data-deletetrade="${safe(row.id)}">Elimina</button></div></div>${row.note ? `<p class="small">${safe(row.note)}</p>` : ""}</div>`).join("") : `<p class="small">Nessun movimento.</p>`;
   }
 
   function renderNotes() {
@@ -468,6 +485,7 @@
     $("tradeAsset").value = trade.asset_id;
     $("tradeQty").value = trade.quantity;
     $("tradePrice").value = trade.price;
+    if ($("tradeFee")) $("tradeFee").value = n(trade.fee);
     $("tradeNote").value = trade.note || "";
     updateTradeTotal();
     document.getElementById("movementPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -478,6 +496,7 @@
     editingTradeId = "";
     $("tradeQty").value = "";
     $("tradePrice").value = "";
+    if ($("tradeFee")) $("tradeFee").value = "0";
     $("tradeNote").value = "";
     renderTradeForm();
   }
@@ -486,13 +505,14 @@
     const assetId = $("tradeAsset").value;
     const quantity = n($("tradeQty").value);
     const price = n($("tradePrice").value);
+    const fee = Math.max(0, n($("tradeFee")?.value));
     if (!assetId || quantity <= 0 || price <= 0) {
       toast("Inserisci strumento, quantità e prezzo");
       return;
     }
     saveUndo(editingTradeId ? "modifica movimento" : "nuovo movimento");
     const amount = quantity * price;
-    const row = { user_id: userId, asset_id: assetId, date: $("tradeDate").value || today(), side: tradeSide, quantity, price, amount, note: $("tradeNote").value || "", updated_at: new Date().toISOString() };
+    const row = { user_id: userId, asset_id: assetId, date: $("tradeDate").value || today(), side: tradeSide, quantity, price, amount, fee, note: $("tradeNote").value || "", updated_at: new Date().toISOString() };
     const result = editingTradeId
       ? await client.from("investment_trades").update(row).eq("user_id", userId).eq("id", editingTradeId)
       : await client.from("investment_trades").insert({ ...row, id: uid("investment-trade") });
@@ -505,6 +525,7 @@
     editingTradeId = "";
     $("tradeQty").value = "";
     $("tradePrice").value = "";
+    if ($("tradeFee")) $("tradeFee").value = "0";
     $("tradeNote").value = "";
     await loadCloud();
     toast("Movimento salvato");
@@ -580,7 +601,7 @@
   }
 
   document.addEventListener("input", event => {
-    if (["tradeQty", "tradePrice"].includes(event.target.id)) updateTradeTotal();
+    if (["tradeQty", "tradePrice", "tradeFee"].includes(event.target.id)) updateTradeTotal();
     if (event.target.matches("[data-metric-check]")) renderDashboard();
   });
 
