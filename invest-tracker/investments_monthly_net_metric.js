@@ -6,19 +6,19 @@
   const SUPABASE_KEY = "sb_publishable_VBzZaA3NAIvqMxJcZZTwPg_4_GEi1a3";
   const TAX_RATE = 0.26;
   const SCREENSHOT_VALUES = {
-    "Nasdaq": 48899.60,
-    "Occidente ex-USA": 11950.14,
-    "Stoxx healthcare": 10216.18,
-    "Physical Gold": 6799.77,
-    "MSCI Indonesia": 1970.98,
-    "FTSE Saudi Arabia": 1968.09,
+    "Nasdaq": 49691.75,
+    "Occidente ex-USA": 12179.66,
+    "Stoxx healthcare": 10030.50,
+    "Physical Gold": 6729.80,
     "FTSE Korea": 2080.40,
+    "MSCI Indonesia": 2010.23,
     "MSCI Japan EUR (Acc)": 2002.32,
-    "21share ETH Core ETP": 5082,
-    "Berkshire H": 23042,
-    "Franklin INDIA": 18801,
-    "Ishare Bitcoin ETP": 5088,
-    "MSCI World minimum volatility": 21124
+    "FTSE Saudi Arabia": 1994.37,
+    "21share ETH Core ETP": 5012.00,
+    "Berkshire H": 23625.00,
+    "Franklin INDIA": 19195.00,
+    "Ishare Bitcoin ETP": 4979.00,
+    "MSCI World minimum volatility": 21285.00
   };
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const n = value => {
