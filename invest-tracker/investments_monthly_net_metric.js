@@ -43,14 +43,39 @@
   }
 
   function computePosition(asset, trades, entries) {
-    const rows = trades.filter(row => row.asset_id === asset.id);
-    const buyQty = rows.filter(row => row.side === "buy").reduce((sum, row) => sum + n(row.quantity), 0);
-    const buyAmount = rows.filter(row => row.side === "buy").reduce((sum, row) => sum + n(row.amount), 0);
-    const sellQty = rows.filter(row => row.side === "sell").reduce((sum, row) => sum + n(row.quantity), 0);
-    const sellAmount = rows.filter(row => row.side === "sell").reduce((sum, row) => sum + n(row.amount), 0);
-    const avgCost = buyQty > 0 ? buyAmount / buyQty : 0;
-    const openQty = Math.max(0, buyQty - sellQty);
-    const openCost = openQty * avgCost;
+    const rows = trades
+      .filter(row => row.asset_id === asset.id)
+      .slice()
+      .sort((a, b) =>
+        String(a.date || "").localeCompare(String(b.date || "")) ||
+        String(a.created_at || "").localeCompare(String(b.created_at || ""))
+      );
+    let openQty = 0;
+    let openCost = 0;
+    let realizedGain = 0;
+
+    rows.forEach(row => {
+      const quantity = n(row.quantity);
+      const amount = n(row.amount);
+      if (row.side === "buy") {
+        openQty += quantity;
+        openCost += amount;
+        return;
+      }
+      if (row.side === "sell" && openQty > 0) {
+        const quantitySold = Math.min(quantity, openQty);
+        const avgOpenCost = openCost / openQty;
+        const allocatedProceeds = quantity > 0 ? amount * (quantitySold / quantity) : 0;
+        realizedGain += allocatedProceeds - quantitySold * avgOpenCost;
+        openQty -= quantitySold;
+        openCost -= quantitySold * avgOpenCost;
+        if (openQty < 0.0000001) {
+          openQty = 0;
+          openCost = 0;
+        }
+      }
+    });
+
     const latestEntry = entries
       .filter(entry => entry.generic_option === asset.block_id && n(entry.current_value) > 0)
       .sort((a, b) => String(b.date).localeCompare(String(a.date)))[0];
@@ -58,7 +83,6 @@
     const screenshotValue = SCREENSHOT_VALUES[asset.name];
     const price = screenshotValue && openQty > 0 ? screenshotValue / openQty : fallbackPrice;
     const marketValue = screenshotValue && openQty > 0 ? screenshotValue : openQty * price;
-    const realizedGain = sellAmount - sellQty * avgCost;
     const unrealizedGain = marketValue - openCost;
     return { realizedGain, unrealizedGain, openQty };
   }
