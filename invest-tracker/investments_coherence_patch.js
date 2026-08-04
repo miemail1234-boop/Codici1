@@ -175,51 +175,117 @@
     $("dashboard").innerHTML = metricCards(totals).filter(card => visible.has(card.key)).map(card => `<div class="card"><h3>${safe(card.title)}</h3><div class="value">${card.value}</div><div class="small">${safe(card.hint)}</div></div>`).join("");
   }
 
-  function assetHistory(asset, entries) {
-    const byDate = new Map();
-    entries
-      .filter(entry => entry.generic_option === asset.block_id && n(entry.current_value) > 0 && entry.date)
+  function buildPositionCycles(asset, entries, trades) {
+    const ordered = trades.filter(row => row.asset_id === asset.id).slice().sort((a, b) =>
+      String(a.date || "").localeCompare(String(b.date || "")) ||
+      String(a.created_at || "").localeCompare(String(b.created_at || ""))
+    );
+    const cycles = [];
+    let current = null;
+    let qty = 0;
+    let cost = 0;
+    ordered.forEach(trade => {
+      const amount = n(trade.amount);
+      const fee = Math.max(0, n(trade.fee));
+      const quantity = n(trade.quantity);
+      if (trade.side === "buy") {
+        if (qty < 0.0000001) {
+          current = { index: cycles.length + 1, startDate: trade.date || "", endDate: "", closed: false, rows: [] };
+          cycles.push(current);
+          qty = 0;
+          cost = 0;
+        }
+        qty += quantity;
+        cost += amount + fee;
+        current.rows.push({ date: trade.date, value: cost, price: n(trade.price), label: "Costo dopo acquisto", order: 0 });
+        return;
+      }
+      if (trade.side === "sell" && current && qty > 0.0000001) {
+        const sold = Math.min(quantity, qty);
+        const avg = cost / qty;
+        qty -= sold;
+        cost -= sold * avg;
+        if (qty < 0.0000001) {
+          current.rows.push({ date: trade.date, value: Math.max(0, amount - fee), price: n(trade.price), label: "Vendita totale · ricavo netto", order: 2 });
+          current.endDate = trade.date || "";
+          current.closed = true;
+          current = null;
+          qty = 0;
+          cost = 0;
+        }
+      }
+    });
+    entries.filter(entry => entry.generic_option === asset.block_id && n(entry.current_value) > 0 && entry.date)
       .sort((a, b) => String(a.date).localeCompare(String(b.date)) || n(a.created_at_ms) - n(b.created_at_ms))
-      .forEach(entry => byDate.set(entry.date, n(entry.current_value)));
-    return [...byDate.entries()].sort((a, b) => String(a[0]).localeCompare(String(b[0]))).map(([date, value]) => ({ date, value })).slice(-12);
+      .forEach(entry => {
+        const cycle = cycles.slice().reverse().find(item => String(entry.date) >= String(item.startDate) && (!item.endDate || String(entry.date) <= String(item.endDate)));
+        if (!cycle) return;
+        cycle.rows.push({ date: entry.date, value: n(entry.current_value), price: n(entry.current_price), label: "Aggiornamento prezzo", order: 1 });
+      });
+    cycles.forEach(cycle => {
+      const seen = new Set();
+      cycle.rows = cycle.rows.sort((a, b) => String(a.date).localeCompare(String(b.date)) || a.order - b.order).filter(row => {
+        const key = row.date + "|" + row.value.toFixed(6) + "|" + row.label;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    });
+    return cycles;
   }
 
-  function lineChartHtml(asset, entries) {
-    const rows = assetHistory(asset, entries);
-    if (rows.length < 2) return `<p class="small">Grafico valore: servono almeno due aggiornamenti prezzo.</p>`;
-    const w = 520;
-    const h = 120;
-    const pad = 12;
-    const min = Math.min(...rows.map(row => row.value));
-    const max = Math.max(...rows.map(row => row.value));
+  function cycleSvg(asset, cycles) {
+    const flat = [];
+    cycles.forEach(cycle => cycle.rows.forEach(row => flat.push({ cycle, row })));
+    if (flat.length < 2) return `<p class="small">Servono almeno due punti per questo intervallo.</p>`;
+    const w = Math.max(520, 28 + (flat.length - 1) * 44);
+    const h = 130;
+    const pad = 14;
+    const min = Math.min(...flat.map(item => item.row.value));
+    const max = Math.max(...flat.map(item => item.row.value));
     const span = Math.max(1, max - min);
-    const coords = rows.map((row, index) => {
-      const x = pad + (rows.length === 1 ? 0 : index * (w - pad * 2) / (rows.length - 1));
-      const y = h - pad - ((row.value - min) / span) * (h - pad * 2);
-      return { row, x: x.toFixed(1), y: y.toFixed(1) };
-    });
-    const points = coords.map(point => `${point.x},${point.y}`).join(" ");
-    const first = rows[0];
-    const last = rows[rows.length - 1];
-    const delta = last.value - first.value;
-    return `<div class="asset-line-chart" style="margin-top:12px;border:1px solid var(--border);border-radius:14px;padding:10px;background:rgba(0,0,0,.12)">
-      <div class="history-title"><strong>Andamento valore asset</strong><span class="small ${delta >= 0 ? "pos" : "neg"}">${delta >= 0 ? "+" : ""}${eur(delta)}</span></div>
-      <svg viewBox="0 0 ${w} ${h}" width="100%" height="120" role="img" aria-label="Andamento valore ${safe(asset.name)}">
-        <polyline points="${points}" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
-        ${coords.map(({ row, x, y }) => {
-          const tooltip = `${safe(row.date)}<br>${eur(row.value)}`;
-          return `<g data-chart-tooltip="${tooltip}" tabindex="0"><circle class="chart-hit" cx="${x}" cy="${y}" r="10" fill="transparent"></circle><circle class="chart-dot" cx="${x}" cy="${y}" r="3.8" fill="currentColor"></circle><title>${safe(row.date)} · ${eur(row.value)}</title></g>`;
-        }).join("")}
-      </svg>
-      <div class="history-title small"><span>${safe(first.date.slice(5))} · ${eur(first.value)}</span><span>${safe(last.date.slice(5))} · ${eur(last.value)}</span></div>
+    const coords = flat.map((item, index) => ({
+      ...item,
+      x: (pad + index * (w - pad * 2) / Math.max(1, flat.length - 1)).toFixed(1),
+      y: (h - pad - ((item.row.value - min) / span) * (h - pad * 2)).toFixed(1)
+    }));
+    const lines = cycles.map(cycle => {
+      const points = coords.filter(point => point.cycle === cycle).map(point => `${point.x},${point.y}`).join(" ");
+      return points ? `<polyline points="${points}" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>` : "";
+    }).join("");
+    const dots = coords.map(({ cycle, row, x, y }) => {
+      const tooltip = `${safe(row.date)}<br>Ciclo ${cycle.index} · ${safe(row.label)}<br>${eur(row.value)}${row.price ? `<br>Prezzo ${eur(row.price)}` : ""}`;
+      return `<g data-chart-tooltip="${tooltip}" tabindex="0"><circle class="chart-hit" cx="${x}" cy="${y}" r="11" fill="transparent"></circle><circle class="chart-dot" cx="${x}" cy="${y}" r="4" fill="currentColor"></circle><title>${safe(row.date)} · ${safe(row.label)} · ${eur(row.value)}</title></g>`;
+    }).join("");
+    return `<div style="overflow-x:auto;overflow-y:hidden"><svg viewBox="0 0 ${w} ${h}" width="${w}" height="130" role="img" aria-label="Andamento per cicli ${safe(asset.name)}">${lines}${dots}</svg></div>`;
+  }
+
+  function lineChartHtml(asset, entries, trades) {
+    const cycles = buildPositionCycles(asset, entries, trades);
+    const current = cycles.filter(cycle => !cycle.closed).slice(-1);
+    const first = current[0]?.rows[0];
+    const last = current[0]?.rows.slice(-1)[0];
+    const delta = first && last ? last.value - first.value : 0;
+    return `<div class="asset-line-chart cycle-aware-chart" style="margin-top:12px;border:1px solid var(--border);border-radius:14px;padding:10px;background:rgba(0,0,0,.12)">
+      <div class="tabs"><button class="btn active" type="button" data-chart-mode="current">Posizione attuale</button><button class="btn" type="button" data-chart-mode="all">Storico completo</button></div>
+      <div data-cycle-panel="current">
+        <div class="history-title"><strong>Posizione attuale</strong>${first && last ? `<span class="small ${delta >= 0 ? "pos" : "neg"}">${delta >= 0 ? "+" : ""}${eur(delta)}</span>` : ""}</div>
+        ${cycleSvg(asset, current)}
+        <p class="small">${first && last ? `${safe(first.date)} → ${safe(last.date)}` : "Nessun ciclo aperto"}</p>
+      </div>
+      <div data-cycle-panel="all" style="display:none">
+        <div class="history-title"><strong>Storico completo · cicli separati</strong><span class="small">${cycles.length} cicli</span></div>
+        ${cycleSvg(asset, cycles)}
+        <p class="small">La linea si interrompe a ogni vendita totale: il riacquisto riparte dal nuovo costo.</p>
+      </div>
     </div>`;
   }
 
-  function renderPositions(totals, blocks, entries) {
+  function renderPositions(totals, blocks, entries, trades) {
     $("positions").innerHTML = totals.openPositions.sort((a, b) => b.marketValue - a.marketValue).map(pos => {
       const allocation = totals.marketValue > 0 ? pos.marketValue / totals.marketValue * 100 : 0;
       const cycleLabel = pos.cycleCount > 1 ? `Ciclo attuale #${pos.cycleCount} · dal ${safe(pos.currentCycleStart)}` : `Posizione aperta dal ${safe(pos.currentCycleStart)}`;
-      return `<div class="asset"><div class="asset-head"><div><h3>${safe(pos.asset.name)}</h3><p class="small">Altro · Altro · ${safe(blockName(blocks, pos.asset.block_id))} · ultimo aggiornamento prezzo</p></div><div class="actions"><button class="btn" data-sellall="${safe(pos.asset.id)}">Vendi tutto</button></div></div><div class="metrics"><span class="pill">Quantità ${fmt4(pos.openQty)}</span><span class="pill">Costo medio ${eur(pos.avgCost)}</span><span class="pill">Valore aperto ${eur(pos.marketValue)}</span><span class="pill ${pos.unrealizedGain >= 0 ? "pos" : "neg"}">Rendimento attuale ${pct(pos.openReturn)}</span><span class="pill ${pos.unrealizedGain >= 0 ? "pos" : "neg"}">Guadagno aperto ${eur(pos.unrealizedGain)}</span></div><p class="small">${cycleLabel} · costo ciclo ${eur(pos.openCost)} · realizzato storico ${eur(pos.realizedGain)} · <span class="${pos.cumulativeGain >= 0 ? "pos" : "neg"}">guadagno cumulato ${eur(pos.cumulativeGain)}</span> · allocazione ${pct(allocation)}</p>${lineChartHtml(pos.asset, entries)}</div>`;
+      return `<div class="asset"><div class="asset-head"><div><h3>${safe(pos.asset.name)}</h3><p class="small">Altro · Altro · ${safe(blockName(blocks, pos.asset.block_id))} · ultimo aggiornamento prezzo</p></div><div class="actions"><button class="btn" data-sellall="${safe(pos.asset.id)}">Vendi tutto</button></div></div><div class="metrics"><span class="pill">Quantità ${fmt4(pos.openQty)}</span><span class="pill">Costo medio ${eur(pos.avgCost)}</span><span class="pill">Valore aperto ${eur(pos.marketValue)}</span><span class="pill ${pos.unrealizedGain >= 0 ? "pos" : "neg"}">Rendimento attuale ${pct(pos.openReturn)}</span><span class="pill ${pos.unrealizedGain >= 0 ? "pos" : "neg"}">Guadagno aperto ${eur(pos.unrealizedGain)}</span></div><p class="small">${cycleLabel} · costo ciclo ${eur(pos.openCost)} · realizzato storico ${eur(pos.realizedGain)} · <span class="${pos.cumulativeGain >= 0 ? "pos" : "neg"}">guadagno cumulato ${eur(pos.cumulativeGain)}</span> · allocazione ${pct(allocation)}</p>${lineChartHtml(pos.asset, entries, trades)}</div>`;
     }).join("");
   }
 
@@ -298,7 +364,7 @@
       totals.annualGross = grossReturn * 12 / 13;
       totals.annualNet = netReturn * 12 / 13;
       renderDashboard(totals);
-      renderPositions(totals, rows.blocks, rows.entries);
+      renderPositions(totals, rows.blocks, rows.entries, rows.trades);
       renderAllocation(totals);
       renderBlocks(totals, rows.blocks, rows.assets, positions);
       renderPriceUpdates(rows.entries);
@@ -331,6 +397,14 @@
     if (e.target.matches("[data-metric-check]")) setTimeout(applyCoherence, 0);
   }, true);
   document.addEventListener("click", e => {
+    const modeButton = e.target.closest?.("[data-chart-mode]");
+    if (modeButton) {
+      const root = modeButton.closest(".cycle-aware-chart");
+      const mode = modeButton.dataset.chartMode;
+      root?.querySelectorAll("[data-chart-mode]").forEach(button => button.classList.toggle("active", button.dataset.chartMode === mode));
+      root?.querySelectorAll("[data-cycle-panel]").forEach(panel => { panel.style.display = panel.dataset.cyclePanel === mode ? "" : "none"; });
+      return;
+    }
     if (e.target.closest("#reloadBtn,[data-metric-preset]")) setTimeout(applyCoherence, 900);
   }, true);
   setTimeout(applyCoherence, 1200);
