@@ -65,18 +65,47 @@
 
   function computePosition(asset) {
     const rows = tradesForAsset(asset.id);
-    const buys = rows.filter(row => row.side === "buy");
-    const sells = rows.filter(row => row.side === "sell");
-    const buyQty = buys.reduce((sum, row) => sum + n(row.quantity), 0);
-    const buyAmount = buys.reduce((sum, row) => sum + n(row.amount), 0);
-    const sellQty = sells.reduce((sum, row) => sum + n(row.quantity), 0);
-    const sellAmount = sells.reduce((sum, row) => sum + n(row.amount), 0);
-    const avgCost = buyQty > 0 ? buyAmount / buyQty : 0;
-    const openQty = Math.max(0, buyQty - sellQty);
-    const openCost = openQty * avgCost;
+    const ordered = rows.slice().sort((a, b) =>
+      String(a.date || "").localeCompare(String(b.date || "")) ||
+      String(a.created_at || "").localeCompare(String(b.created_at || ""))
+    );
+    let openQty = 0;
+    let openCost = 0;
+    let realizedGain = 0;
+    let buyQty = 0;
+    let buyAmount = 0;
+    let sellQty = 0;
+    let sellAmount = 0;
+
+    ordered.forEach(row => {
+      const quantity = n(row.quantity);
+      const amount = n(row.amount);
+      if (row.side === "buy") {
+        openQty += quantity;
+        openCost += amount;
+        buyQty += quantity;
+        buyAmount += amount;
+        return;
+      }
+      if (row.side === "sell" && openQty > 0) {
+        const quantitySold = Math.min(quantity, openQty);
+        const avgOpenCost = openCost / openQty;
+        const allocatedProceeds = quantity > 0 ? amount * (quantitySold / quantity) : 0;
+        realizedGain += allocatedProceeds - quantitySold * avgOpenCost;
+        openQty -= quantitySold;
+        openCost -= quantitySold * avgOpenCost;
+        sellQty += quantity;
+        sellAmount += amount;
+        if (openQty < 0.0000001) {
+          openQty = 0;
+          openCost = 0;
+        }
+      }
+    });
+
+    const avgCost = openQty > 0 ? openCost / openQty : 0;
     const price = n(asset.current_price) || (openQty > 0 ? latestEntryValue(asset.block_id) / openQty : 0);
     const marketValue = openQty * price;
-    const realizedGain = sellAmount - sellQty * avgCost;
     const unrealizedGain = marketValue - openCost;
     return { asset, rows, buyQty, buyAmount, sellQty, sellAmount, avgCost, openQty, openCost, price, marketValue, realizedGain, unrealizedGain };
   }
