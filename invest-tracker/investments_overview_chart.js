@@ -34,7 +34,7 @@
     let panel = document.getElementById("overviewChartPanel");
     if (panel) {
       const description = panel.querySelector("p.small");
-      if (description) description.textContent = "Linea principale: rendimento totale netto stimato del portafoglio nel tempo. Le linee degli asset restano selezionabili come confronto.";
+      if (description) description.textContent = "Linea principale: rendimento totale netto stimato del portafoglio nel tempo. Le linee degli asset mostrano solo il ciclo attualmente aperto, senza falsi cali dopo una vendita totale.";
       const averageButton = panel.querySelector("#overviewOnlyAverage");
       if (averageButton) averageButton.textContent = "Solo rendimento netto";
       return panel;
@@ -44,7 +44,7 @@
     panel = document.createElement("section");
     panel.className = "panel";
     panel.id = "overviewChartPanel";
-    panel.innerHTML = `<h2>Andamento generale</h2><p class="small">Linea principale: rendimento totale netto stimato del portafoglio nel tempo. Le linee degli asset restano selezionabili come confronto.</p><div class="overview-chart-actions"><button class="btn" type="button" id="overviewSelectAll">Tutti</button><button class="btn" type="button" id="overviewSelectNone">Nessuno</button><button class="btn" type="button" id="overviewOnlyAverage">Solo rendimento netto</button></div><div class="overview-chart-controls" id="overviewAssetControls"></div><div id="overviewChart"></div>`;
+    panel.innerHTML = `<h2>Andamento generale</h2><p class="small">Linea principale: rendimento totale netto stimato del portafoglio nel tempo. Le linee degli asset mostrano solo il ciclo attualmente aperto, senza falsi cali dopo una vendita totale.</p><div class="overview-chart-actions"><button class="btn" type="button" id="overviewSelectAll">Tutti</button><button class="btn" type="button" id="overviewSelectNone">Nessuno</button><button class="btn" type="button" id="overviewOnlyAverage">Solo rendimento netto</button></div><div class="overview-chart-controls" id="overviewAssetControls"></div><div id="overviewChart"></div>`;
     dashboard.insertAdjacentElement("afterend", panel);
     return panel;
   }
@@ -74,27 +74,83 @@
     document.getElementById("overviewChartTooltip")?.classList.remove("show");
   }
 
-  function firstBuy(asset) {
-    return allTrades
-      .filter(trade => trade.asset_id === asset.id && trade.side === "buy" && n(trade.amount) > 0 && trade.date)
-      .sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.created_at || "").localeCompare(String(b.created_at || "")))[0];
+  function ledgerAt(asset, date) {
+    const rows = allTrades
+      .filter(trade => trade.asset_id === asset.id && trade.date && String(trade.date).localeCompare(String(date)) <= 0)
+      .slice()
+      .sort((a, b) =>
+        String(a.date || "").localeCompare(String(b.date || "")) ||
+        String(a.created_at || "").localeCompare(String(b.created_at || ""))
+      );
+    let openQty = 0;
+    let openCost = 0;
+    let realizedGain = 0;
+    let totalBuy = 0;
+    let currentCycleStart = "";
+
+    rows.forEach(trade => {
+      const quantity = n(trade.quantity);
+      const amount = n(trade.amount);
+      const fee = Math.max(0, n(trade.fee));
+      if (trade.side === "buy") {
+        if (openQty < 0.0000001) currentCycleStart = trade.date || "";
+        openQty += quantity;
+        openCost += amount + fee;
+        totalBuy += amount + fee;
+        return;
+      }
+      if (trade.side === "sell" && openQty > 0) {
+        const sold = Math.min(quantity, openQty);
+        const avg = openCost / openQty;
+        const netProceeds = Math.max(0, amount - fee);
+        const allocatedProceeds = quantity > 0 ? netProceeds * (sold / quantity) : 0;
+        realizedGain += allocatedProceeds - sold * avg;
+        openQty -= sold;
+        openCost -= sold * avg;
+        if (openQty < 0.0000001) {
+          openQty = 0;
+          openCost = 0;
+          currentCycleStart = "";
+        }
+      }
+    });
+
+    return { openQty, openCost, realizedGain, totalBuy, currentCycleStart };
   }
 
   function rawHistory(asset) {
-    const buy = firstBuy(asset);
-    if (!buy) return [];
-    const baseValue = n(buy.amount);
-    if (!baseValue) return [];
-    const rows = [{ date: buy.date, value: baseValue, index: 100, label: "Acquisto" }];
+    const finalState = ledgerAt(asset, "9999-12-31");
+    const cycleStart = finalState.currentCycleStart;
+    if (!cycleStart || finalState.openQty <= 0 || finalState.openCost <= 0) return [];
+
+    const startState = ledgerAt(asset, cycleStart);
+    const rows = [{
+      date: cycleStart,
+      value: startState.openCost,
+      index: 100,
+      label: "Inizio ciclo attuale"
+    }];
+
     allEntries
-      .filter(entry => entry.generic_option === asset.block_id && n(entry.current_value) > 0 && entry.date)
+      .filter(entry =>
+        entry.generic_option === asset.block_id &&
+        n(entry.current_value) > 0 &&
+        entry.date &&
+        String(entry.date).localeCompare(String(cycleStart)) >= 0
+      )
       .sort((a, b) => String(a.date).localeCompare(String(b.date)) || n(a.created_at_ms) - n(b.created_at_ms))
-      .forEach(entry => rows.push({
-        date: entry.date,
-        value: n(entry.current_value),
-        index: n(entry.current_value) / baseValue * 100,
-        label: entry.transaction_type === "buy" ? "Acquisto" : "Aggiornamento prezzo"
-      }));
+      .forEach(entry => {
+        const state = ledgerAt(asset, entry.date);
+        if (state.currentCycleStart !== cycleStart || state.openCost <= 0) return;
+        const cycleReturn = (n(entry.current_value) - state.openCost) / state.openCost * 100;
+        rows.push({
+          date: entry.date,
+          value: n(entry.current_value),
+          index: 100 + cycleReturn,
+          label: "Rendimento ciclo attuale"
+        });
+      });
+
     const byDate = new Map();
     rows.forEach(row => byDate.set(row.date, row));
     return [...byDate.values()].sort((a, b) => String(a.date).localeCompare(String(b.date)));
@@ -127,22 +183,20 @@
       let unrealizedGain = 0;
 
       allAssets.forEach(asset => {
-        const trades = allTrades.filter(trade => trade.asset_id === asset.id && trade.date && String(trade.date).localeCompare(String(date)) <= 0);
-        const buys = trades.filter(trade => trade.side === "buy");
-        const sells = trades.filter(trade => trade.side === "sell");
-        const buyQty = buys.reduce((sum, row) => sum + n(row.quantity), 0);
-        const buyAmount = buys.reduce((sum, row) => sum + n(row.amount), 0);
-        const sellQty = sells.reduce((sum, row) => sum + n(row.quantity), 0);
-        const sellAmount = sells.reduce((sum, row) => sum + n(row.amount), 0);
-        const avgCost = buyQty > 0 ? buyAmount / buyQty : 0;
-        const openQty = Math.max(0, buyQty - sellQty);
-        const openCost = openQty * avgCost;
+        const state = ledgerAt(asset, date);
         const latest = latestEntryAtOrBefore(asset, date);
-        const marketValue = openQty > 0 ? (latest ? n(latest.current_value) : openCost) : 0;
+        const latestBelongsToCurrentCycle = Boolean(
+          latest &&
+          state.currentCycleStart &&
+          String(latest.date).localeCompare(String(state.currentCycleStart)) >= 0
+        );
+        const marketValue = state.openQty > 0
+          ? (latestBelongsToCurrentCycle ? n(latest.current_value) : state.openCost)
+          : 0;
 
-        totalBuy += buyAmount;
-        realizedGain += sellAmount - sellQty * avgCost;
-        unrealizedGain += marketValue - openCost;
+        totalBuy += state.totalBuy;
+        realizedGain += state.realizedGain;
+        unrealizedGain += marketValue - state.openCost;
       });
 
       const grossProfit = realizedGain + unrealizedGain;
@@ -256,7 +310,7 @@
         ${netPoints.map(point => `<circle class="overview-point" cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="4.4" fill="currentColor" data-overview-tip="Rendimento totale netto<br>${safe(point.date)}<br>${pct(point.netReturn)}<br>Netto ${eur(point.netProfit)}<br>Tasse stimate ${eur(point.tax)}"></circle>`).join("")}
         ${assetPaths.map(item => item.points.map(point => `<circle class="overview-point" cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="3" fill="currentColor" opacity=".45" data-overview-tip="${safe(item.asset.name)}<br>${safe(point.date)}<br>${safe(point.label)}<br>${pct(point.index - 100)}"></circle>`).join("")).join("")}
       </svg>
-      <div class="history-title small"><span>Linea spessa = rendimento totale netto stimato · linee sottili = asset selezionati</span><span>${footerRight}</span></div>
+      <div class="history-title small"><span>Linea spessa = rendimento totale netto stimato · linee sottili = rendimento del ciclo attuale degli asset</span><span>${footerRight}</span></div>
     </div>`;
   }
 
