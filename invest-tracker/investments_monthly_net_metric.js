@@ -57,15 +57,17 @@
     rows.forEach(row => {
       const quantity = n(row.quantity);
       const amount = n(row.amount);
+      const fee = Math.max(0, n(row.fee));
       if (row.side === "buy") {
         openQty += quantity;
-        openCost += amount;
+        openCost += amount + fee;
         return;
       }
       if (row.side === "sell" && openQty > 0) {
         const quantitySold = Math.min(quantity, openQty);
         const avgOpenCost = openCost / openQty;
-        const allocatedProceeds = quantity > 0 ? amount * (quantitySold / quantity) : 0;
+        const netProceeds = Math.max(0, amount - fee);
+        const allocatedProceeds = quantity > 0 ? netProceeds * (quantitySold / quantity) : 0;
         realizedGain += allocatedProceeds - quantitySold * avgOpenCost;
         openQty -= quantitySold;
         openCost -= quantitySold * avgOpenCost;
