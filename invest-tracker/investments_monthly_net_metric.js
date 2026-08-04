@@ -11,7 +11,7 @@
     "Stoxx healthcare": 10216.18,
     "Physical Gold": 6799.77,
     "MSCI Indonesia": 1970.98,
-    "FTSE Saudi Arabia": 1968.09,
+    "FTSE Saudi Arabia": 1968.09,\n    "FTSE Korea": 2080.40,\n    "MSCI Japan EUR (Acc)": 2002.32,
     "21share ETH Core ETP": 5082,
     "Berkshire H": 23042,
     "Franklin INDIA": 18801,
