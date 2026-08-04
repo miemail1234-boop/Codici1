@@ -5,7 +5,7 @@
   const SUPABASE_URL = "https://kujyowhezihjambhpahe.supabase.co";
   const SUPABASE_KEY = "sb_publishable_VBzZaA3NAIvqMxJcZZTwPg_4_GEi1a3";
   const TAX_RATE = 0.26;
-  const SCREENSHOT_CASH = 33096.52 + 8963 + 1825.39;
+  const SCREENSHOT_CASH = 33196.45 + 8989 + 1825.39;
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const $ = id => document.getElementById(id);
   const n = value => {
@@ -60,21 +60,60 @@
   }
 
   function computePosition(asset, trades, entries) {
-    const rows = trades.filter(row => row.asset_id === asset.id);
-    const buyQty = rows.filter(row => row.side === "buy").reduce((sum, row) => sum + n(row.quantity), 0);
-    const buyAmount = rows.filter(row => row.side === "buy").reduce((sum, row) => sum + n(row.amount), 0);
-    const sellQty = rows.filter(row => row.side === "sell").reduce((sum, row) => sum + n(row.quantity), 0);
-    const sellAmount = rows.filter(row => row.side === "sell").reduce((sum, row) => sum + n(row.amount), 0);
-    const avgCost = buyQty > 0 ? buyAmount / buyQty : 0;
-    const openQty = Math.max(0, buyQty - sellQty);
-    const openCost = openQty * avgCost;
+    const rows = trades.filter(row => row.asset_id === asset.id).slice().sort((a, b) =>
+      String(a.date || "").localeCompare(String(b.date || "")) ||
+      String(a.created_at || "").localeCompare(String(b.created_at || ""))
+    );
+    let openQty = 0;
+    let openCost = 0;
+    let realizedGain = 0;
+    let buyAmount = 0;
+    let sellAmount = 0;
+    let cycleCount = 0;
+    let closedCycles = 0;
+    let currentCycleStart = "";
+
+    rows.forEach(row => {
+      const quantity = n(row.quantity);
+      const amount = n(row.amount);
+      const fee = Math.max(0, n(row.fee));
+      if (row.side === "buy") {
+        if (openQty < 0.0000001) {
+          cycleCount += 1;
+          currentCycleStart = row.date || "";
+        }
+        openQty += quantity;
+        openCost += amount + fee;
+        buyAmount += amount + fee;
+        return;
+      }
+      if (row.side === "sell" && openQty > 0) {
+        const sold = Math.min(quantity, openQty);
+        const avg = openCost / openQty;
+        const netProceeds = Math.max(0, amount - fee);
+        const allocatedProceeds = quantity > 0 ? netProceeds * (sold / quantity) : 0;
+        realizedGain += allocatedProceeds - sold * avg;
+        openQty -= sold;
+        openCost -= sold * avg;
+        sellAmount += netProceeds;
+        if (openQty < 0.0000001) {
+          openQty = 0;
+          openCost = 0;
+          closedCycles += 1;
+          currentCycleStart = "";
+        }
+      }
+    });
+
+    const avgCost = openQty > 0 ? openCost / openQty : 0;
     const latestEntry = latestPriceEntry(asset, entries);
     const latestPrice = n(latestEntry?.current_price) || (openQty > 0 ? n(latestEntry?.current_value) / openQty : 0);
     const price = latestPrice || n(asset.current_price);
     const marketValue = openQty * price;
-    const realizedGain = sellAmount - sellQty * avgCost;
     const unrealizedGain = marketValue - openCost;
-    return { asset, openQty, openCost, avgCost, price, marketValue, realizedGain, unrealizedGain, sellAmount, buyAmount };
+    const openReturn = openCost > 0 ? unrealizedGain / openCost * 100 : 0;
+    const cumulativeGain = realizedGain + unrealizedGain;
+    return { asset, openQty, openCost, avgCost, price, marketValue, realizedGain, unrealizedGain, sellAmount, buyAmount, openReturn, cumulativeGain, cycleCount, closedCycles, currentCycleStart };
   }
 
   function selectedMetricKeys() {
@@ -179,7 +218,8 @@
   function renderPositions(totals, blocks, entries) {
     $("positions").innerHTML = totals.openPositions.sort((a, b) => b.marketValue - a.marketValue).map(pos => {
       const allocation = totals.marketValue > 0 ? pos.marketValue / totals.marketValue * 100 : 0;
-      return `<div class="asset"><div class="asset-head"><div><h3>${safe(pos.asset.name)}</h3><p class="small">Altro · Altro · ${safe(blockName(blocks, pos.asset.block_id))} · ultimo aggiornamento prezzo</p></div><div class="actions"><button class="btn" data-sellall="${safe(pos.asset.id)}">Vendi tutto</button></div></div><div class="metrics"><span class="pill">Quantità ${fmt4(pos.openQty)}</span><span class="pill">Costo medio ${eur(pos.avgCost)}</span><span class="pill">Valore aperto ${eur(pos.marketValue)}</span><span class="pill ${pos.unrealizedGain >= 0 ? "pos" : "neg"}">Guadagno ${eur(pos.unrealizedGain)}</span></div><p class="small">Realizzato ${eur(pos.realizedGain)} · aperto ${eur(pos.unrealizedGain)} · costo residuo ${eur(pos.openCost)} · allocazione ${pct(allocation)}</p>${lineChartHtml(pos.asset, entries)}</div>`;
+      const cycleLabel = pos.cycleCount > 1 ? `Ciclo attuale #${pos.cycleCount} · dal ${safe(pos.currentCycleStart)}` : `Posizione aperta dal ${safe(pos.currentCycleStart)}`;
+      return `<div class="asset"><div class="asset-head"><div><h3>${safe(pos.asset.name)}</h3><p class="small">Altro · Altro · ${safe(blockName(blocks, pos.asset.block_id))} · ultimo aggiornamento prezzo</p></div><div class="actions"><button class="btn" data-sellall="${safe(pos.asset.id)}">Vendi tutto</button></div></div><div class="metrics"><span class="pill">Quantità ${fmt4(pos.openQty)}</span><span class="pill">Costo medio ${eur(pos.avgCost)}</span><span class="pill">Valore aperto ${eur(pos.marketValue)}</span><span class="pill ${pos.unrealizedGain >= 0 ? "pos" : "neg"}">Rendimento attuale ${pct(pos.openReturn)}</span><span class="pill ${pos.unrealizedGain >= 0 ? "pos" : "neg"}">Guadagno aperto ${eur(pos.unrealizedGain)}</span></div><p class="small">${cycleLabel} · costo ciclo ${eur(pos.openCost)} · realizzato storico ${eur(pos.realizedGain)} · <span class="${pos.cumulativeGain >= 0 ? "pos" : "neg"}">guadagno cumulato ${eur(pos.cumulativeGain)}</span> · allocazione ${pct(allocation)}</p>${lineChartHtml(pos.asset, entries)}</div>`;
     }).join("");
   }
 
