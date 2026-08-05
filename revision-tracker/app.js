@@ -33,6 +33,7 @@ async function loadRevisionScripts() {
   await loadScript('revision_review_patch.js?v=2');
   await loadScript('revision_atlas_selection_fix.js?v=1');
   await loadScript('revision_editor_patch.js?v=1');
+  await loadScript('revision_history_patch.js?v=1');
   revisionScriptsLoaded = true;
 }
 
