@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Revision Tracker</title>
+  <link rel="stylesheet" href="styles.css?v=1">
+</head>
+<body>
+  <header class="topbar">
+    <div><p class="eyebrow">Paper review</p><h1>Revision Tracker</h1><p>Carica documenti Word, seleziona il testo e aggiungi commenti ed evidenziazioni.</p></div>
+    <div class="top-actions"><span id="userLabel"></span><button id="signOutBtn" class="secondary" hidden>Esci</button><a class="secondary" href="../">Codici1</a></div>
+  </header>
+  <main>
+    <section id="authPanel" class="panel auth-panel">
+      <h2>Accesso</h2>
+      <p class="hint">Usa lo stesso account Supabase di Life Tracker. Se hai già una sessione attiva, l’accesso avviene automaticamente.</p>
+      <div class="auth-grid"><input id="emailInput" type="email" placeholder="Email"><input id="passwordInput" type="password" placeholder="Password"><button id="loginBtn" class="primary">Accedi</button><button id="magicBtn" class="secondary">Invia link magico</button></div>
+      <p id="authStatus" class="hint">Controllo sessione...</p>
+    </section>
+    <section id="screen-revisions" class="screen" data-screen-panel="revisions"></section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="vendor/supabase.js?v=21"></script>
+  <script src="https://unpkg.com/mammoth@1.8.0/mammoth.browser.min.js"></script>
+  <script src="app.js?v=1"></script>
+</body>
+</html>
