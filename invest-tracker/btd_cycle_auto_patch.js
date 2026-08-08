@@ -33,7 +33,7 @@
   function status(text, tone = '') {
     const node = document.getElementById('etfDrawdownUpdateStatus');
     if (!node) return;
-    node.textContent = text;
+    if (node.textContent !== text) node.textContent = text;
     if (tone) node.dataset.tone = tone;
     else delete node.dataset.tone;
   }
@@ -105,8 +105,10 @@
           editor.parentElement?.insertBefore(info, editor);
         }
         if (info) {
-          info.innerHTML = `<strong>Ciclo automatico:</strong> ${String(meta.provider || '—')} · ${String(meta.latest_period || '—')} · indice ${fmtNum(meta.indicator_latest, 3)} · score ${fmtNum(meta.economic_cycle_score, 1)} · aggiornato ${fmtDate(meta.fetched_at)}`;
-          info.title = String(meta.source || '');
+          const html = `<strong>Ciclo automatico:</strong> ${String(meta.provider || '—')} · ${String(meta.latest_period || '—')} · indice ${fmtNum(meta.indicator_latest, 3)} · score ${fmtNum(meta.economic_cycle_score, 1)} · aggiornato ${fmtDate(meta.fetched_at)}`;
+          if (info.innerHTML !== html) info.innerHTML = html;
+          const title = String(meta.source || '');
+          if (info.title !== title) info.title = title;
         }
       }
     });
