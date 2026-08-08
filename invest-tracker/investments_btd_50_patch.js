@@ -7,7 +7,7 @@
     document.head.appendChild(s);
   }
   load('btd_edge_scan_patch.js?v=2');
-  load('btd_cycle_auto_patch.js?v=1');
+  load('btd_cycle_auto_patch.js?v=2');
   load('btd_update_button_patch.js?v=1');
   load('btd_news_patch.js?v=2');
   load('investments_overview_chart.js?v=4');
