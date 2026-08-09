@@ -5,6 +5,15 @@
 
   const CORE_FUNCTION = 'btd-core-scan';
 
+  function migrateNewsHistoryOnce() {
+    try {
+      const flag = 'invest-tracker-btd-core-v5-history-migrated';
+      if (localStorage.getItem(flag) === '1') return;
+      localStorage.removeItem('invest-tracker-btd-news-history-v2');
+      localStorage.setItem(flag, '1');
+    } catch (_) {}
+  }
+
   function patchSupabaseFactory() {
     const sb = window.supabase;
     if (!sb?.createClient || sb.createClient.__btdCoreWrapped) return;
@@ -104,6 +113,7 @@
     }
   }
 
+  migrateNewsHistoryOnce();
   patchSupabaseFactory();
 
   const style = document.createElement('style');
