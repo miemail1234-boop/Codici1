@@ -54,12 +54,18 @@
       if (/neutrali a 50|utili|rischio strutturale/i.test(node.textContent || '')) node.style.display = 'none';
     });
 
+    document.querySelectorAll('.btd-signal small').forEach(node => {
+      if ((node.textContent || '').trim().toLowerCase() === 'provvisorio') node.remove();
+    });
+
     document.querySelectorAll('.btd-why').forEach(node => {
       let html = node.innerHTML;
       const obsolete = [
         'I driver macro sono ancora neutrali a 50/100: il punteggio è provvisorio finché non vengono configurati.',
         'Ciclo economico e politica monetaria sono automatici; utili e rischio strutturale sono ancora neutrali a 50/100: il punteggio resta parzialmente provvisorio.',
-        'Politica monetaria, utili e rischio strutturale sono ancora neutrali a 50/100: il punteggio resta parzialmente provvisorio.'
+        'Politica monetaria, utili e rischio strutturale sono ancora neutrali a 50/100: il punteggio resta parzialmente provvisorio.',
+        'Gli utili/revisioni sono impostati come costruttivi.',
+        'Gli utili/revisioni restano un punto debole.'
       ];
       obsolete.forEach(text => { html = html.replace(text, ''); });
       html = html.replace(/\s{2,}/g, ' ').trim();
@@ -74,6 +80,16 @@
         setText(card.querySelector('small'), 'driver automatici');
       }
     });
+
+    document.querySelectorAll('#btdNews .btd-news-item > div:first-child small').forEach(node => {
+      const text = (node.textContent || '').trim();
+      if (text === 'Macro neutro · score provvisorio' || text === 'Contesto macro configurato') setText(node, '4 driver automatici');
+    });
+    const newsMeta = document.querySelector('#btdNews .btd-news-head .small');
+    if (newsMeta) {
+      const next = (newsMeta.textContent || '').replace(/macro configurato\s+\d+\/\d+/i, 'Core automatico 14/14');
+      setText(newsMeta, next);
+    }
 
     const meta = document.getElementById('etfDrawdownMeta');
     if (meta && /BTD Score|Fonte mercato/.test(meta.textContent || '')) {
