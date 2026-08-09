@@ -20,13 +20,22 @@
     const original = sb.createClient.bind(sb);
     const wrapped = function (...args) {
       const client = original(...args);
-      if (!client?.functions?.invoke || client.functions.invoke.__btdCoreWrapped) return client;
-      const originalInvoke = client.functions.invoke.bind(client.functions);
+      const functions = client?.functions;
+      if (!functions?.invoke || functions.invoke.__btdCoreWrapped) return client;
+      const originalInvoke = functions.invoke.bind(functions);
       const invoke = function (name, options) {
         return originalInvoke(name === 'btd-current-scan' ? CORE_FUNCTION : name, options);
       };
       invoke.__btdCoreWrapped = true;
-      client.functions.invoke = invoke;
+      functions.invoke = invoke;
+      try {
+        Object.defineProperty(client, 'functions', {
+          value: functions,
+          configurable: true,
+          enumerable: false,
+          writable: false
+        });
+      } catch (_) {}
       return client;
     };
     wrapped.__btdCoreWrapped = true;
