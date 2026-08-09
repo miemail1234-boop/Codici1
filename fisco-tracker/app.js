@@ -1,7 +1,11 @@
 (() => {
   'use strict';
 
-  const STORE_KEY = 'fiscoTrackerWeb.v1';
+  const STORE_KEY = 'fiscoTrackerWeb.v2';
+  const LEGACY_STORE_KEY = 'fiscoTrackerWeb.v1';
+  const SUPABASE_URL = 'https://kujyowhezihjambhpahe.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_VBzZaA3NAIvqMxJcZZTwPg_4_GEi1a3';
+  const SUPABASE_TABLE = 'fisco_tracker_profiles';
   const years = Array.from({ length: 31 }, (_, i) => 2024 + i);
 
   const baseAssets = [
@@ -9,7 +13,7 @@
     { id: 'trade-republic', name: 'Trade Republic', type: 'Broker', regime: 'Amministrato', icon: '🏦', details: 'Broker in regime amministrato: verifica comunque estratti e documenti.' },
     { id: 'binance', name: 'Binance', type: 'Crypto', regime: 'Dichiarativo', icon: '₿', details: 'Monitoraggio crypto e calcolo eventuali plusvalenze.' },
     { id: 'home', name: 'Affitto', type: 'Casa', regime: 'Detrazione', icon: '🏠', details: 'Contratto e canoni per eventuale detrazione in dichiarazione.' },
-    { id: 'enpap', name: 'ENPAP', type: 'Previdenza', regime: 'Cassa professionale', icon: '🛡️', details: 'Acconti, comunicazione redditi e contributi psicologi.' },
+    { id: 'enpap', name: 'ENPAP', type: 'Previdenza', regime: 'Cassa professionale', icon: '🛡️', details: 'Acconti, comunicazione redditi e contributi psicologi.' }
   ];
 
   const templates = [
@@ -23,10 +27,13 @@
     { key: 'tari', month: 12, day: 16, title: 'TARI', desc: 'Verifica avviso comunale tassa rifiuti.', assets: ['home'], payment: true, explanation: 'Scadenza locale: data e importo possono variare per Comune.', paymentInfo: 'PagoPA/F24 secondo avviso ricevuto.' },
     { key: 'bollo-auto', month: 1, day: 31, title: 'Bollo auto', desc: 'Controlla scadenza regionale del bollo auto.', assets: [], payment: true, explanation: 'Scadenza collegata al veicolo; verifica su portale regionale o ACI.', paymentInfo: 'Pagamento tramite PagoPA, home banking, ACI o canali autorizzati.' },
     { key: 'assicurazione-auto', month: 9, day: 1, title: 'Assicurazione auto', desc: 'Promemoria rinnovo assicurazione auto.', assets: [], payment: true, explanation: 'Promemoria personale utile per evitare scadenze assicurative.', paymentInfo: 'Paga secondo canale indicato dalla compagnia.' },
-    { key: 'ordine-psicologi', month: 2, day: 28, title: 'Ordine Psicologi Lombardia', desc: 'Quota annuale iscrizione ordine.', assets: ['enpap'], payment: true, explanation: 'Promemoria per quota di iscrizione professionale.', paymentInfo: 'Pagamento secondo avviso dell’Ordine.' },
+    { key: 'ordine-psicologi', month: 2, day: 28, title: 'Ordine Psicologi Lombardia', desc: 'Quota annuale iscrizione ordine.', assets: ['enpap'], payment: true, explanation: 'Promemoria per quota di iscrizione professionale.', paymentInfo: 'Pagamento secondo avviso dell’Ordine.' }
   ];
 
   let state = loadState();
+  let supabase = null;
+  let session = null;
+  let cloudReady = false;
 
   const $ = id => document.getElementById(id);
   const fmtDate = iso => new Date(`${iso}T12:00:00`).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -42,7 +49,7 @@
       relatedAssets: t.assets,
       hasPayment: t.payment,
       explanation: t.explanation,
-      paymentInfo: t.paymentInfo,
+      paymentInfo: t.paymentInfo
     }))).sort((a, b) => a.date.localeCompare(b.date));
   }
 
@@ -55,16 +62,37 @@
     if (!data || typeof data !== 'object') return next;
     next.completedDeadlines = Array.isArray(data.completedDeadlines)
       ? Object.fromEntries(data.completedDeadlines.map(id => [id, true]))
-      : (data.completedDeadlines || {});
-    next.paymentAmounts = data.paymentAmounts || {};
-    next.deadlineNotes = data.deadlineNotes || {};
-    next.uploadedFiles = data.uploadedFiles || {};
-    if (Array.isArray(data.assets)) next.assets = data.assets;
+      : cleanObject(data.completedDeadlines);
+    next.paymentAmounts = cleanObject(data.paymentAmounts);
+    next.deadlineNotes = cleanObject(data.deadlineNotes);
+    next.uploadedFiles = cleanObject(data.uploadedFiles);
+    if (Array.isArray(data.assets)) next.assets = data.assets.map(normalizeAsset).filter(Boolean);
     return next;
   }
 
+  function cleanObject(value) {
+    return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+  }
+
+  function normalizeAsset(asset) {
+    if (!asset || typeof asset !== 'object') return null;
+    return {
+      id: String(asset.id || crypto.randomUUID()),
+      name: String(asset.name || 'Asset senza nome'),
+      type: String(asset.type || ''),
+      regime: String(asset.regime || ''),
+      icon: String(asset.icon || '◼️'),
+      details: String(asset.details || '')
+    };
+  }
+
   function loadState() {
-    try { return normalizeImported(JSON.parse(localStorage.getItem(STORE_KEY))); } catch { return defaultState(); }
+    try {
+      const raw = localStorage.getItem(STORE_KEY) || localStorage.getItem(LEGACY_STORE_KEY);
+      return normalizeImported(JSON.parse(raw));
+    } catch {
+      return defaultState();
+    }
   }
 
   function saveState() {
@@ -79,6 +107,7 @@
     if (name === 'assets') renderAssets();
     if (name === 'dashboard') renderDashboard();
     if (name === 'data') renderRaw();
+    if (name === 'cloud') renderCloud();
   }
 
   function renderDashboard() {
@@ -96,13 +125,15 @@
     const done = list.filter(d => state.completedDeadlines[d.id]).length;
     $('doneCount').textContent = done;
     $('pendingCount').textContent = list.length - done;
+    $('syncHint').textContent = session ? 'Cloud collegato.' : 'Cloud opzionale non collegato.';
     renderPaymentYears();
     renderPayments();
   }
 
   function renderPaymentYears() {
     const current = String(new Date().getFullYear());
-    $('yearPayments').innerHTML = years.map(y => `<option value="${y}" ${String(y) === current ? 'selected' : ''}>${y}</option>`).join('');
+    const currentValue = $('yearPayments').value || current;
+    $('yearPayments').innerHTML = years.map(y => `<option value="${y}" ${String(y) === currentValue ? 'selected' : ''}>${y}</option>`).join('');
   }
 
   function renderPayments() {
@@ -112,12 +143,31 @@
   }
 
   function renderAssets() {
-    $('assetsGrid').innerHTML = state.assets.map(a => `<article class="asset"><div class="icon">${a.icon || '◼️'}</div><h3>${a.name}</h3><p class="muted">${a.type || ''} · ${a.regime || ''}</p><p>${a.details || ''}</p></article>`).join('');
+    const grid = $('assetsGrid');
+    grid.innerHTML = '';
+    state.assets.forEach(a => {
+      const article = document.createElement('article');
+      article.className = 'asset';
+      const icon = document.createElement('div');
+      icon.className = 'icon';
+      icon.textContent = a.icon || '◼️';
+      const title = document.createElement('h3');
+      title.textContent = a.name;
+      const meta = document.createElement('p');
+      meta.className = 'muted';
+      meta.textContent = [a.type, a.regime].filter(Boolean).join(' · ');
+      const details = document.createElement('p');
+      details.textContent = a.details || '';
+      article.append(icon, title, meta, details);
+      grid.appendChild(article);
+    });
   }
 
   function renderYearFilter() {
     const current = new Date().getFullYear();
+    const currentValue = $('yearFilter').value || 'current';
     $('yearFilter').innerHTML = `<option value="current">Anno corrente (${current})</option><option value="all">Tutti gli anni</option>` + years.map(y => `<option value="${y}">${y}</option>`).join('');
+    $('yearFilter').value = currentValue;
   }
 
   function renderTimeline() {
@@ -158,14 +208,23 @@
 
   function renderFileBox(id, box) {
     const f = state.uploadedFiles[id];
+    box.innerHTML = '';
     if (!f) { box.textContent = 'Nessun documento allegato.'; return; }
-    box.innerHTML = `<strong>${f.name}</strong><br><button data-download>Scarica</button> <button class="danger" data-delete>Elimina</button>`;
-    box.querySelector('[data-download]').addEventListener('click', () => downloadDataUrl(f.data, f.name));
-    box.querySelector('[data-delete]').addEventListener('click', () => { delete state.uploadedFiles[id]; saveState(); renderTimeline(); });
+    const name = document.createElement('strong');
+    name.textContent = f.name || 'documento';
+    const download = document.createElement('button');
+    download.textContent = 'Scarica';
+    download.addEventListener('click', () => downloadDataUrl(f.data, f.name));
+    const del = document.createElement('button');
+    del.className = 'danger';
+    del.textContent = 'Elimina';
+    del.addEventListener('click', () => { delete state.uploadedFiles[id]; saveState(); renderTimeline(); });
+    box.append(name, document.createElement('br'), download, ' ', del);
   }
 
   function attachFile(id, file, box) {
     if (!file) return;
+    if (file.size > 2 * 1024 * 1024 && !confirm('Il file supera 2 MB e può rendere pesante il backup. Allegarlo comunque?')) return;
     const reader = new FileReader();
     reader.onload = () => { state.uploadedFiles[id] = { name: file.name, type: file.type, data: reader.result, uploadedAt: new Date().toISOString() }; saveState(); renderFileBox(id, box); };
     reader.readAsDataURL(file);
@@ -191,13 +250,95 @@
 
   async function importJson(file) {
     if (!file) return;
-    const data = JSON.parse(await file.text());
-    state = normalizeImported(data);
-    saveState();
-    renderAll();
+    try {
+      const data = JSON.parse(await file.text());
+      state = normalizeImported(data);
+      saveState();
+      renderAll();
+    } catch (error) {
+      alert(`Import non riuscito: ${error.message}`);
+    }
   }
 
-  function renderAll() { renderYearFilter(); renderAssets(); renderTimeline(); renderDashboard(); renderRaw(); }
+  async function initCloud() {
+    setCloudStatus('Inizializzazione Supabase…');
+    try {
+      const mod = await import('https://esm.sh/@supabase/supabase-js@2');
+      supabase = mod.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: true, autoRefreshToken: true } });
+      const result = await supabase.auth.getSession();
+      session = result.data.session;
+      cloudReady = true;
+      supabase.auth.onAuthStateChange((_event, nextSession) => { session = nextSession; renderCloud(); renderDashboard(); });
+      renderCloud();
+    } catch (error) {
+      cloudReady = false;
+      setCloudStatus(`Cloud non disponibile: ${error.message}`);
+    }
+  }
+
+  function renderCloud() {
+    const loginBox = $('loginBox');
+    const syncBox = $('syncBox');
+    if (!cloudReady) {
+      loginBox.classList.remove('hidden');
+      syncBox.classList.add('hidden');
+      setCloudStatus('Cloud non inizializzato o non raggiungibile. I dati locali restano disponibili.');
+      return;
+    }
+    if (session?.user) {
+      loginBox.classList.add('hidden');
+      syncBox.classList.remove('hidden');
+      setCloudStatus(`Collegato come ${session.user.email}. Ultimo dato locale: ${new Date().toLocaleString('it-IT')}.`);
+    } else {
+      loginBox.classList.remove('hidden');
+      syncBox.classList.add('hidden');
+      setCloudStatus('Non collegato. Inserisci la tua email per ricevere un magic link.');
+    }
+  }
+
+  function setCloudStatus(message) {
+    $('cloudStatus').textContent = message;
+  }
+
+  async function loginCloud() {
+    if (!supabase) return;
+    const email = $('emailInput').value.trim();
+    if (!email) { alert('Inserisci un indirizzo email.'); return; }
+    setCloudStatus('Invio del magic link…');
+    const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: location.href.split('#')[0] } });
+    setCloudStatus(error ? `Errore login: ${error.message}` : 'Magic link inviato. Controlla la posta e poi torna qui.');
+  }
+
+  async function pushCloud() {
+    if (!session?.user) return;
+    setCloudStatus('Salvataggio su cloud…');
+    const payload = { user_id: session.user.id, data: state };
+    const { error } = await supabase.from(SUPABASE_TABLE).upsert(payload, { onConflict: 'user_id' });
+    setCloudStatus(error ? `Errore salvataggio: ${error.message}` : `Salvato su cloud alle ${new Date().toLocaleTimeString('it-IT')}.`);
+  }
+
+  async function pullCloud() {
+    if (!session?.user) return;
+    if (!confirm('Caricare i dati dal cloud sostituendo i dati locali correnti?')) return;
+    setCloudStatus('Caricamento dal cloud…');
+    const { data, error } = await supabase.from(SUPABASE_TABLE).select('data, updated_at').eq('user_id', session.user.id).maybeSingle();
+    if (error) { setCloudStatus(`Errore caricamento: ${error.message}`); return; }
+    if (!data?.data) { setCloudStatus('Nessun backup cloud trovato per questo account.'); return; }
+    state = normalizeImported(data.data);
+    saveState();
+    renderAll();
+    setCloudStatus(`Dati cloud caricati. Ultimo aggiornamento cloud: ${new Date(data.updated_at).toLocaleString('it-IT')}.`);
+  }
+
+  async function logoutCloud() {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    session = null;
+    renderCloud();
+    renderDashboard();
+  }
+
+  function renderAll() { renderYearFilter(); renderAssets(); renderTimeline(); renderDashboard(); renderRaw(); renderCloud(); }
 
   document.querySelectorAll('.nav').forEach(btn => btn.addEventListener('click', () => view(btn.dataset.view)));
   $('yearPayments').addEventListener('change', renderPayments);
@@ -206,7 +347,12 @@
   $('seedBtn').addEventListener('click', () => { if (confirm('Ripristinare il modello base? I dati locali resteranno, salvo assets personalizzati.')) { state.assets = baseAssets; saveState(); renderAll(); } });
   $('exportBtn').addEventListener('click', exportJson);
   $('importInput').addEventListener('change', e => importJson(e.target.files[0]));
-  $('wipeBtn').addEventListener('click', () => { if (confirm('Cancellare tutti i dati locali di Fisco Tracker?')) { localStorage.removeItem(STORE_KEY); state = defaultState(); renderAll(); } });
+  $('wipeBtn').addEventListener('click', () => { if (confirm('Cancellare tutti i dati locali di Fisco Tracker?')) { localStorage.removeItem(STORE_KEY); localStorage.removeItem(LEGACY_STORE_KEY); state = defaultState(); renderAll(); } });
+  $('loginBtn').addEventListener('click', loginCloud);
+  $('pushCloudBtn').addEventListener('click', pushCloud);
+  $('pullCloudBtn').addEventListener('click', pullCloud);
+  $('logoutBtn').addEventListener('click', logoutCloud);
 
   renderAll();
+  initCloud();
 })();
