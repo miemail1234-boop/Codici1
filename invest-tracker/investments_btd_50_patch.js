@@ -6,7 +6,7 @@
     s.async = false;
     document.head.appendChild(s);
   }
-  load('btd_core_patch.js?v=3');
+  load('btd_core_patch.js?v=4');
   load('btd_edge_scan_patch.js?v=2');
   load('btd_cycle_auto_patch.js?v=3');
   load('btd_update_button_patch.js?v=1');
