@@ -7,11 +7,29 @@
 
   function migrateNewsHistoryOnce() {
     try {
-      const flag = 'invest-tracker-btd-core-v5-history-migrated';
+      const flag = 'invest-tracker-btd-core-v5-history-migrated-v2';
       if (localStorage.getItem(flag) === '1') return;
       localStorage.removeItem('invest-tracker-btd-news-history-v2');
       localStorage.setItem(flag, '1');
     } catch (_) {}
+  }
+
+  function makeRoutedFetch(baseFetch) {
+    if (typeof baseFetch !== 'function') return baseFetch;
+    const routed = function (input, init) {
+      try {
+        const isRequest = typeof Request !== 'undefined' && input instanceof Request;
+        const rawUrl = isRequest ? input.url : String(input);
+        if (rawUrl.includes('/functions/v1/btd-current-scan')) {
+          const nextUrl = rawUrl.replace('/functions/v1/btd-current-scan', `/functions/v1/${CORE_FUNCTION}`);
+          if (isRequest) return baseFetch(new Request(nextUrl, input), init);
+          return baseFetch(nextUrl, init);
+        }
+      } catch (_) {}
+      return baseFetch(input, init);
+    };
+    routed.__btdCoreWrapped = true;
+    return routed;
   }
 
   function patchSupabaseFactory() {
@@ -19,24 +37,17 @@
     if (!sb?.createClient || sb.createClient.__btdCoreWrapped) return;
     const original = sb.createClient.bind(sb);
     const wrapped = function (...args) {
-      const client = original(...args);
-      const functions = client?.functions;
-      if (!functions?.invoke || functions.invoke.__btdCoreWrapped) return client;
-      const originalInvoke = functions.invoke.bind(functions);
-      const invoke = function (name, options) {
-        return originalInvoke(name === 'btd-current-scan' ? CORE_FUNCTION : name, options);
+      const options = args[2] && typeof args[2] === 'object' ? args[2] : {};
+      const globalOptions = options.global && typeof options.global === 'object' ? options.global : {};
+      const baseFetch = globalOptions.fetch || window.fetch.bind(window);
+      args[2] = {
+        ...options,
+        global: {
+          ...globalOptions,
+          fetch: makeRoutedFetch(baseFetch)
+        }
       };
-      invoke.__btdCoreWrapped = true;
-      functions.invoke = invoke;
-      try {
-        Object.defineProperty(client, 'functions', {
-          value: functions,
-          configurable: true,
-          enumerable: false,
-          writable: false
-        });
-      } catch (_) {}
-      return client;
+      return original(...args);
     };
     wrapped.__btdCoreWrapped = true;
     sb.createClient = wrapped;
