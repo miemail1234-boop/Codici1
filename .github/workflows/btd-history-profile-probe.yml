@@ -1,32 +1,14 @@
-name: BTD History Profile Probe
+name: BTD History Profile Probe (disabled)
 
 on:
-  push:
-    paths:
-      - '.github/workflows/btd-history-profile-probe.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  probe:
+  disabled:
+    if: ${{ false }}
     runs-on: ubuntu-latest
-    timeout-minutes: 5
     steps:
-      - name: Fetch historical profiles
-        shell: bash
-        run: |
-          set -euo pipefail
-          URL='https://kujyowhezihjambhpahe.supabase.co/functions/v1/btd-history-profile-probe'
-          ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1anlvd2hlemloamFtYmhwYWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMTc0ODEsImV4cCI6MjA5NDc5MzQ4MX0.eIUDonerpv0KFSfrbronkfgPBBwy7xWsK4YGaTXxTlY'
-          curl --fail-with-body --silent --show-error \
-            --request POST "$URL" \
-            --header "Authorization: Bearer $ANON" \
-            --header "apikey: $ANON" \
-            --header 'Content-Type: application/json' \
-            --data '{}' \
-            --output /tmp/history.json
-          jq '{ok,generated_at_utc,method,errors}' /tmp/history.json
-          jq -r '.results[] | [.asset,.historical_ticker,.proxy,.observations,.first_date,.last_date,.dd_median_p50,.dd_interesting_p75,.dd_rare_p90,.dd_very_rare_p95,.dd_extreme_p975,.max_dd_52w,.current_hist_dd_52w,.current_hist_percentile] | @tsv' /tmp/history.json
-          jq -e '.ok == true and (.results|length)==14' /tmp/history.json >/dev/null
+      - run: echo disabled
