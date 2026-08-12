@@ -24,29 +24,20 @@
     busy = true;
     const statusNode = document.getElementById('etfDrawdownUpdateStatus');
     const original = button?.textContent || 'Aggiorna BTD Radar';
-    if (button) {
-      button.disabled = true;
-      button.textContent = 'Aggiornamento BTD…';
-    }
-    if (statusNode) statusNode.textContent = 'Nuovo snapshot BTD Core v5 in corso…';
-
+    if (button) { button.disabled = true; button.textContent = 'Aggiornamento BTD…'; }
+    if (statusNode) statusNode.textContent = 'Nuovo snapshot BTD Core v6 con rarity index in corso…';
     try {
-      const { data, error } = await client.functions.invoke(SCAN_FUNCTION, {
-        body: { requested_at: new Date().toISOString(), force: true, source: 'invest-tracker-ui' }
-      });
+      const { data, error } = await client.functions.invoke(SCAN_FUNCTION, { body: { requested_at: new Date().toISOString(), force: true, source: 'invest-tracker-ui' } });
       if (error || !data || data.status !== 'success') {
         const message = error?.message || data?.message || data?.error || `scan ${data?.status || 'fallito'}`;
         if (statusNode) statusNode.textContent = `Aggiornamento BTD non completo: ${message}`;
         return;
       }
-      if (statusNode) statusNode.textContent = `Snapshot BTD salvato: ${data.success_count}/${data.asset_count} asset. Ricarico…`;
+      if (statusNode) statusNode.textContent = `Snapshot Core v6 salvato: ${data.success_count}/${data.asset_count} asset. Ricarico…`;
       setTimeout(() => document.getElementById('reloadBtn')?.click(), 120);
     } finally {
       busy = false;
-      if (button) {
-        button.disabled = false;
-        button.textContent = original;
-      }
+      if (button) { button.disabled = false; button.textContent = original; }
     }
   }
 
@@ -55,12 +46,8 @@
     if (button) runPersistentScan(button);
   });
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', ensureButton, { once: true });
-  } else {
-    ensureButton();
-  }
-
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ensureButton, { once: true });
+  else ensureButton();
   setTimeout(ensureButton, 1000);
   setTimeout(ensureButton, 3000);
 })();
