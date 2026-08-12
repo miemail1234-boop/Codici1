@@ -7,6 +7,7 @@
   const SUPABASE_KEY = 'sb_publishable_VBzZaA3NAIvqMxJcZZTwPg_4_GEi1a3';
   const SCAN_FUNCTION = 'btd-scan-and-store';
   const client = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_KEY);
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
   let busy = false;
 
   function ensureButton() {
@@ -19,6 +20,22 @@
     head.appendChild(actions);
   }
 
+  async function invokeWithRetry(body, statusNode) {
+    let lastError = null;
+    let lastData = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      const { data, error } = await client.functions.invoke(SCAN_FUNCTION, { body });
+      lastError = error;
+      lastData = data;
+      if (!error && data?.status === 'success') return { data, error: null, attempt };
+      if (attempt < 3) {
+        if (statusNode) statusNode.textContent = `Tentativo ${attempt}/3 non riuscito; retry automatico…`;
+        await sleep(attempt === 1 ? 900 : 1800);
+      }
+    }
+    return { data: lastData, error: lastError, attempt: 3 };
+  }
+
   async function runPersistentScan(button) {
     if (busy || !client) return;
     busy = true;
@@ -27,13 +44,14 @@
     if (button) { button.disabled = true; button.textContent = 'Aggiornamento BTD…'; }
     if (statusNode) statusNode.textContent = 'Nuovo snapshot BTD Core v6 con rarity index in corso…';
     try {
-      const { data, error } = await client.functions.invoke(SCAN_FUNCTION, { body: { requested_at: new Date().toISOString(), force: true, source: 'invest-tracker-ui' } });
+      const body = { requested_at: new Date().toISOString(), force: true, source: 'invest-tracker-ui' };
+      const { data, error, attempt } = await invokeWithRetry(body, statusNode);
       if (error || !data || data.status !== 'success') {
         const message = error?.message || data?.message || data?.error || `scan ${data?.status || 'fallito'}`;
-        if (statusNode) statusNode.textContent = `Aggiornamento BTD non completo: ${message}`;
+        if (statusNode) statusNode.textContent = `Aggiornamento BTD non completo dopo ${attempt} tentativi: ${message}`;
         return;
       }
-      if (statusNode) statusNode.textContent = `Snapshot Core v6 salvato: ${data.success_count}/${data.asset_count} asset. Ricarico…`;
+      if (statusNode) statusNode.textContent = `Snapshot Core v6 salvato: ${data.success_count}/${data.asset_count} asset${attempt > 1 ? ` · riuscito al tentativo ${attempt}` : ''}. Ricarico…`;
       setTimeout(() => document.getElementById('reloadBtn')?.click(), 120);
     } finally {
       busy = false;
