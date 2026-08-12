@@ -19,7 +19,7 @@ jobs:
         run: |
           set -euo pipefail
           URL='https://kujyowhezihjambhpahe.supabase.co/functions/v1/btd-history-profile-probe'
-          ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1anlvd2hlemloamFtYmhwYWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMTc0ODEsImV4cCI6MjA5NDc5MzQ4MX0.eIUDonerpv0KFSfrbronkfgPBBxy7xWsK4YGaTXxTlY'
+          ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1anlvd2hlemloamFtYmhwYWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMTc0ODEsImV4cCI6MjA5NDc5MzQ4MX0.eIUDonerpv0KFSfrbronkfgPBBwy7xWsK4YGaTXxTlY'
           curl --fail-with-body --silent --show-error \
             --request POST "$URL" \
             --header "Authorization: Bearer $ANON" \
