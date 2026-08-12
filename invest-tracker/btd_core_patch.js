@@ -3,7 +3,7 @@
   if (window.__BTD_CORE_V5_PATCH__) return;
   window.__BTD_CORE_V5_PATCH__ = true;
 
-  const CORE_FUNCTION = 'btd-core-scan';
+  const CORE_FUNCTION = 'btd-score-readout';
 
   function migrateNewsHistoryOnce() {
     try {
@@ -123,13 +123,13 @@
     const meta = document.getElementById('etfDrawdownMeta');
     if (meta && /BTD Score|Fonte mercato/.test(meta.textContent || '')) {
       const suffix = meta.textContent?.match(/aggiornato\s+(.+?)(?:\.|$)/i)?.[1];
-      const value = `BTD Core v5 · pesi: DD 43,75% · ciclo 25% · monetario 18,75% · momentum 12,5%${suffix ? ` · aggiornato ${suffix}` : ''}.`;
+      const value = `BTD Core v5 · snapshot persistente · pesi: DD 43,75% · ciclo 25% · monetario 18,75% · momentum 12,5%${suffix ? ` · aggiornato ${suffix}` : ''}.`;
       setText(meta, value);
     }
 
     const status = document.getElementById('etfDrawdownUpdateStatus');
     if (status && /BTD Score v|BTD Core/.test(status.textContent || '')) {
-      setText(status, 'BTD Core v5 attivo: 4 driver automatici, cache macro 24h.');
+      setText(status, 'BTD Core v5: ultimo snapshot completo persistito in Supabase.');
     }
   }
 
