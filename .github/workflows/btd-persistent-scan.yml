@@ -20,14 +20,30 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          URL='https://kujyowhezihjambhpahe.supabase.co/functions/v1/btd-scan-and-store'
+          BASE='https://kujyowhezihjambhpahe.supabase.co/functions/v1'
           ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1anlvd2hlemloamFtYmhwYWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMTc0ODEsImV4cCI6MjA5NDc5MzQ4MX0.eIUDonerpv0KFSfrbronkfgPBBwy7xWsK4YGaTXxTlY'
           curl --fail-with-body --silent --show-error \
-            --request POST "$URL" \
+            --request POST "$BASE/btd-scan-and-store" \
             --header "Authorization: Bearer $ANON" \
             --header "apikey: $ANON" \
             --header 'Content-Type: application/json' \
             --data '{"source":"github-actions"}' \
-            --output /tmp/btd.json
-          jq '{ok,status,run_id,asset_count,success_count,error_count,generated_at_utc}' /tmp/btd.json
-          jq -e '.status == "success" and .asset_count > 0 and .success_count == .asset_count and .error_count == 0' /tmp/btd.json >/dev/null
+            --output /tmp/btd-scan.json
+          jq '{ok,status,run_id,asset_count,success_count,error_count,generated_at_utc}' /tmp/btd-scan.json
+          jq -e '.status == "success" and .asset_count == 14 and .success_count == 14 and .error_count == 0' /tmp/btd-scan.json >/dev/null
+
+      - name: Validate persisted BTD readout
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://kujyowhezihjambhpahe.supabase.co/functions/v1'
+          ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1anlvd2hlemloamFtYmhwYWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMTc0ODEsImV4cCI6MjA5NDc5MzQ4MX0.eIUDonerpv0KFSfrbronkfgPBBwy7xWsK4YGaTXxTlY'
+          curl --fail-with-body --silent --show-error \
+            --request POST "$BASE/btd-score-readout" \
+            --header "Authorization: Bearer $ANON" \
+            --header "apikey: $ANON" \
+            --header 'Content-Type: application/json' \
+            --data '{}' \
+            --output /tmp/btd-readout.json
+          jq '{ok,run_id,count,generated_at_utc,health}' /tmp/btd-readout.json
+          jq -e '.ok == true and .count == 14 and .health.status == "OK" and .health.success_count == 14 and .health.error_count == 0' /tmp/btd-readout.json >/dev/null
