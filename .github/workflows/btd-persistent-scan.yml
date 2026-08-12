@@ -23,6 +23,7 @@ jobs:
           BASE='https://kujyowhezihjambhpahe.supabase.co/functions/v1'
           ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1anlvd2hlemloamFtYmhwYWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMTc0ODEsImV4cCI6MjA5NDc5MzQ4MX0.eIUDonerpv0KFSfrbronkfgPBBwy7xWsK4YGaTXxTlY'
           curl --fail-with-body --silent --show-error \
+            --retry 3 --retry-delay 2 --retry-max-time 30 --retry-all-errors \
             --request POST "$BASE/btd-scan-and-store" \
             --header "Authorization: Bearer $ANON" \
             --header "apikey: $ANON" \
@@ -39,6 +40,7 @@ jobs:
           BASE='https://kujyowhezihjambhpahe.supabase.co/functions/v1'
           ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1anlvd2hlemloamFtYmhwYWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMTc0ODEsImV4cCI6MjA5NDc5MzQ4MX0.eIUDonerpv0KFSfrbronkfgPBBwy7xWsK4YGaTXxTlY'
           curl --fail-with-body --silent --show-error \
+            --retry 3 --retry-delay 2 --retry-max-time 30 --retry-all-errors \
             --request POST "$BASE/btd-score-readout" \
             --header "Authorization: Bearer $ANON" \
             --header "apikey: $ANON" \
