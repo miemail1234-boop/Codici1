@@ -1,0 +1,33 @@
+name: BTD Persistent Scan
+
+on:
+  schedule:
+    - cron: '30 5 * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/btd-persistent-scan.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Run BTD scan and persist snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://kujyowhezihjambhpahe.supabase.co/functions/v1/btd-scan-and-store'
+          ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1anlvd2hlemloamFtYmhwYWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMTc0ODEsImV4cCI6MjA5NDc5MzQ4MX0.eIUDonerpv0KFSfrbronkfgPBBwy7xWsK4YGaTXxTlY'
+          curl --fail-with-body --silent --show-error \
+            --request POST "$URL" \
+            --header "Authorization: Bearer $ANON" \
+            --header "apikey: $ANON" \
+            --header 'Content-Type: application/json' \
+            --data '{"source":"github-actions"}' \
+            --output /tmp/btd.json
+          jq '{ok,status,run_id,asset_count,success_count,error_count,generated_at_utc}' /tmp/btd.json
+          jq -e '.status == "success" and .asset_count > 0 and .success_count == .asset_count and .error_count == 0' /tmp/btd.json >/dev/null
