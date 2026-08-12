@@ -29,8 +29,8 @@ jobs:
             --header 'Content-Type: application/json' \
             --data '{"source":"github-actions"}' \
             --output /tmp/btd-scan.json
-          jq '{ok,status,run_id,asset_count,success_count,error_count,generated_at_utc}' /tmp/btd-scan.json
-          jq -e '.status == "success" and .asset_count == 14 and .success_count == 14 and .error_count == 0' /tmp/btd-scan.json >/dev/null
+          jq '{ok,status,score_model,weights,run_id,asset_count,success_count,error_count,generated_at_utc}' /tmp/btd-scan.json
+          jq -e '.status == "success" and .score_model == "BTD Core v6" and .weights.historical_rarity == 40 and .asset_count == 14 and .success_count == 14 and .error_count == 0' /tmp/btd-scan.json >/dev/null
 
       - name: Validate persisted BTD readout
         shell: bash
@@ -45,5 +45,5 @@ jobs:
             --header 'Content-Type: application/json' \
             --data '{}' \
             --output /tmp/btd-readout.json
-          jq '{ok,run_id,count,generated_at_utc,health}' /tmp/btd-readout.json
-          jq -e '.ok == true and .count == 14 and .health.status == "OK" and .health.success_count == 14 and .health.error_count == 0' /tmp/btd-readout.json >/dev/null
+          jq '{ok,score_model,weights,run_id,count,generated_at_utc,health}' /tmp/btd-readout.json
+          jq -e '.ok == true and .score_model == "BTD Core v6" and .weights.historical_rarity == 40 and .count == 14 and .health.status == "OK" and .health.success_count == 14 and .health.error_count == 0 and ([.results[].historical_rarity_score] | all(. != null))' /tmp/btd-readout.json >/dev/null
