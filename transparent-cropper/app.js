@@ -1,1 +1,267 @@
-const $=id=>document.getElementById(id);const file=$('fileInput'),imgC=$('imageCanvas'),ovC=$('overlayCanvas'),stage=$('canvasStage'),view=$('viewport'),empty=$('emptyState');const ix=imgC.getContext('2d'),ox=ovC.getContext('2d');const brush=$('brushSize'),zoom=$('zoomRange'),bl=$('brushLabel'),zl=$('zoomLabel');const exp=$('exportBtn'),reset=$('resetBtn'),undo=$('undoBtn'),redo=$('redoBtn');const tools=[...document.querySelectorAll('[data-tool]')];let src=null,url='',name='image.png',tool='brush',scale=1,done=[],redos=[],drawing=false,cur=null;function enable(v){[exp,reset,brush,zoom,...tools].forEach(e=>e.disabled=!v);buttons()}function buttons(){const v=!!src;undo.disabled=!v||!done.length;redo.disabled=!v||!redos.length}function pt(e){const r=ovC.getBoundingClientRect();return{x:(e.clientX-r.left)*ovC.width/r.width,y:(e.clientY-r.top)*ovC.height/r.height}}function paint(ctx,o){if(o.type==='rect'){ctx.fillRect(o.x,o.y,o.w,o.h);return}ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=o.size;const p=o.points;if(p.length===1){ctx.beginPath();ctx.arc(p[0].x,p[0].y,o.size/2,0,Math.PI*2);ctx.fill();return}ctx.beginPath();ctx.moveTo(p[0].x,p[0].y);for(let i=1;i<p.length;i++)ctx.lineTo(p[i].x,p[i].y);ctx.stroke()}function base(){if(!src)return;ix.clearRect(0,0,imgC.width,imgC.height);ix.drawImage(src,0,0);if(done.length){ix.save();ix.fillStyle='#fff';ix.strokeStyle='#fff';done.forEach(o=>paint(ix,o));ix.restore()}}function overlay(){ox.clearRect(0,0,ovC.width,ovC.height);if(!cur)return;ox.save();ox.fillStyle='rgba(220,38,38,.38)';ox.strokeStyle='rgba(220,38,38,.70)';paint(ox,cur);ox.restore()}function render(){base();overlay();buttons()}function setZoom(){if(!src)return;stage.style.width=Math.round(imgC.width*scale)+'px';stage.style.height=Math.round(imgC.height*scale)+'px';zl.textContent=Math.round(scale*100)+'%'}function loadPng(f){if(!f||f.type!=='image/png')return $('fileStatus').textContent='Seleziona un PNG valido.';if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(f);const im=new Image();im.onload=()=>{src=im;name=f.name;imgC.width=ovC.width=im.naturalWidth;imgC.height=ovC.height=im.naturalHeight;done=[];redos=[];scale=1;zoom.value=100;brush.value=Math.max(5,Math.min(500,Math.round(Math.min(im.naturalWidth,im.naturalHeight)*.02)));bl.textContent=brush.value+' px';$('fileStatus').textContent=name;$('resolutionStatus').textContent=im.naturalWidth+' × '+im.naturalHeight+' px · output invariato';empty.hidden=true;view.hidden=false;enable(true);setZoom();render()};im.src=url}file.addEventListener('change',e=>loadPng(e.target.files?.[0]));tools.forEach(b=>b.addEventListener('click',()=>{tool=b.dataset.tool;tools.forEach(x=>x.classList.toggle('active',x===b))}));brush.addEventListener('input',()=>bl.textContent=brush.value+' px');zoom.addEventListener('input',()=>{scale=Number(zoom.value)/100;setZoom()});ovC.addEventListener('pointerdown',e=>{if(!src)return;e.preventDefault();drawing=true;ovC.setPointerCapture(e.pointerId);const p=pt(e);cur=tool==='brush'?{type:'brush',size:Number(brush.value),points:[p]}:{type:'rect',sx:p.x,sy:p.y,x:p.x,y:p.y,w:0,h:0};overlay()});ovC.addEventListener('pointermove',e=>{if(!drawing||!cur)return;const p=pt(e);if(cur.type==='brush')cur.points.push(p);else{cur.x=Math.min(cur.sx,p.x);cur.y=Math.min(cur.sy,p.y);cur.w=Math.abs(p.x-cur.sx);cur.h=Math.abs(p.y-cur.sy)}overlay()});function finish(e){if(!drawing||!cur)return;drawing=false;try{ovC.releasePointerCapture(e.pointerId)}catch(_){}if(cur.type!=='rect'||(cur.w>1&&cur.h>1)){done.push(cur);redos=[]}cur=null;render()}ovC.addEventListener('pointerup',finish);ovC.addEventListener('pointercancel',()=>{drawing=false;cur=null;overlay()});undo.addEventListener('click',()=>{if(done.length)redos.push(done.pop());render()});redo.addEventListener('click',()=>{if(redos.length)done.push(redos.pop());render()});reset.addEventListener('click',()=>{done=[];redos=[];cur=null;render()});exp.addEventListener('click',()=>{if(!src)return;base();imgC.toBlob(b=>{if(!b)return;const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name.replace(/\.png$/i,'')+'-white.png';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)},'image/png')});window.addEventListener('keydown',e=>{if(!(e.metaKey||e.ctrlKey))return;if(e.key.toLowerCase()==='z'&&!e.shiftKey){e.preventDefault();undo.click()}else if((e.key.toLowerCase()==='z'&&e.shiftKey)||e.key.toLowerCase()==='y'){e.preventDefault();redo.click()}});enable(false);
+const $ = id => document.getElementById(id);
+const fileInput = $('fileInput');
+const canvas = $('imageCanvas');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
+const stage = $('canvasStage');
+const viewport = $('viewport');
+const emptyState = $('emptyState');
+const rectPreview = $('rectPreview');
+const brushSize = $('brushSize');
+const zoomRange = $('zoomRange');
+const brushLabel = $('brushLabel');
+const zoomLabel = $('zoomLabel');
+const exportBtn = $('exportBtn');
+const resetBtn = $('resetBtn');
+const undoBtn = $('undoBtn');
+const redoBtn = $('redoBtn');
+const toolButtons = [...document.querySelectorAll('[data-tool]')];
+
+let image = null;
+let objectUrl = '';
+let fileName = 'image.png';
+let tool = 'brush';
+let zoom = 1;
+let drawing = false;
+let startPoint = null;
+let lastPoint = null;
+let originalImageData = null;
+let undoStack = [];
+let redoStack = [];
+
+function setEnabled(enabled) {
+  [exportBtn, resetBtn, brushSize, zoomRange, ...toolButtons].forEach(el => el.disabled = !enabled);
+  updateHistoryButtons();
+}
+
+function updateHistoryButtons() {
+  undoBtn.disabled = !image || undoStack.length === 0;
+  redoBtn.disabled = !image || redoStack.length === 0;
+}
+
+function snapshot() {
+  return ctx.getImageData(0, 0, canvas.width, canvas.height);
+}
+
+function restore(imageData) {
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function pushUndo() {
+  undoStack.push(snapshot());
+  if (undoStack.length > 30) undoStack.shift();
+  redoStack = [];
+  updateHistoryButtons();
+}
+
+function pointFromEvent(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - rect.left) * canvas.width / rect.width,
+    y: (event.clientY - rect.top) * canvas.height / rect.height
+  };
+}
+
+function drawWhiteLine(a, b) {
+  ctx.save();
+  ctx.strokeStyle = '#ffffff';
+  ctx.fillStyle = '#ffffff';
+  ctx.lineWidth = Number(brushSize.value);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(a.x, a.y);
+  ctx.lineTo(b.x, b.y);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawWhiteDot(p) {
+  ctx.save();
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, Number(brushSize.value) / 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function showRectPreview(a, b) {
+  const left = Math.min(a.x, b.x) * zoom;
+  const top = Math.min(a.y, b.y) * zoom;
+  const width = Math.abs(b.x - a.x) * zoom;
+  const height = Math.abs(b.y - a.y) * zoom;
+  rectPreview.hidden = false;
+  rectPreview.style.left = `${left}px`;
+  rectPreview.style.top = `${top}px`;
+  rectPreview.style.width = `${width}px`;
+  rectPreview.style.height = `${height}px`;
+}
+
+function hideRectPreview() {
+  rectPreview.hidden = true;
+}
+
+function applyWhiteRect(a, b) {
+  const x = Math.min(a.x, b.x);
+  const y = Math.min(a.y, b.y);
+  const w = Math.abs(b.x - a.x);
+  const h = Math.abs(b.y - a.y);
+  if (w < 1 || h < 1) return;
+  ctx.save();
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(x, y, w, h);
+  ctx.restore();
+}
+
+function setZoom() {
+  if (!image) return;
+  stage.style.width = `${Math.round(canvas.width * zoom)}px`;
+  stage.style.height = `${Math.round(canvas.height * zoom)}px`;
+  canvas.style.width = '100%';
+  canvas.style.height = '100%';
+  zoomLabel.textContent = `${Math.round(zoom * 100)}%`;
+}
+
+function loadPng(file) {
+  if (!file || file.type !== 'image/png') {
+    $('fileStatus').textContent = 'Seleziona un PNG valido.';
+    return;
+  }
+  if (objectUrl) URL.revokeObjectURL(objectUrl);
+  objectUrl = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    image = img;
+    fileName = file.name;
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
+    originalImageData = snapshot();
+    undoStack = [];
+    redoStack = [];
+    zoom = 1;
+    zoomRange.value = 100;
+    brushSize.value = Math.max(5, Math.min(500, Math.round(Math.min(img.naturalWidth, img.naturalHeight) * 0.02)));
+    brushLabel.textContent = `${brushSize.value} px`;
+    $('fileStatus').textContent = fileName;
+    $('resolutionStatus').textContent = `${img.naturalWidth} × ${img.naturalHeight} px · output invariato`;
+    emptyState.hidden = true;
+    viewport.hidden = false;
+    setEnabled(true);
+    setZoom();
+  };
+  img.onerror = () => $('fileStatus').textContent = 'Impossibile leggere il PNG.';
+  img.src = objectUrl;
+}
+
+fileInput.addEventListener('change', event => loadPng(event.target.files?.[0]));
+
+toolButtons.forEach(button => button.addEventListener('click', () => {
+  tool = button.dataset.tool;
+  toolButtons.forEach(item => item.classList.toggle('active', item === button));
+}));
+
+brushSize.addEventListener('input', () => {
+  brushLabel.textContent = `${brushSize.value} px`;
+});
+
+zoomRange.addEventListener('input', () => {
+  zoom = Number(zoomRange.value) / 100;
+  setZoom();
+});
+
+canvas.addEventListener('pointerdown', event => {
+  if (!image) return;
+  event.preventDefault();
+  drawing = true;
+  canvas.setPointerCapture(event.pointerId);
+  startPoint = pointFromEvent(event);
+  lastPoint = startPoint;
+  pushUndo();
+  if (tool === 'brush') drawWhiteDot(startPoint);
+  else showRectPreview(startPoint, startPoint);
+});
+
+canvas.addEventListener('pointermove', event => {
+  if (!drawing || !image) return;
+  const point = pointFromEvent(event);
+  if (tool === 'brush') {
+    drawWhiteLine(lastPoint, point);
+    lastPoint = point;
+  } else {
+    showRectPreview(startPoint, point);
+  }
+});
+
+function finishDrawing(event) {
+  if (!drawing || !image) return;
+  drawing = false;
+  try { canvas.releasePointerCapture(event.pointerId); } catch (_) {}
+  const endPoint = pointFromEvent(event);
+  if (tool === 'rect') {
+    applyWhiteRect(startPoint, endPoint);
+    hideRectPreview();
+  }
+  startPoint = null;
+  lastPoint = null;
+  updateHistoryButtons();
+}
+
+canvas.addEventListener('pointerup', finishDrawing);
+canvas.addEventListener('pointercancel', event => {
+  if (!drawing) return;
+  drawing = false;
+  hideRectPreview();
+  if (undoStack.length) restore(undoStack.pop());
+  startPoint = null;
+  lastPoint = null;
+  updateHistoryButtons();
+});
+
+undoBtn.addEventListener('click', () => {
+  if (!undoStack.length) return;
+  redoStack.push(snapshot());
+  restore(undoStack.pop());
+  updateHistoryButtons();
+});
+
+redoBtn.addEventListener('click', () => {
+  if (!redoStack.length) return;
+  undoStack.push(snapshot());
+  restore(redoStack.pop());
+  updateHistoryButtons();
+});
+
+resetBtn.addEventListener('click', () => {
+  if (!image || !originalImageData) return;
+  pushUndo();
+  restore(originalImageData);
+  hideRectPreview();
+  updateHistoryButtons();
+});
+
+exportBtn.addEventListener('click', () => {
+  if (!image) return;
+  canvas.toBlob(blob => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName.replace(/\.png$/i, '') + '-white.png';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, 'image/png');
+});
+
+window.addEventListener('keydown', event => {
+  if (!(event.metaKey || event.ctrlKey)) return;
+  if (event.key.toLowerCase() === 'z' && !event.shiftKey) {
+    event.preventDefault();
+    undoBtn.click();
+  } else if ((event.key.toLowerCase() === 'z' && event.shiftKey) || event.key.toLowerCase() === 'y') {
+    event.preventDefault();
+    redoBtn.click();
+  }
+});
+
+setEnabled(false);
