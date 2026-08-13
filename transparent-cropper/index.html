@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f4f1eb">
-  <title>Transparent Cropper</title>
-  <link rel="stylesheet" href="styles.css?v=1">
+  <title>White Cropper</title>
+  <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
   <header class="topbar">
     <div>
       <p class="eyebrow">Image tools</p>
-      <h1>Transparent Cropper</h1>
-      <p>Rimuovi parti di un PNG rendendole trasparenti, mantenendo esattamente la risoluzione originale.</p>
+      <h1>White Cropper</h1>
+      <p>Copri con bianco pieno le parti di un PNG mantenendo esattamente la risoluzione originale.</p>
     </div>
     <a class="button secondary" href="../">Codici1</a>
   </header>
@@ -26,11 +26,10 @@
       </div>
 
       <div class="control-group tools" aria-label="Strumenti">
-        <button class="button tool active" data-tool="brush" disabled>Pennello</button>
-        <button class="button tool" data-tool="rect" disabled>Rettangolo</button>
+        <button class="button tool active" data-tool="brush" disabled>Pennello bianco</button>
+        <button class="button tool" data-tool="rect" disabled>Rettangolo bianco</button>
         <button id="undoBtn" class="button secondary" disabled>Annulla</button>
         <button id="redoBtn" class="button secondary" disabled>Ripristina</button>
-        <button id="applyBtn" class="button primary" disabled>Applica trasparenza</button>
       </div>
 
       <div class="control-group sliders">
@@ -42,7 +41,7 @@
         <span id="fileStatus">Nessuna immagine caricata.</span>
         <span id="resolutionStatus"></span>
       </div>
-      <p class="hint">Le aree evidenziate in rosso saranno rese trasparenti. Tutto il lavoro avviene localmente nel browser.</p>
+      <p class="hint">Il bianco viene applicato direttamente mentre disegni. Tutto il lavoro avviene localmente nel browser.</p>
     </section>
 
     <section class="panel workspace-panel">
@@ -53,12 +52,12 @@
       <div id="viewport" class="viewport" hidden>
         <div id="canvasStage" class="canvas-stage">
           <canvas id="imageCanvas"></canvas>
-          <canvas id="overlayCanvas"></canvas>
+          <div id="rectPreview" hidden></div>
         </div>
       </div>
     </section>
   </main>
 
-  <script src="app.js?v=2"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>
