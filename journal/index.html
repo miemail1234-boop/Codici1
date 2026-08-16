@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4f1eb">
+  <title>Journal</title>
+  <link rel="stylesheet" href="styles.css?v=1">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Calendar · Notes</p>
+      <h1>Journal</h1>
+      <p>Un calendario semplice per scrivere e ritrovare note giorno per giorno.</p>
+    </div>
+    <div class="top-actions">
+      <button id="exportBtn" class="button primary">Esporta note CSV</button>
+      <a class="button secondary" href="../">Codici1</a>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel calendar-panel">
+      <div class="calendar-head">
+        <button id="prevMonth" class="icon-button" aria-label="Mese precedente">‹</button>
+        <div>
+          <h2 id="monthLabel"></h2>
+          <button id="todayBtn" class="text-button">Oggi</button>
+        </div>
+        <button id="nextMonth" class="icon-button" aria-label="Mese successivo">›</button>
+      </div>
+      <div class="weekdays" aria-hidden="true">
+        <span>Lun</span><span>Mar</span><span>Mer</span><span>Gio</span><span>Ven</span><span>Sab</span><span>Dom</span>
+      </div>
+      <div id="calendarGrid" class="calendar-grid"></div>
+    </section>
+
+    <section class="panel editor-panel">
+      <div class="editor-head">
+        <div>
+          <p class="eyebrow">Giorno selezionato</p>
+          <h2 id="selectedDateLabel"></h2>
+        </div>
+        <span id="noteCount" class="badge">0 note</span>
+      </div>
+
+      <form id="noteForm" class="note-form">
+        <textarea id="noteInput" rows="6" placeholder="Scrivi una nota per questo giorno…" required></textarea>
+        <div class="form-actions">
+          <button id="cancelEditBtn" type="button" class="button secondary" hidden>Annulla modifica</button>
+          <button id="saveNoteBtn" type="submit" class="button primary">Aggiungi nota</button>
+        </div>
+      </form>
+
+      <div id="notesList" class="notes-list"></div>
+    </section>
+  </main>
+
+  <script src="app.js?v=1"></script>
+</body>
+</html>
