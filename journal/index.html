@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#f4f1eb">
   <title>Journal</title>
   <link rel="stylesheet" href="styles.css?v=3">
-  <link rel="stylesheet" href="errors.css?v=1">
+  <link rel="stylesheet" href="errors.css?v=2">
 </head>
 <body>
   <header class="topbar">
@@ -41,6 +41,7 @@
     <nav id="sectionNav" class="section-nav" aria-label="Sezioni Journal" hidden>
       <button id="journalTab" class="section-tab active" type="button" role="tab" aria-selected="true">Diario</button>
       <button id="errorsTab" class="section-tab" type="button" role="tab" aria-selected="false">Errori da non ripetere</button>
+      <button id="changeTab" class="section-tab" type="button" role="tab" aria-selected="false">Change</button>
     </nav>
 
     <div id="journalLayout" class="layout" hidden>
@@ -106,11 +107,32 @@
 
       <div id="errorsList" class="errors-list"></div>
     </section>
+
+    <section id="changePanel" class="panel change-panel" hidden>
+      <div class="change-head">
+        <div>
+          <p class="eyebrow">Obiettivi · Progressi</p>
+          <h2>Change</h2>
+          <p>Annota obiettivi, cambiamenti che vuoi introdurre, progressi e risultati raggiunti.</p>
+        </div>
+        <span id="changeCount" class="badge">0 note</span>
+      </div>
+
+      <form id="changeForm" class="change-form">
+        <textarea id="changeInput" rows="6" placeholder="Scrivi un obiettivo, un progresso o un cambiamento che vuoi portare avanti…" required></textarea>
+        <div class="form-actions">
+          <button id="changeCancelBtn" type="button" class="button secondary" hidden>Annulla modifica</button>
+          <button id="changeSaveBtn" type="submit" class="button primary">Aggiungi nota</button>
+        </div>
+      </form>
+
+      <div id="changeList" class="change-list"></div>
+    </section>
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="../vendor/supabase.js?v=21"></script>
   <script src="app.js?v=3"></script>
-  <script src="errors_patch.js?v=1"></script>
+  <script src="errors_patch.js?v=2"></script>
 </body>
 </html>
