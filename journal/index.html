@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#f4f1eb">
   <title>Journal</title>
   <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="errors.css?v=1">
 </head>
 <body>
   <header class="topbar">
@@ -36,6 +37,11 @@
       </div>
       <p id="authStatus" class="hint">Controllo sessione...</p>
     </section>
+
+    <nav id="sectionNav" class="section-nav" aria-label="Sezioni Journal" hidden>
+      <button id="journalTab" class="section-tab active" type="button" role="tab" aria-selected="true">Diario</button>
+      <button id="errorsTab" class="section-tab" type="button" role="tab" aria-selected="false">Errori da non ripetere</button>
+    </nav>
 
     <div id="journalLayout" class="layout" hidden>
       <section class="panel calendar-panel">
@@ -79,10 +85,32 @@
         <div id="notesList" class="notes-list"></div>
       </section>
     </div>
+
+    <section id="errorsPanel" class="panel errors-panel" hidden>
+      <div class="errors-head">
+        <div>
+          <p class="eyebrow">Promemoria personali</p>
+          <h2>Errori da non ripetere</h2>
+          <p>Annota liberamente errori, decisioni sbagliate o lezioni che vuoi ricordare.</p>
+        </div>
+        <span id="errorsCount" class="badge">0 note</span>
+      </div>
+
+      <form id="errorsForm" class="errors-form">
+        <textarea id="errorsInput" rows="6" placeholder="Scrivi qualcosa che non vuoi ripetere…" required></textarea>
+        <div class="form-actions">
+          <button id="errorsCancelBtn" type="button" class="button secondary" hidden>Annulla modifica</button>
+          <button id="errorsSaveBtn" type="submit" class="button primary">Aggiungi errore</button>
+        </div>
+      </form>
+
+      <div id="errorsList" class="errors-list"></div>
+    </section>
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="../vendor/supabase.js?v=21"></script>
   <script src="app.js?v=3"></script>
+  <script src="errors_patch.js?v=1"></script>
 </body>
 </html>
