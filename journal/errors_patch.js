@@ -1,13 +1,16 @@
 (()=>{
   const ERRORS_TABLE='journal_errors';
   const CHANGE_TABLE='journal_changes';
+  const TODO_TABLE='journal_todo_single';
   const nav=document.getElementById('sectionNav');
   const journalTab=document.getElementById('journalTab');
   const errorsTab=document.getElementById('errorsTab');
   const changeTab=document.getElementById('changeTab');
+  const todoTab=document.getElementById('todoTab');
   const journalLayout=document.getElementById('journalLayout');
   const errorsPanel=document.getElementById('errorsPanel');
   const changePanel=document.getElementById('changePanel');
+  const todoPanel=document.getElementById('todoPanel');
 
   const errorsForm=document.getElementById('errorsForm');
   const errorsInput=document.getElementById('errorsInput');
@@ -23,12 +26,18 @@
   const changeSaveBtn=document.getElementById('changeSaveBtn');
   const changeCancelBtn=document.getElementById('changeCancelBtn');
 
+  const todoForm=document.getElementById('todoForm');
+  const todoInput=document.getElementById('todoInput');
+  const todoSaveBtn=document.getElementById('todoSaveBtn');
+  const todoStatus=document.getElementById('todoStatus');
+
   let sectionUser=null;
   let errorRows=[];
   let changeRows=[];
   let editingErrorId=null;
   let editingChangeId=null;
   let activeSection='journal';
+  let todoLoaded=false;
 
   function esc(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
   function toastMessage(message){
@@ -94,22 +103,37 @@
     changeRows=data||[];renderChanges();
   }
 
+  async function loadTodo(){
+    if(!sectionUser)return;
+    todoStatus.textContent='Caricamento...';
+    const {data,error}=await supabaseClient.from(TODO_TABLE).select('content').eq('user_id',sectionUser.id).maybeSingle();
+    if(error){todoStatus.textContent='Errore';return toastMessage(error.message||'Errore Supabase')}
+    todoInput.value=data?.content||'';
+    todoLoaded=true;
+    todoStatus.textContent='';
+  }
+
   function setSection(section){
     activeSection=section;
     const showJournal=section==='journal';
     const showErrors=section==='errors';
     const showChange=section==='change';
+    const showTodo=section==='todo';
     journalLayout.hidden=!showJournal;
     errorsPanel.hidden=!showErrors;
     changePanel.hidden=!showChange;
+    todoPanel.hidden=!showTodo;
     journalTab.classList.toggle('active',showJournal);
     errorsTab.classList.toggle('active',showErrors);
     changeTab.classList.toggle('active',showChange);
+    todoTab.classList.toggle('active',showTodo);
     journalTab.setAttribute('aria-selected',String(showJournal));
     errorsTab.setAttribute('aria-selected',String(showErrors));
     changeTab.setAttribute('aria-selected',String(showChange));
+    todoTab.setAttribute('aria-selected',String(showTodo));
     if(showErrors)loadErrors();
     if(showChange)loadChanges();
+    if(showTodo&&!todoLoaded)loadTodo();
   }
 
   async function syncSession(session){
@@ -119,6 +143,10 @@
     if(!signedIn){
       errorsPanel.hidden=true;
       changePanel.hidden=true;
+      todoPanel.hidden=true;
+      todoInput.value='';
+      todoStatus.textContent='';
+      todoLoaded=false;
       activeSection='journal';
       return;
     }
@@ -142,6 +170,7 @@
   journalTab.addEventListener('click',()=>setSection('journal'));
   errorsTab.addEventListener('click',()=>setSection('errors'));
   changeTab.addEventListener('click',()=>setSection('change'));
+  todoTab.addEventListener('click',()=>setSection('todo'));
   errorsCancelBtn.addEventListener('click',cancelErrorEdit);
   changeCancelBtn.addEventListener('click',cancelChangeEdit);
 
@@ -177,6 +206,24 @@
       cancelChangeEdit();renderChanges();toastMessage('Salvato su Supabase');
     }catch(error){toastMessage(error.message||'Errore Supabase')}
     finally{changeSaveBtn.disabled=false}
+  });
+
+  todoForm.addEventListener('submit',async event=>{
+    event.preventDefault();if(!sectionUser)return;
+    todoSaveBtn.disabled=true;
+    todoStatus.textContent='Salvataggio...';
+    const content=todoInput.value;
+    const {error}=await supabaseClient.from(TODO_TABLE).upsert({user_id:sectionUser.id,content,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+    if(error){
+      todoStatus.textContent='Errore';
+      toastMessage(error.message||'Errore Supabase');
+    }else{
+      todoLoaded=true;
+      todoStatus.textContent='Salvato';
+      toastMessage('Da fare salvato su Supabase');
+      setTimeout(()=>{if(todoStatus.textContent==='Salvato')todoStatus.textContent=''},1800);
+    }
+    todoSaveBtn.disabled=false;
   });
 
   supabaseClient.auth.getSession().then(({data})=>syncSession(data?.session||null));
