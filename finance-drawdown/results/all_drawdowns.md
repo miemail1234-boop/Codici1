@@ -1,36 +1,36 @@
 # BTD radar drawdowns
 
-Generato UTC: 2026-09-02T12:14:05+00:00
+Generato UTC: 2026-09-03T12:11:59+00:00
 
 Asset riusciti: 25 / 27
 
 | # | Asset | Categoria | Ticker | ISIN | Ultimo close | Data | ATH 52w | DD 52w | ATH assoluto | DD assoluto |
 |---:|---|---|---|---|---:|---|---:|---:|---:|---:|
-| 27 | Ethereum | Crypto | `ETH-EUR` | da verificare | 2057.330078 | 2026-09-02 | 4075.661133 | -49.5216% | 4300.855469 | -52.1646% |
-| 26 | Bitcoin | Crypto | `BTC-EUR` | da verificare | 66319.15625 | 2026-09-02 | 107745.132812 | -38.4481% | 107745.132812 | -38.4481% |
-| 21 | MSCI Korea | Asia tech | `IKOR.L` | da verificare | 9405.75 | 2026-09-02 | 11932.0 | -21.1721% | 11932.0 | -21.1721% |
-| 25 | Oro | Real asset | `SGLN.L` | da verificare | 6229.246094 | 2026-09-02 | 7810.0 | -20.2401% | 7810.0 | -20.2401% |
-| 18 | MSCI India | Emergenti paese | `NDIA.L` | da verificare | 8.853 | 2026-09-02 | 10.48 | -15.5248% | 10.742 | -17.5852% |
-| 24 | Rio Tinto / Materials | Materials | `RIO.PA` | da verificare | 25.58 | 2026-09-02 | 28.559 | -10.431% | 31.33754 | -18.3727% |
-| 17 | Emerging Markets ex China | Emergenti | `EMXC.L` | da verificare | 46.549999 | 2026-09-02 | 51.610001 | -9.8043% | 51.610001 | -9.8043% |
-| 16 | MSCI Emerging Markets | Emergenti | `EIMI.L` | da verificare | 54.669998 | 2026-09-02 | 60.549999 | -9.711% | 60.549999 | -9.711% |
-| 20 | MSCI Taiwan | Asia tech | `ITWN.L` | da verificare | 14922.0 | 2026-09-02 | 16338.0 | -8.6669% | 16338.0 | -8.6669% |
-| 10 | FTSE 100 | UK | `ISF.L` | da verificare | 1054.599976 | 2026-09-02 | 1148.400024 | -8.1679% | 1148.400024 | -8.1679% |
-| 3 | Nasdaq 100 | USA growth | `SXRV.DE` | da verificare | 1438.800049 | 2026-09-02 | 1539.199951 | -6.5229% | 1539.199951 | -6.5229% |
-| 4 | Russell 2000 | USA small cap | `IUS3.DE` | da verificare | 99.830002 | 2026-09-02 | 106.68 | -6.4211% | 106.68 | -6.4211% |
-| 13 | FTSE MIB | Europa paese | `CSMIB.MI` | da verificare | 258.200012 | 2026-09-02 | 269.149994 | -4.0684% | 269.149994 | -4.0684% |
-| 12 | DAX | Europa paese | `EXS1.DE` | da verificare | 213.100006 | 2026-09-02 | 219.449997 | -2.8936% | 219.449997 | -2.8936% |
-| 11 | FTSE 250 | UK | `MIDD.L` | da verificare | 2260.0 | 2026-09-02 | 2324.5 | -2.7748% | 2324.5 | -2.7748% |
-| 23 | World Energy | Settore ciclico | `WENS.L` | da verificare | 7.571 | 2026-09-02 | 7.78 | -2.6864% | 7.78 | -2.6864% |
-| 22 | World Health Care | Settore difensivo | `WHEA.L` | da verificare | 73.059998 | 2026-09-02 | 75.050003 | -2.6516% | 75.050003 | -2.6516% |
-| 8 | STOXX Europe 600 | Europa core | `EXSA.DE` | da verificare | 64.5 | 2026-09-02 | 66.230003 | -2.6121% | 66.230003 | -2.6121% |
-| 2 | S&P 500 | USA core | `VUAA.DE` | da verificare | 127.449997 | 2026-09-02 | 130.850006 | -2.5984% | 130.850006 | -2.5984% |
-| 14 | SMI | Europa difensivo | `CSSMI.SW` | da verificare | 148.320007 | 2026-09-02 | 152.039993 | -2.4467% | 152.039993 | -2.4467% |
-| 9 | STOXX Europe 600 Value | Europa value | `EXV1.DE` | da verificare | 42.384998 | 2026-09-02 | 43.435001 | -2.4174% | 43.435001 | -2.4174% |
-| 1 | FTSE All-World / MSCI ACWI | Globale core | `VWCE.DE` | da verificare | 166.020004 | 2026-09-02 | 170.119995 | -2.4101% | 170.119995 | -2.4101% |
-| 6 | MSCI World Quality | World factor | `IWQU.L` | da verificare | 89.129997 | 2026-09-02 | 91.309998 | -2.3875% | 91.309998 | -2.3875% |
-| 5 | MSCI World Value | World factor | `IWVL.L` | da verificare | 81.050003 | 2026-09-02 | 82.68 | -1.9715% | 82.68 | -1.9715% |
-| 7 | MSCI World Minimum Volatility | World factor | `MVOL.L` | da verificare | 78.129997 | 2026-09-02 | 78.800003 | -0.8503% | 78.800003 | -0.8503% |
+| 27 | Ethereum | Crypto | `ETH-EUR` | da verificare | 2074.77002 | 2026-09-03 | 4075.661133 | -49.0937% | 4300.855469 | -51.7591% |
+| 26 | Bitcoin | Crypto | `BTC-EUR` | da verificare | 67205.429688 | 2026-09-03 | 107745.132812 | -37.6256% | 107745.132812 | -37.6256% |
+| 21 | MSCI Korea | Asia tech | `IKOR.L` | da verificare | 9424.5 | 2026-09-03 | 11932.0 | -21.0149% | 11932.0 | -21.0149% |
+| 25 | Oro | Real asset | `SGLN.L` | da verificare | 6383.314941 | 2026-09-03 | 7810.0 | -18.2674% | 7810.0 | -18.2674% |
+| 18 | MSCI India | Emergenti paese | `NDIA.L` | da verificare | 8.872 | 2026-09-03 | 10.48 | -15.3435% | 10.742 | -17.4083% |
+| 16 | MSCI Emerging Markets | Emergenti | `EIMI.L` | da verificare | 54.799999 | 2026-09-03 | 60.549999 | -9.4963% | 60.549999 | -9.4963% |
+| 17 | Emerging Markets ex China | Emergenti | `EMXC.L` | da verificare | 47.174999 | 2026-09-03 | 51.610001 | -8.5933% | 51.610001 | -8.5933% |
+| 20 | MSCI Taiwan | Asia tech | `ITWN.L` | da verificare | 14983.0 | 2026-09-03 | 16338.0 | -8.2935% | 16338.0 | -8.2935% |
+| 10 | FTSE 100 | UK | `ISF.L` | da verificare | 1058.800049 | 2026-09-03 | 1148.400024 | -7.8022% | 1148.400024 | -7.8022% |
+| 3 | Nasdaq 100 | USA growth | `SXRV.DE` | da verificare | 1438.400024 | 2026-09-03 | 1539.199951 | -6.5489% | 1539.199951 | -6.5489% |
+| 4 | Russell 2000 | USA small cap | `IUS3.DE` | da verificare | 100.300003 | 2026-09-03 | 106.68 | -5.9805% | 106.68 | -5.9805% |
+| 24 | Rio Tinto / Materials | Materials | `RIO.PA` | da verificare | 26.860001 | 2026-09-03 | 28.559 | -5.9491% | 31.33754 | -14.2881% |
+| 13 | FTSE MIB | Europa paese | `CSMIB.MI` | da verificare | 258.700012 | 2026-09-03 | 269.149994 | -3.8826% | 269.149994 | -3.8826% |
+| 12 | DAX | Europa paese | `EXS1.DE` | da verificare | 212.949997 | 2026-09-03 | 219.449997 | -2.962% | 219.449997 | -2.962% |
+| 11 | FTSE 250 | UK | `MIDD.L` | da verificare | 2265.5 | 2026-09-03 | 2324.5 | -2.5382% | 2324.5 | -2.5382% |
+| 2 | S&P 500 | USA core | `VUAA.DE` | da verificare | 127.635002 | 2026-09-03 | 130.850006 | -2.457% | 130.850006 | -2.457% |
+| 8 | STOXX Europe 600 | Europa core | `EXSA.DE` | da verificare | 64.660004 | 2026-09-03 | 66.230003 | -2.3705% | 66.230003 | -2.3705% |
+| 1 | FTSE All-World / MSCI ACWI | Globale core | `VWCE.DE` | da verificare | 166.619995 | 2026-09-03 | 170.119995 | -2.0574% | 170.119995 | -2.0574% |
+| 14 | SMI | Europa difensivo | `CSSMI.SW` | da verificare | 149.059998 | 2026-09-03 | 152.039993 | -1.96% | 152.039993 | -1.96% |
+| 6 | MSCI World Quality | World factor | `IWQU.L` | da verificare | 89.599998 | 2026-09-03 | 91.309998 | -1.8727% | 91.309998 | -1.8727% |
+| 9 | STOXX Europe 600 Value | Europa value | `EXV1.DE` | da verificare | 42.639999 | 2026-09-03 | 43.435001 | -1.8303% | 43.435001 | -1.8303% |
+| 22 | World Health Care | Settore difensivo | `WHEA.L` | da verificare | 73.760002 | 2026-09-03 | 75.050003 | -1.7189% | 75.050003 | -1.7189% |
+| 23 | World Energy | Settore ciclico | `WENS.L` | da verificare | 7.666 | 2026-09-03 | 7.78 | -1.4653% | 7.78 | -1.4653% |
+| 5 | MSCI World Value | World factor | `IWVL.L` | da verificare | 82.099998 | 2026-09-03 | 82.68 | -0.7015% | 82.68 | -0.7015% |
+| 7 | MSCI World Minimum Volatility | World factor | `MVOL.L` | da verificare | 78.529999 | 2026-09-03 | 78.800003 | -0.3426% | 78.800003 | -0.3426% |
 
 ## Falliti
 
