@@ -5,7 +5,6 @@
   const SUPABASE_URL = "https://kujyowhezihjambhpahe.supabase.co";
   const SUPABASE_KEY = "sb_publishable_VBzZaA3NAIvqMxJcZZTwPg_4_GEi1a3";
   const TAX_RATE = 0.26;
-  const SCREENSHOT_CASH = 33196.45 + 8989 + 1825.39;
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const $ = id => document.getElementById(id);
   const n = value => {
@@ -17,6 +16,17 @@
   const fmt4 = value => new Intl.NumberFormat("it-IT", { maximumFractionDigits: 4 }).format(n(value));
   const safe = value => String(value ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]));
   let patching = false;
+
+  function latestCashSnapshot(flows) {
+    const snapshotTypes = new Set(["cash_non_invested", "cash_balance", "overnight_cash"]);
+    const snapshotRows = flows.filter(flow => snapshotTypes.has(flow.type) && flow.date);
+    const latestDate = snapshotRows.reduce((latest, row) => String(row.date) > latest ? String(row.date) : latest, "");
+    if (!latestDate) return { date: "", value: 0 };
+    const value = snapshotRows
+      .filter(row => String(row.date) === latestDate)
+      .reduce((sum, row) => sum + n(row.amount), 0);
+    return { date: latestDate, value };
+  }
 
   function ensureChartTooltip() {
     if (!document.getElementById("assetChartTooltipStyles")) {
@@ -136,7 +146,7 @@
       { key: "unrealized", title: "Utile non realizzato", value: eur(totals.unrealizedGain), hint: "posizioni aperte" },
       { key: "openValue", title: "Valore aperto asset", value: eur(totals.marketValue), hint: `${totals.openPositions.length} posizioni aperte` },
       { key: "openCost", title: "Capitale ancora investito", value: eur(totals.openCost), hint: "cost basis aperto" },
-      { key: "cash", title: "Cash non investito", value: eur(totals.cashNonInvested), hint: "overnight + saldo liquidità; altcoin escluse" },
+      { key: "cash", title: "Cash non investito", value: eur(totals.cashNonInvested), hint: `overnight + saldo liquidità; snapshot ${totals.cashDate || "n/d"}; altcoin escluse` },
       { key: "openReturn", title: "Rendimento aperto", value: pct(totals.openCost ? totals.unrealizedGain / totals.openCost * 100 : 0), hint: "su capitale ancora investito" }
     ];
   }
@@ -292,7 +302,7 @@
   function renderAllocation(totals) {
     const grandTotal = totals.marketValue + totals.cashNonInvested;
     const rows = totals.openPositions.sort((a, b) => b.marketValue - a.marketValue).map(pos => ({ name: pos.asset.name, value: pos.marketValue, sub: "Asset investito" }));
-    rows.push({ name: "Cash non investito", value: totals.cashNonInvested, sub: "Overnight + saldo liquidità; altcoin escluse" });
+    rows.push({ name: "Cash non investito", value: totals.cashNonInvested, sub: `Overnight + saldo liquidità; snapshot ${totals.cashDate || "n/d"}; altcoin escluse` });
     $("allocation").innerHTML = rows.map(row => {
       const p = grandTotal ? row.value / grandTotal * 100 : 0;
       return `<div class="allocation-row"><div class="history-title"><div><strong>${safe(row.name)}</strong><div class="small">${safe(row.sub)} · ${eur(row.value)} · ${pct(p)}</div></div></div><div class="barbox"><div class="bar" style="width:${Math.max(2, Math.min(100, p))}%"></div></div></div>`;
@@ -308,7 +318,7 @@
       const profit = relatedPositions.reduce((sum, pos) => sum + pos.realizedGain + pos.unrealizedGain, 0);
       return `<div class="asset"><h3>${safe(block.title || block.name)}: ${safe(block.name || "")}</h3><div class="metrics"><span class="pill">Investito ${eur(invested)}</span><span class="pill">Mercato ${eur(market)}</span><span class="pill">Cash 0,00 €</span><span class="pill ${profit >= 0 ? "pos" : "neg"}">Profitto ${eur(profit)}</span></div><div class="field"><label>Strategia e drawdown</label><textarea readonly>${safe(block.strategy || "")}</textarea></div></div>`;
     });
-    rows.push(`<div class="asset"><h3>Cash non investito</h3><div class="metrics"><span class="pill">Overnight + saldo ${eur(totals.cashNonInvested)}</span><span class="pill">Altcoin escluse</span></div></div>`);
+    rows.push(`<div class="asset"><h3>Cash non investito</h3><div class="metrics"><span class="pill">Overnight + saldo ${eur(totals.cashNonInvested)}</span><span class="pill">Snapshot ${safe(totals.cashDate || "n/d")}</span><span class="pill">Altcoin escluse</span></div></div>`);
     $("blocks").innerHTML = rows.join("");
   }
 
@@ -353,14 +363,15 @@
       const unrealizedGain = openPositions.reduce((sum, pos) => sum + pos.unrealizedGain, 0);
       const totalBuy = positions.reduce((sum, pos) => sum + pos.buyAmount, 0);
       const totalSell = positions.reduce((sum, pos) => sum + pos.sellAmount, 0);
-      const cashNonInvested = SCREENSHOT_CASH;
+      const cashSnapshot = latestCashSnapshot(rows.flows);
+      const cashNonInvested = cashSnapshot.value;
       const portfolioValue = marketValue + cashNonInvested;
       const grossProfit = realizedGain + unrealizedGain;
       const tax = grossProfit > 0 ? grossProfit * TAX_RATE : 0;
       const netProfit = grossProfit - tax;
       const grossReturn = totalBuy ? grossProfit / totalBuy * 100 : 0;
       const netReturn = totalBuy ? netProfit / totalBuy * 100 : 0;
-      const totals = { openPositions, marketValue, openCost, realizedGain, unrealizedGain, totalBuy, totalSell, cashNonInvested, portfolioValue, grossProfit, tax, netProfit, grossReturn, netReturn };
+      const totals = { openPositions, marketValue, openCost, realizedGain, unrealizedGain, totalBuy, totalSell, cashNonInvested, cashDate: cashSnapshot.date, portfolioValue, grossProfit, tax, netProfit, grossReturn, netReturn };
       totals.annualGross = grossReturn * 12 / 13;
       totals.annualNet = netReturn * 12 / 13;
       renderDashboard(totals);
