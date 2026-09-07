@@ -7,6 +7,7 @@
   <title>Journal</title>
   <link rel="stylesheet" href="styles.css?v=3">
   <link rel="stylesheet" href="errors.css?v=3">
+  <link rel="stylesheet" href="tags.css?v=1">
 </head>
 <body>
   <header class="topbar">
@@ -43,6 +44,7 @@
       <button id="errorsTab" class="section-tab" type="button" role="tab" aria-selected="false">Errori da non ripetere</button>
       <button id="changeTab" class="section-tab" type="button" role="tab" aria-selected="false">Change</button>
       <button id="todoTab" class="section-tab" type="button" role="tab" aria-selected="false">Da fare</button>
+      <button id="tagTab" class="section-tab" type="button" role="tab" aria-selected="false">Tag</button>
     </nav>
 
     <div id="journalLayout" class="layout" hidden>
@@ -146,11 +148,60 @@
         </div>
       </form>
     </section>
+
+    <section id="tagsPanel" class="panel tags-panel" hidden>
+      <div class="tags-head">
+        <div>
+          <p class="eyebrow">Memoria · Tassonomia</p>
+          <h2>Tag</h2>
+          <p>Esplora nel tempo riflessioni, conoscenze, intenzioni e cambiamenti attraverso metadati strutturati.</p>
+        </div>
+        <div id="tagsOverview" class="tags-overview"></div>
+      </div>
+
+      <div class="tags-search-row">
+        <input id="tagsSearch" type="search" placeholder="Cerca nel testo, nei titoli e nelle sintesi…" autocomplete="off">
+        <button id="tagsRefreshBtn" type="button" class="button secondary">Aggiorna</button>
+      </div>
+      <div id="tagsStatus" class="tags-status" role="status" aria-live="polite"></div>
+
+      <div id="unclassifiedCard" class="unclassified-card"></div>
+
+      <div class="taxonomy-grid">
+        <section class="taxonomy-block">
+          <div class="taxonomy-block-head"><h3>Aree</h3><span class="taxonomy-block-count">Area principale</span></div>
+          <div id="areaList" class="facet-list"></div>
+        </section>
+        <section class="taxonomy-block">
+          <div class="taxonomy-block-head"><h3>Tipi di nota</h3><span class="taxonomy-block-count">Natura del contenuto</span></div>
+          <div id="kindList" class="facet-list"></div>
+        </section>
+        <section class="taxonomy-block">
+          <div class="taxonomy-block-head"><h3>Tag</h3><span class="taxonomy-block-count">Temi specifici</span></div>
+          <div id="tagList" class="facet-list"></div>
+        </section>
+        <section class="taxonomy-block">
+          <div class="taxonomy-block-head"><h3>Entità</h3><span class="taxonomy-block-count">Persone, progetti, fonti</span></div>
+          <div id="entityList" class="facet-list"></div>
+        </section>
+      </div>
+
+      <section class="memory-results">
+        <div class="memory-results-head">
+          <h3 id="memoryResultsTitle">Esplora la memoria</h3>
+          <span id="memoryResultsCount" class="memory-results-count"></span>
+        </div>
+        <div id="memoryResultsList" class="memory-results-list">
+          <div class="taxonomy-empty">Seleziona un’area, un tipo, un tag o un’entità, oppure usa la ricerca.</div>
+        </div>
+      </section>
+    </section>
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="../vendor/supabase.js?v=21"></script>
   <script src="app.js?v=3"></script>
   <script src="errors_patch.js?v=3"></script>
+  <script src="tags_patch.js?v=1"></script>
 </body>
 </html>
