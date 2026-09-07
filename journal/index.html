@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="styles.css?v=3">
   <link rel="stylesheet" href="errors.css?v=3">
   <link rel="stylesheet" href="tags.css?v=1">
+  <link rel="stylesheet" href="instructions.css?v=1">
 </head>
 <body>
   <header class="topbar">
@@ -45,6 +46,7 @@
       <button id="changeTab" class="section-tab" type="button" role="tab" aria-selected="false">Change</button>
       <button id="todoTab" class="section-tab" type="button" role="tab" aria-selected="false">Da fare</button>
       <button id="tagTab" class="section-tab" type="button" role="tab" aria-selected="false">Tag</button>
+      <button id="instructionsTab" class="section-tab" type="button" role="tab" aria-selected="false">Istruzioni</button>
     </nav>
 
     <div id="journalLayout" class="layout" hidden>
@@ -196,6 +198,49 @@
         </div>
       </section>
     </section>
+
+    <section id="instructionsPanel" class="panel instructions-panel" hidden>
+      <div class="instructions-head">
+        <div>
+          <p class="eyebrow">Configurazione · ChatGPT</p>
+          <h2>Istruzioni Journal</h2>
+          <p>Queste istruzioni vengono lette da ChatGPT prima di operare sul Journal. La versione corrente è salvata su Supabase.</p>
+        </div>
+        <div class="instructions-meta">
+          <span id="instructionsVersion">Versione non salvata</span>
+          <span id="instructionsUpdated">Mai salvata</span>
+        </div>
+      </div>
+
+      <form id="instructionsForm" class="instructions-form">
+        <textarea id="instructionsInput" spellcheck="false" placeholder="Scrivi qui le istruzioni operative del Journal…"></textarea>
+        <div class="instructions-actions">
+          <span id="instructionsStatus" class="instructions-status" role="status" aria-live="polite"></span>
+          <div class="instructions-actions-right">
+            <button id="instructionsHistoryBtn" type="button" class="button secondary" aria-expanded="false">Cronologia versioni</button>
+            <button id="instructionsSaveBtn" type="submit" class="button primary">Salva istruzioni</button>
+          </div>
+        </div>
+      </form>
+
+      <section id="instructionsHistory" class="instructions-history" hidden>
+        <div class="instructions-history-head">
+          <h3>Cronologia versioni</h3>
+        </div>
+        <div id="instructionHistoryList" class="instruction-history-list"></div>
+
+        <article id="instructionPreview" class="instruction-preview" hidden>
+          <div class="instruction-preview-head">
+            <h4 id="instructionPreviewTitle"></h4>
+            <button id="instructionPreviewClose" type="button" class="button secondary">Chiudi</button>
+          </div>
+          <pre id="instructionPreviewContent"></pre>
+          <div class="instruction-preview-actions">
+            <button id="instructionPreviewRestore" type="button" class="button primary">Ripristina questa versione</button>
+          </div>
+        </article>
+      </section>
+    </section>
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -203,5 +248,6 @@
   <script src="app.js?v=3"></script>
   <script src="errors_patch.js?v=3"></script>
   <script src="tags_patch.js?v=1"></script>
+  <script src="instructions_patch.js?v=1"></script>
 </body>
 </html>
