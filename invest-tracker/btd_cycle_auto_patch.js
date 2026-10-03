@@ -8,7 +8,7 @@
   const CYCLE_FUNCTION = 'btd-economic-cycle';
   const MONETARY_FUNCTION = 'btd-monetary-update';
   const TTL_MS = 24 * 60 * 60 * 1000;
-  const EXPECTED_ASSETS = 14;
+  const EXPECTED_ASSETS = 15;
   const client = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_KEY);
 
   let cycleRows = new Map();
@@ -180,7 +180,7 @@
     if (!client) throw new Error('Client Supabase non disponibile');
     if (refreshPromise) return refreshPromise;
     refreshPromise = (async () => {
-      status(reason === 'manual' ? 'Aggiornamento macro 14/14 in corso…' : 'Dati macro scaduti: aggiornamento in background…');
+      status(reason === 'manual' ? 'Aggiornamento macro 15/15 in corso…' : 'Dati macro scaduti: aggiornamento in background…');
       const jobs = [];
       if (options.cycle) jobs.push(invokeUpdate(CYCLE_FUNCTION, 'Ciclo', reason));
       if (options.monetary) jobs.push(invokeUpdate(MONETARY_FUNCTION, 'Monetario', reason));
@@ -191,7 +191,7 @@
       if (rejected.length) {
         status(`Aggiornamento macro parziale: ${rejected.map(x => x.reason?.message || x.reason).join(' · ')}`, 'warn');
       } else {
-        status('Macro aggiornato: ciclo 14/14 + monetario 14/14.', 'ok');
+        status('Macro aggiornato: ciclo 15/15 + monetario 15/15.', 'ok');
       }
       return results;
     })();
