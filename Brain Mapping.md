@@ -519,10 +519,11 @@ Questa sezione verrà compilata progressivamente sulla base del protocollo reale
 - **Sampling rate:** da identificare
 - **Grid:** da identificare
 - **Reference:** da identificare
-- **Intensità di stimolazione:** da identificare
-- **Pulse width:** da identificare
+- **Intensità di stimolazione ACEP:** partenza da 20 mA, progressiva riduzione fino alla response threshold
+- **Response threshold ACEP:** 2–5 mA
+- **Pulse width:** 0,5 ms
 - **Stimolo mono/bifasico:** da identificare
-- **Frequenza/intervallo interstimolo:** da identificare
+- **Frequenza/intervallo interstimolo:** 1,1 Hz
 - **Numero di trial:** da identificare
 - **Trigger/event marker:** da identificare
 - **Formato raw:** da identificare
