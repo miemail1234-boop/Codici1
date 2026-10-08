@@ -589,21 +589,21 @@ Questa sezione verrà aggiornata con i concetti effettivamente acquisiti, dubbi 
 
 Priorità attuale: **Livello 1, punto 1 — Fondamenti di neurofisiologia elettrica.**
 
-# Congresso ISIN 2026 — Master checklist: 148 domande
+# ISIN 2026 Congress — Master Checklist: 148 Questions
 
-## Obiettivo
+## Goal
 
-Per considerare completa la preparazione congressuale, devo essere in grado di rispondere a tutte le 148 domande seguenti a tre livelli:
+To consider my congress preparation complete, I should be able to answer all 148 questions below at three levels:
 
-- **30 secondi:** risposta congressuale chiara e precisa;
-- **2 minuti:** spiegazione tecnica;
-- **controdomanda:** capacità di difendere limiti, alternative e dettagli del setup.
+- **30 seconds:** a clear, concise congress-style answer;
+- **2 minutes:** a technically solid explanation;
+- **follow-up challenge:** the ability to defend assumptions, limitations, alternative interpretations, and details of our actual setup.
 
-### Legenda delle fonti
+### Source legend
 
-- **[A1]** Abstract ISIN 2026 su hand-object manipulation.
-- **[A2]** Abstract ISIN 2026 su visuospatial attention: lavoro da presentare.
-- **[PROTO]** Informazione fornita direttamente sul protocollo corrente.
+- **[A1]** ISIN 2026 abstract on hand-object manipulation.
+- **[A2]** ISIN 2026 abstract on visuospatial attention — the study I will present.
+- **[PROTO]** Information directly provided about the current protocol.
 - **[G1]** Puglisi et al., 2026, *Nature Communications*, “Convergent causal mapping unravels distinct frontal networks for visuospatial selective attention”.
 - **[G2]** Viganò et al., 2022, *Brain*, “Stimulation of frontal pathways disrupts hand muscle control during object manipulation”.
 - **[G3]** Fornia et al., 2022, *NeuroImage*, “Motor impairment evoked by direct electrical stimulation of human parietal cortex during object manipulation”.
@@ -614,592 +614,592 @@ Per considerare completa la preparazione congressuale, devo essere in grado di r
 - **[G8]** Viganò et al., 2022, *Frontiers in Oncology*, transcranial vs direct electrical stimulation for intraoperative MEP monitoring.
 - **[G9]** Viganò et al., 2019, *Cortex*, human hand-knob electrophysiology.
 
-### Legenda dello stato
+### Status legend
 
-- **✅** risposta già sostenuta direttamente dal nostro materiale;
-- **⚠️** risposta parziale: il principio è chiaro ma il dettaglio del setup ACEP corrente va verificato;
-- **📚** tema teorico non documentato in modo sufficiente nel corpus del gruppo: da integrare con letteratura generale.
-
----
-
-## A. Fondamenti ACEP e significato fisiologico
-
-### 1. Che cos'è un axono-cortical evoked potential?
-**Risposta:** È una risposta corticale time-locked evocata stimolando elettricamente un sito sottocorticale di sostanza bianca. Nel nostro studio lo stimolo viene applicato a siti iVSAT-positivi e la risposta viene registrata con uno strip sul superior frontal gyrus/lateral pre-SMA. Non è “il segnale del fascio”, ma una risposta corticale evocata dal reclutamento elettrico di fibre sottocorticali. **Stato: ✅ [A2].**
-
-### 2. Che cosa stiamo misurando fisicamente con l'elettrodo corticale?
-**Risposta:** Una differenza di potenziale extracellulare generata dall'attività sincronizzata di popolazioni neuronali corticali e dipendente dal riferimento di registrazione. Il corpus del gruppo descrive l'ECoG intraoperatorio, ma non sviluppa in dettaglio la biogenesi dei field potentials. **Stato: 📚; setup ECoG storico in [G4, G5].**
-
-### 3. Perché stimolando sostanza bianca posso ottenere una risposta corticale distante?
-**Risposta:** L'interpretazione del paradigma è che lo stimolo recluti fibre assonali vicine al probe e che l'attività propagata raggiunga la corteccia connessa, generando una risposta registrabile. Il meccanismo bi-fisico dell'attivazione extracellulare dell'assone va approfondito con letteratura generale. **Stato: ✅ per il paradigma [A1, A2], 📚 per il meccanismo.**
-
-### 4. Perché si parla di “axono-cortical” e non semplicemente di “subcortico-cortical”?
-**Risposta:** Il termine enfatizza che l'elemento eccitabile bersaglio della stimolazione sottocorticale è interpretato come assonale e che la risposta viene registrata corticalmente. Il nome è quindi fisiologico, non solo anatomico. **Stato: ✅ [A1, A2], con meccanismo da approfondire.**
-
-### 5. Un ACEP dimostra che due regioni sono anatomicamente connesse?
-**Risposta:** Supporta una relazione di connettività tra sito stimolato e corteccia registrata, soprattutto se la risposta è riproducibile, breve-latenza e topograficamente specifica. Da solo non identifica con certezza un singolo fascio né la precisa architettura anatomica attraversata. **Stato: ✅ come interpretazione prudente [A2, G1].**
-
-### 6. Un ACEP dimostra una connessione monosynaptica?
-**Risposta:** No. Una latenza breve è compatibile con propagazione rapida, ma non dimostra da sola che non esistano sinapsi intermedie o più vie coinvolte. **Stato: 📚; non dimostrato dal corpus del gruppo.**
-
-### 7. Cosa significa che la risposta è “task-independent”?
-**Risposta:** Dopo che il sito funzionale è stato identificato con il compito comportamentale, l'ACEP può essere evocato e registrato senza richiedere che il paziente continui a eseguire il task durante ogni stimolo. **Stato: ✅ [A1, A2].**
-
-### 8. Qual è il vantaggio potenziale rispetto al solo behavioural mapping?
-**Risposta:** Fornisce un marker elettrofisiologico riproducibile della relazione tra sito sottocorticale e target corticale, complementare alla risposta comportamentale e potenzialmente utilizzabile quando la performance attiva del paziente non è disponibile. **Stato: ✅ [A1, A2].**
-
-### 9. Perché gli ACEP potrebbero essere utili in asleep surgery?
-**Risposta:** Perché non richiedono necessariamente una risposta comportamentale attiva durante l'acquisizione; l'abstract propone esplicitamente la futura applicazione in procedure asleep. Questa applicazione non è ancora validata nel campione presentato. **Stato: ✅ [A1, A2].**
-
-### 10. Qual è la differenza fra ACEP/SCEP e CCEP?
-**Risposta:** Nel paradigma ACEP/SCEP si stimola la sostanza bianca e si registra dalla corteccia; nei CCEP si stimola un sito corticale e si registra una risposta in un altro sito corticale. Il confronto sistematico richiede letteratura generale specifica. **Stato: 📚.**
+- **✅** directly supported by our material;
+- **⚠️** partially supported: the principle is clear, but a detail of the current ACEP setup still needs verification;
+- **📚** theoretical topic not sufficiently documented in the group corpus and requiring general literature.
 
 ---
 
-## B. Stimolatore, probe e waveform dello stimolo
+## A. ACEP fundamentals and physiological meaning
 
-### 11. Quale stimolatore utilizzate per generare gli ACEP?
-**Risposta:** Non è specificato nell'abstract ACEP. Nei lavori precedenti del gruppo, la LF-DES usa un **OSIRIS-NeuroStimulator, Inomed, integrato nel sistema ISIS**, ma non va automaticamente assunto che sia lo stesso generatore ACEP. **Stato: ⚠️ [G3, G4].**
+### 1. What is an axono-cortical evoked potential?
+**Answer:** An ACEP is a time-locked cortical response elicited by electrically stimulating a subcortical white-matter site. In our study, stimulation is delivered at iVSAT-positive subcortical sites and cortical activity is recorded over the superior frontal gyrus/lateral pre-SMA. Importantly, an ACEP is not “the signal of a tract”; it is a cortical response produced after electrically recruiting neural elements, most plausibly axons, near the stimulation site. **Status: ✅ [A2].**
 
-### 12. Lo stimolatore ACEP è constant-current o constant-voltage?
-**Risposta:** Non è dichiarato nell'abstract. I protocolli LF-DES e HF-DES storici del gruppo sono descritti come **constant current**; per gli ACEP correnti va verificato direttamente sulla macchina/protocollo. **Stato: ⚠️ [G3, G4, G8].**
+### 2. What are we physically measuring with the cortical electrode?
+**Answer:** The cortical electrode measures an extracellular voltage difference between the recording contact and a reference. That voltage reflects the summed electrical activity of local and nearby neuronal populations rather than single-neuron action potentials. Therefore, waveform amplitude and polarity depend not only on physiology but also on source geometry, electrode position, and the chosen reference. **Status: 📚; historical ECoG setup in [G4, G5].**
 
-### 13. Quale elettrodo/probe viene usato per la stimolazione sottocorticale ACEP?
-**Risposta:** L'abstract non specifica modello, diametro e geometria. L'iVSAT viene mappato con un probe bipolare con 5 mm di distanza inter-tip; nei lavori precedenti il probe LF-DES ha due ball tips da 2 mm separate di 5 mm. Verificare se lo stesso probe viene usato per ACEP. **Stato: ⚠️ [G1, G3, G4].**
+### 3. Why can stimulation of white matter produce a response in distant cortex?
+**Answer:** The working physiological model is that electrical stimulation recruits axons close to the probe, generates propagating action potentials, and activates a connected cortical population. The distant cortical response is then recorded as an evoked field potential. The detailed biophysics of extracellular axonal activation is not fully developed in the group papers and should be supported by general neurophysiology literature. **Status: ✅ for the paradigm [A1, A2], 📚 for the mechanism.**
 
-### 14. La stimolazione ACEP è monopolare o bipolare?
-**Risposta:** “Biphasic pulse” descrive la forma temporale dell'impulso, non la configurazione spaziale monopolar/bipolar. Il mapping iVSAT è bipolare, ma l'abstract ACEP non dice esplicitamente se il single-pulse ACEP sia erogato con la stessa configurazione. **Stato: ⚠️ [A2, G1].**
+### 4. Why do we call it “axono-cortical” rather than simply “subcortico-cortical”?
+**Answer:** “Subcortico-cortical” describes the spatial arrangement, whereas “axono-cortical” emphasizes the proposed physiological substrate: stimulation of axonal elements in white matter followed by a cortical response. The term therefore carries a mechanistic interpretation, not just an anatomical one. That mechanism should still be expressed cautiously because the exact recruited fibers are not directly visualized by the evoked potential itself. **Status: ✅ [A1, A2], mechanism to be further developed.**
 
-### 15. Cosa significa esattamente “biphasic pulse”?
-**Risposta:** Un impulso composto da due fasi di polarità opposta. Nel corpus LF-DES del gruppo si parla esplicitamente di biphasic square-wave pulses; per ACEP sono riportati single biphasic pulses. **Stato: ✅ [A2, G3, G4].**
+### 5. Does an ACEP prove that two regions are anatomically connected?
+**Answer:** It provides evidence that stimulation at one subcortical location can reproducibly influence a cortical recording site with a characteristic latency and topography. This supports a connectivity relationship, especially when appropriate negative and topographic controls are present. However, ACEP alone does not identify a single tract with certainty or fully reconstruct the anatomical route taken by the response. **Status: ✅ as a cautious interpretation [A2, G1].**
 
-### 16. 0,5 ms significa 0,5 ms per fase o durata totale dell'impulso ACEP?
-**Risposta:** L'abstract ACEP dice solo “pulse width 0.5 ms” e quindi è ambiguo. Nei protocolli LF-DES precedenti del gruppo è scritto esplicitamente **0.5 ms each phase**. Non trasferire questa informazione agli ACEP senza verifica. **Stato: ⚠️ [A2, G3, G4].**
+### 6. Does an ACEP prove monosynaptic connectivity?
+**Answer:** No. A short latency is compatible with rapid and relatively direct propagation, but latency alone cannot establish that no intermediate synapse or parallel pathway is involved. Demonstrating monosynaptic connectivity would require additional physiological and anatomical evidence beyond the ACEP waveform. **Status: 📚; not demonstrated by the group corpus.**
 
-### 17. Le due fasi sono simmetriche?
-**Risposta:** Non documentato per il protocollo ACEP. “Biphasic” da solo non garantisce identica ampiezza e durata delle due fasi. **Stato: ⚠️.**
+### 7. What does “task-independent” mean in this context?
+**Answer:** The functional subcortical site is first identified behaviorally during awake mapping, but once that site has been established, the ACEP can be evoked without requiring active task performance for every stimulus. In practical terms, the electrophysiological readout does not depend on the patient producing an overt behavioral response on each trial. This is the basis for its potential use beyond fully awake task-based mapping. **Status: ✅ [A1, A2].**
 
-### 18. Qual è la polarità della prima fase?
-**Risposta:** Non documentata nell'abstract o nei materiali ACEP disponibili. Va ricavata dalle impostazioni dello stimolatore o dal manuale della macchina. **Stato: ⚠️.**
+### 8. What is the potential advantage of ACEP over behavioral mapping alone?
+**Answer:** Behavioral mapping tells us whether stimulation disrupts a function, whereas ACEP adds an electrophysiological marker linking a functionally identified subcortical site to a cortical response. The two approaches are complementary: one probes behavior and the other probes evoked network physiology. A reliable electrophysiological marker could be particularly valuable when continuous active performance is not possible. **Status: ✅ [A1, A2].**
 
-### 19. Perché utilizzate impulsi bifasici?
-**Risposta:** Il corpus descrive il loro uso ma non fornisce il razionale elettrochimico completo. Il razionale generale riguarda il bilanciamento della carica e la riduzione della polarizzazione netta all'interfaccia elettrodo-tessuto. **Stato: 📚.**
+### 9. Why might ACEPs be useful during asleep surgery?
+**Answer:** Because the evoked response can in principle be recorded without the patient performing the cognitive task at that moment. Our abstract explicitly proposes this as a future clinical application, but our current study was performed during awake surgery, so asleep applicability remains a hypothesis to be prospectively validated. It should therefore be presented as a translational direction rather than an established indication. **Status: ✅ [A1, A2].**
 
-### 20. Perché è stata scelta una pulse width di 0,5 ms?
-**Risposta:** È coerente con il paradigma di stimolazione intraoperatoria del gruppo, dove 0,5 ms è ricorrente in LF-DES e HF-DES. L'abstract ACEP non fornisce però una giustificazione specifica basata su strength-duration. **Stato: ⚠️ [G1, G3, G4, G8].**
-
-### 21. Perché utilizzate 1,1 Hz?
-**Risposta:** L'abstract riporta 1,1 Hz ma non ne esplicita il razionale. Va verificato se deriva dal generatore, da convenzioni tecniche o da esigenze di separazione tra risposte successive. **Stato: ⚠️ [A1, A2].**
-
-### 22. 1,1 Hz è il valore impostato o è stato verificato nei dati?
-**Risposta:** Non è specificato. Per essere tecnicamente solidi dobbiamo distinguere frequenza nominale dello stimolatore da intervallo interstimolo misurato dai trigger nel raw. **Stato: ⚠️.**
-
-### 23. Perché single pulses invece di un train di stimoli?
-**Risposta:** Il protocollo ACEP usa single pulses per ottenere una risposta evocata temporalmente interpretabile dopo ogni stimolo; il mapping comportamentale iVSAT usa invece train a 60 Hz per interferire transitoriamente con la funzione. Il razionale dettagliato va completato. **Stato: ✅ per la distinzione [A2, G1], 📚 per la fisiologia.**
-
-### 24. Perché partite da 20 mA e poi scendete?
-**Risposta:** Il protocollo dichiara una partenza da 20 mA con riduzione progressiva fino alla response threshold. Il razionale operativo plausibile è identificare una risposta e poi stimarne la soglia minima, ma l'abstract non lo formalizza. **Stato: ⚠️ [A2].**
-
-### 25. Con quali step diminuite la corrente?
-**Risposta:** Non documentato nell'abstract ACEP. Nel lavoro sul mapping sottocorticale della manipolazione la soglia LF-DES veniva rivalutata diminuendo la corrente in step di **0,5 mA**, ma non va assunto per ACEP. **Stato: ⚠️ [G2].**
-
-### 26. Come definite esattamente la response threshold ACEP?
-**Risposta:** Sappiamo che il range nel nostro campione è **2–5 mA**, ma non è ancora documentato il criterio operativo: numero di risposte richieste, ampiezza minima, riproducibilità o SNR. Questa è una priorità da recuperare. **Stato: ⚠️ [PROTO].**
-
-### 27. Quanti trial devono mostrare la risposta perché la consideriate presente?
-**Risposta:** Non specificato per ACEP. Nei paradigmi comportamentali del gruppo un sito è spesso considerato eloquente se l'errore compare in **tre trial non consecutivi**, ma questo criterio non può essere trasferito automaticamente alla risposta elettrofisiologica. **Stato: ⚠️ [G1, G6, G7].**
-
-### 28. Quanti impulsi vengono acquisiti per ogni condizione ACEP?
-**Risposta:** Non documentato nell'abstract. Va recuperato dal protocollo/raw perché determina precisione dell'average, SNR e affidabilità trial-to-trial. **Stato: ⚠️.**
-
-### 29. Quanto tempo intercorre tra condizioni o serie diverse?
-**Risposta:** Non documentato per ACEP. Nei task LF-DES del gruppo si mantengono spesso 3–4 secondi tra stimolazioni per evitare dragging effects, ma non è automaticamente il protocollo ACEP. **Stato: ⚠️ [G3, G7, G9].**
-
-### 30. Qual è la carica per fase del nostro stimolo?
-**Risposta:** Serve chiarire se 0,5 ms sia **per fase**. Se lo fosse, \(Q=I\times t\): a 2–5 mA la carica sarebbe **1–2,5 µC per fase**; a 20 mA sarebbe **10 µC per fase**. Se 0,5 ms è durata totale bifasica, questi valori cambiano. **Stato: ⚠️ [PROTO, A2].**
-
-### 31. Qual è la charge density all'interfaccia elettrodo-tessuto?
-**Risposta:** Non calcolabile finché non conosciamo area effettiva del contatto e definizione esatta della pulse width. Va recuperata la geometria del probe ACEP. **Stato: ⚠️.**
-
-### 32. Perché la stessa corrente non significa lo stesso recruitment in due siti?
-**Risposta:** Il gruppo riconosce che il DES può avere spread verso tessuto vicino/remoto e che anatomia e geometria del sito contano. Il recruitment dipende inoltre da distanza e orientamento delle fibre e proprietà del tessuto. **Stato: ✅ per il limite generale [G1], 📚 per la biofisica completa.**
-
-### 33. Perché la stessa carica non significa necessariamente lo stesso effetto fisiologico?
-**Risposta:** Perché corrente e durata influenzano la probabilità di attivazione secondo proprietà temporali della membrana; due impulsi con uguale carica possono avere differenti combinazioni intensità-durata e quindi differente efficacia. **Stato: 📚.**
-
-### 34. Come influenzano diametro, mielina e orientamento assonale la soglia?
-**Risposta:** È un tema di eccitabilità assonale extracellulare non sviluppato nei lavori del gruppo forniti. Va studiato con letteratura neurofisiologica specifica. **Stato: 📚.**
-
-### 35. Che cos'è il volume of tissue activated?
-**Risposta:** È il volume di tessuto nel quale il campo prodotto dalla stimolazione raggiunge condizioni sufficienti a reclutare elementi neurali; non coincide semplicemente con la posizione geometrica del tip. **Stato: 📚.**
-
-### 36. Da cosa dipende la focalità della stimolazione?
-**Risposta:** Il gruppo descrive la stimolazione bipolare come relativamente focale e usa probe con tip a distanza definita; la focalità dipende comunque da geometria, distanza, conduttività e anisotropia del tessuto. **Stato: ✅/📚 [G4, G5].**
+### 10. What is the difference between ACEP/SCEP and CCEP?
+**Answer:** In ACEP/SCEP paradigms, stimulation is delivered in subcortical white matter and the response is recorded from cortex. In CCEP paradigms, one cortical site is stimulated and responses are recorded from another cortical site. Both probe effective connectivity, but the stimulated neural compartment, field geometry, and interpretation are different. **Status: 📚.**
 
 ---
 
-## C. Sistema di registrazione ECoG
+## B. Stimulator, probe, and stimulus waveform
 
-### 37. Quale sistema usate per registrare l'ECoG ACEP?
-**Risposta:** Non specificato nell'abstract ACEP. Nei lavori storici del gruppo il monitoraggio ECoG viene descritto con sistemi **Comet/Grass**, mentre EMG/MEP usa ISIS-IOM/Inomed. Non bisogna assumere che il sistema ACEP sia identico. **Stato: ⚠️ [G4, G5].**
+### 11. Which stimulator do we use to generate ACEPs?
+**Answer:** The current ACEP abstract does not specify the stimulator model. Previous work from our group used the **OSIRIS NeuroStimulator (Inomed), integrated with the ISIS system**, for low-frequency direct electrical stimulation, but we cannot automatically assume that the same generator was used for the ACEP protocol. This must be verified directly from the current operating-room setup or acquisition log. **Status: ⚠️ [G3, G4].**
 
-### 38. Qual è il sampling rate dell'ACEP?
-**Risposta:** Non documentato. È uno dei dati tecnici prioritari da recuperare perché influenza la precisione delle latenze <15 ms. **Stato: ⚠️.**
+### 12. Is the ACEP stimulator constant-current or constant-voltage?
+**Answer:** This is not explicitly stated for the current ACEP protocol. Historical LF-DES and HF-DES protocols from our group are described as constant-current stimulation, but that information cannot be transferred to the ACEP setup without confirmation. The distinction matters because current delivered to tissue behaves differently under constant-current and constant-voltage stimulation when impedance changes. **Status: ⚠️ [G3, G4, G8].**
 
-### 39. Qual è la risoluzione temporale corrispondente?
-**Risposta:** È \(1/F_s\). Non può essere calcolata finché non conosciamo il sampling rate ACEP. **Stato: ⚠️.**
+### 13. Which electrode or probe is used for subcortical ACEP stimulation?
+**Answer:** The ACEP abstract does not report the exact probe model, contact diameter, or geometry. In the iVSAT mapping protocol, a bipolar probe with a 5-mm inter-tip distance is used, and older LF-DES studies describe two 2-mm ball tips separated by 5 mm. We need to verify whether ACEP stimulation uses that same probe or a different configuration. **Status: ⚠️ [G1, G3, G4].**
 
-### 40. Qual è la frequenza di Nyquist?
-**Risposta:** È \(F_s/2\). Anche questa dipende dal sampling rate effettivo del sistema ACEP. **Stato: ⚠️.**
+### 14. Is ACEP stimulation monopolar or bipolar?
+**Answer:** The phrase “biphasic pulse” refers to the temporal polarity of the stimulus waveform and does not tell us whether the spatial stimulation configuration is monopolar or bipolar. The iVSAT mapping protocol is bipolar, but the ACEP abstract does not explicitly state the spatial configuration of the single-pulse stimulation. This is therefore a specific setup detail that must be confirmed. **Status: ⚠️ [A2, G1].**
 
-### 41. Come è fatto lo strip: numero, diametro e spacing dei contatti?
-**Risposta:** L'abstract dice “strip electrode” ma non specifica geometria. Nei lavori storici vengono usati strip 4–8 contatti per ECoG e 4/6 contatti per MEP monitoring, ma il modello ACEP va verificato. **Stato: ⚠️ [G4, G5, G8].**
+### 15. What exactly does “biphasic pulse” mean?
+**Answer:** A biphasic pulse contains two phases of opposite electrical polarity within a single stimulus event. In the group’s LF-DES literature, the stimulus is explicitly described as a biphasic square-wave pulse, while the ACEP protocol reports single biphasic pulses. To fully characterize the waveform, however, we still need phase duration, relative amplitude, interphase interval if any, and first-phase polarity. **Status: ✅ for the basic definition [A2, G3, G4].**
 
-### 42. Dove viene posizionato esattamente lo strip nel nostro studio?
-**Risposta:** Sul **superior frontal gyrus esposto**, in corrispondenza della **lateral pre-SMA**; un ulteriore recording sul precentral gyrus funge da controllo corticale. **Stato: ✅ [A2].**
+### 16. Does 0.5 ms mean 0.5 ms per phase or 0.5 ms total pulse duration?
+**Answer:** The ACEP abstract only states “pulse width 0.5 ms”, which is technically ambiguous. Older LF-DES papers from our group explicitly state **0.5 ms per phase**, but that cannot be assumed for the current single-pulse ACEP protocol. This is one of the most important technical details to verify because it directly affects charge per phase and stimulation dose. **Status: ⚠️ [A2, G3, G4].**
 
-### 43. Come viene localizzato il lateral pre-SMA?
-**Risposta:** L'abstract non descrive la procedura di localizzazione dello strip. Il lavoro [G1] identifica causalmente la regione di interesse alla transizione SMA/pre-SMA e registra siti con neuronavigazione, ma il metodo specifico di posizionamento ACEP va recuperato. **Stato: ⚠️ [G1].**
+### 17. Are the two phases symmetrical?
+**Answer:** This is not documented for the current ACEP protocol. “Biphasic” only tells us that polarity reverses; it does not guarantee equal amplitude, equal duration, or zero net charge. The exact waveform should be checked in the stimulator settings or technical manual. **Status: ⚠️.**
 
-### 44. Qual è il reference usato per l'ACEP?
-**Risposta:** Non documentato. È un'informazione essenziale perché ampiezza e polarità dipendono dal riferimento. **Stato: ⚠️.**
+### 18. What is the polarity of the first phase?
+**Answer:** The available ACEP material does not report whether the first phase is cathodic or anodic. This matters because the spatial pattern of membrane polarization and therefore neural recruitment can depend on electrode geometry and pulse polarity. We should obtain this information directly from the stimulator configuration. **Status: ⚠️.**
 
-### 45. Dove si trova il ground?
-**Risposta:** Non documentato per ACEP. Nei protocolli HF-DES storici reference/ground è descritto sullo scalpo o cranio sopra il solco centrale, ma è un circuito diverso dalla registrazione ACEP. **Stato: ⚠️ [G4, G8].**
+### 19. Why are biphasic pulses used?
+**Answer:** The group papers document their use but do not provide a detailed electrochemical rationale. In general neurostimulation practice, biphasic stimulation is used to reduce net charge accumulation and electrode polarization compared with unbalanced monophasic stimulation. The exact safety implications depend on charge balance, electrode material, contact area, and pulse parameters. **Status: 📚.**
 
-### 46. Perché il reference può cambiare ampiezza, polarità e morfologia?
-**Risposta:** Perché ogni canale registra una differenza di potenziale rispetto al riferimento. Cambiare reference modifica la componente comune sottratta e quindi la forma apparente del segnale. **Stato: 📚.**
+### 20. Why was a pulse width of 0.5 ms chosen?
+**Answer:** A 0.5-ms pulse width is consistent with several intraoperative stimulation protocols used by our group, including LF-DES and HF-DES. However, the ACEP abstract does not provide a specific strength-duration rationale for selecting this value. Therefore, at the congress we should distinguish “this is our protocol” from “this is physiologically optimal,” unless additional validation data are available. **Status: ⚠️ [G1, G3, G4, G8].**
 
-### 47. Usate common reference, common average o bipolar derivations?
-**Risposta:** Non documentato per ACEP. Nei lavori storici l'ECoG di monitoraggio è descritto come **monopolar array referred to a mid-frontal electrode**. Non trasferire automaticamente questo schema all'ACEP. **Stato: ⚠️ [G4, G5].**
+### 21. Why do we stimulate at 1.1 Hz?
+**Answer:** Both ACEP abstracts use 1.1-Hz single-pulse stimulation, but the rationale is not explicitly stated. A low repetition rate is consistent with the need to separate individual evoked responses in time and minimize overlap between successive responses, but this is a general inference rather than a source-derived explanation. The protocol-specific reason should be confirmed with the team. **Status: ⚠️ [A1, A2].**
 
-### 48. Cosa significa nell'abstract “recorded unfiltered”?
-**Risposta:** Significa che non viene dichiarato un band-pass software applicato durante l'acquisizione e che il filtraggio 1–300 Hz è fatto in postprocessing. Non implica necessariamente assenza assoluta di filtri analogici/anti-aliasing hardware. **Stato: ✅/⚠️ [A2].**
+### 22. Is 1.1 Hz the programmed frequency or the frequency actually measured in the data?
+**Answer:** The abstract does not specify this. Technically, a nominal stimulator setting and the interstimulus intervals observed from recorded triggers are not necessarily identical. For high-confidence latency and trial-level analyses, the actual event timing should be verified from the raw acquisition rather than assumed from the nominal setting. **Status: ⚠️.**
 
-### 49. È veramente privo di filtri o esistono filtri hardware?
-**Risposta:** Non sappiamo ancora quali filtri analogici, anti-aliasing o limiti di banda siano incorporati nell'amplificatore. Va verificato nel manuale/setup. **Stato: ⚠️.**
+### 23. Why use single pulses instead of a train of stimuli?
+**Answer:** The iVSAT behavioral mapping protocol uses a 60-Hz train to transiently interfere with ongoing function, whereas the ACEP protocol uses isolated single pulses to generate discrete responses that can be temporally aligned, averaged, and characterized. These are different experimental goals: functional disruption versus evoked-response measurement. The precise cellular reasons for these differences belong to general stimulation physiology. **Status: ✅ for the protocol distinction [A2, G1], 📚 for the full mechanism.**
 
-### 50. Qual è il range dinamico dell'amplificatore?
-**Risposta:** Non documentato. È importante per capire se lo stimulation artifact possa saturare l'ingresso. **Stato: ⚠️.**
+### 24. Why do we start at 20 mA and progressively decrease the current?
+**Answer:** The protocol explicitly states that ACEP stimulation starts at 20 mA and is reduced until the response threshold is reached. Operationally, this allows the team to first establish that an evoked response can be obtained and then identify the lowest current at which it remains reproducible. The abstract, however, does not formally define the thresholding algorithm, so this rationale should be presented as an interpretation until confirmed. **Status: ⚠️ [A2].**
 
-### 51. Quanto rapidamente recupera l'amplificatore dopo lo stimulation artifact?
-**Risposta:** Non documentato. Questa informazione è critica soprattutto per interpretare P0/N0 entro 15 ms. **Stato: ⚠️.**
+### 25. In what current steps do we decrease stimulation?
+**Answer:** The ACEP abstract does not report the step size. In a previous subcortical manipulation-mapping study, LF-DES threshold was reassessed in **0.5-mA steps**, but we should not import that value into the ACEP protocol without direct confirmation. This needs to be recovered from the operating protocol or raw stimulation log. **Status: ⚠️ [G2].**
 
----
+### 26. How exactly do we define the ACEP response threshold?
+**Answer:** We know that the observed ACEP threshold in our cohort is **2–5 mA**, but the operational criterion is still undocumented in the material we have reviewed. We need to know whether threshold means the lowest current producing a reproducible waveform across a predefined number of trials, whether an amplitude or SNR criterion is used, and whether all contacts must meet the same rule. Without that definition, “threshold” is not fully reproducible. **Status: ⚠️ [PROTO].**
 
-## D. Sincronizzazione stimolatore–ECoG
+### 27. How many trials must show a response before we call it present?
+**Answer:** This is not specified for ACEP. In behavioral mapping studies from our group, a site is often considered eloquent when a reproducible error occurs in three non-consecutive stimulation trials, but that criterion cannot be transferred automatically to electrophysiological response detection. The ACEP-specific reproducibility rule must be verified. **Status: ⚠️ [G1, G6, G7].**
 
-### 52. Come viene sincronizzato lo stimolatore con l'ECoG?
-**Risposta:** Non documentato nei materiali disponibili. Dobbiamo identificare esattamente il percorso del trigger. **Stato: ⚠️.**
+### 28. How many pulses are acquired for each ACEP condition?
+**Answer:** The abstract does not report the number of single-pulse trials contributing to each average. This number directly affects SNR, precision of latency and amplitude estimates, and the ability to assess trial-to-trial reliability. It should be extracted from the protocol or from the raw files before the congress. **Status: ⚠️.**
 
-### 53. Esiste un TTL hardware?
-**Risposta:** Non documentato. Verificare cablaggio e canali di acquisizione. **Stato: ⚠️.**
+### 29. How much time separates different stimulation conditions or series?
+**Answer:** This is not documented for the ACEP protocol. Previous behavioral DES paradigms often leave several seconds between stimulation epochs to reduce carry-over or “dragging” effects, but ACEP single-pulse acquisition has a different temporal structure. The actual transition timing between current levels and sites should therefore be checked directly. **Status: ⚠️ [G3, G7, G9].**
 
-### 54. Oppure il marker viene generato via software?
-**Risposta:** Non documentato. Va distinto da un trigger hardware perché può avere latenza/jitter differenti. **Stato: ⚠️.**
+### 30. What is the charge per phase of our stimulus?
+**Answer:** Charge per phase is calculated as \(Q=I\times t\), but only after clarifying whether 0.5 ms refers to each phase. If it is 0.5 ms per phase, a 2–5 mA threshold corresponds to approximately **1–2.5 µC per phase**, while 20 mA corresponds to **10 µC per phase**. If 0.5 ms refers to the total biphasic duration, those numbers would be different. **Status: ⚠️ [PROTO, A2].**
 
-### 55. Come definite precisamente \(t=0\)?
-**Risposta:** Non documentato. Idealmente \(t=0\) deve corrispondere al sample associato all'impulso effettivamente erogato, non solo al comando software. **Stato: ⚠️.**
+### 31. What is the charge density at the electrode–tissue interface?
+**Answer:** We cannot calculate charge density until we know the effective electrode contact area and the exact charge per phase. Charge density is charge divided by the geometric or effective electrode area, so probe geometry is essential. This is therefore a setup-dependent quantity, not something that can be inferred from current alone. **Status: ⚠️.**
 
-### 56. Qual è il jitter temporale del trigger?
-**Risposta:** Non documentato. Va misurato o ricavato dalle specifiche se le latenze vengono interpretate nell'ordine dei millisecondi. **Stato: ⚠️.**
+### 32. Why does the same current not necessarily recruit the same neural population at two different sites?
+**Answer:** Equal current does not imply equal electric field distribution or equal axonal recruitment. Local tissue geometry, distance from the probe, fiber orientation, white-matter architecture, and conductivity can all differ between sites. Our group literature already acknowledges current spread and anatomical variability as relevant limitations of DES, while the full biophysical explanation comes from general stimulation physiology. **Status: ✅ for the general limitation [G1], 📚 for complete biophysics.**
 
-### 57. Il trigger rappresenta il comando o l'impulso effettivamente erogato?
-**Risposta:** Non documentato. È una distinzione fondamentale per la misura della latenza. **Stato: ⚠️.**
+### 33. Why does the same charge not necessarily produce the same physiological effect?
+**Answer:** Charge is only one descriptor of a stimulus. Different combinations of current amplitude and pulse duration can deliver the same charge but interact differently with membrane time constants and excitation thresholds. Therefore, equal charge does not guarantee equal neural recruitment, equal focality, or equal physiological effect. **Status: 📚.**
 
-### 58. Stimolatore ed ECoG condividono lo stesso clock?
-**Risposta:** Non documentato. **Stato: ⚠️.**
+### 34. How do axon diameter, myelination, and orientation affect stimulation threshold?
+**Answer:** These factors influence how an axon responds to an externally applied electric field. Larger, myelinated fibers are often more excitable under many stimulation conditions, while orientation relative to the field and proximity to strong spatial field gradients can substantially modify threshold. This topic is not developed in the group papers and requires dedicated neurostimulation literature. **Status: 📚.**
 
-### 59. Può esserci drift tra i sistemi?
-**Risposta:** In linea teorica sì se usano clock indipendenti; non sappiamo se accada nel nostro setup. **Stato: ⚠️/📚.**
+### 35. What is the volume of tissue activated?
+**Answer:** The volume of tissue activated is the region in which the stimulation-induced electric field is sufficient to recruit neural elements under the specific stimulation conditions. It is not identical to the physical size of the electrode and cannot be defined solely by current amplitude. Electrode geometry, tissue conductivity, anisotropy, pulse parameters, and distance all contribute. **Status: 📚.**
 
-### 60. Potete associare ogni singolo impulso al relativo sample ECoG?
-**Risposta:** Questo deve diventare un requisito della pipeline. Non è documentato nell'abstract se l'associazione sia già ricostruita trial-by-trial. **Stato: ⚠️.**
-
----
-
-## E. Artefatto, preprocessing e qualità del segnale
-
-### 61. Come gestite lo stimulation artifact?
-**Risposta:** Non descritto nell'abstract. È uno dei punti tecnici più urgenti da chiarire. **Stato: ⚠️.**
-
-### 62. L'amplificatore va in saturazione?
-**Risposta:** Non documentato. Va verificato sui raw e nelle specifiche hardware. **Stato: ⚠️.**
-
-### 63. Quanti millisecondi dopo lo stimolo sono contaminati?
-**Risposta:** Non documentato. La finestra contaminata deve essere stabilita sui dati reali prima di interpretare P0/N0. **Stato: ⚠️.**
-
-### 64. Utilizzate blanking, interpolation, template subtraction o altro?
-**Risposta:** Non documentato. **Stato: ⚠️.**
-
-### 65. Come distinguete una P0/N0 precoce dall'artefatto residuo?
-**Risposta:** Il disegno fornisce indizi importanti: riproducibilità, latenza post-stimolo, presenza sui siti attention-positive, assenza sui siti negativi a corrente matched e attenuazione/assenza sul precentrale. Tuttavia serve conoscere anche la gestione tecnica dell'artefatto. **Stato: ✅/⚠️ [A2].**
-
-### 66. Il filtro può produrre ringing?
-**Risposta:** Sì, un transiente molto rapido può generare oscillazioni dovute alla risposta del filtro. Il corpus ACEP non descrive come questo rischio sia stato controllato. **Stato: 📚/⚠️.**
-
-### 67. Un filtro può generare attività apparente prima o subito dopo lo stimolo?
-**Risposta:** Sì, soprattutto con filtri non causali/zero-phase, che possono distribuire temporalmente l'effetto del transiente. Serve conoscere il filtro effettivamente usato. **Stato: 📚/⚠️.**
-
-### 68. Perché avete scelto 1–300 Hz?
-**Risposta:** L'abstract riporta il band-pass 1–300 Hz ma non ne fornisce il razionale. **Stato: ⚠️ [A2].**
-
-### 69. Quale tipo di filtro avete usato: FIR o IIR?
-**Risposta:** Non documentato. **Stato: ⚠️.**
-
-### 70. Quale ordine/transition bandwidth?
-**Risposta:** Non documentato. **Stato: ⚠️.**
-
-### 71. Il filtro è causale o zero-phase?
-**Risposta:** Non documentato. È cruciale se si interpretano latenze precoci. **Stato: ⚠️.**
-
-### 72. Fate baseline correction?
-**Risposta:** Non documentato. **Stato: ⚠️.**
-
-### 73. Qual è la finestra temporale delle epoche?
-**Risposta:** Non documentato. **Stato: ⚠️.**
-
-### 74. Come eliminate trial rumorosi/patologici?
-**Risposta:** Non documentato. Va esplicitato criterio per artefatti, saturazione, movimenti ed eventuali scariche epilettiformi. **Stato: ⚠️.**
-
-### 75. Guardate anche i single trials o solo l'average?
-**Risposta:** L'abstract parla di risposte riproducibili ma non chiarisce come sia valutata la riproducibilità trial-to-trial. Per una discussione tecnica solida dobbiamo poter mostrare/valutare anche i singoli trial. **Stato: ⚠️ [A2].**
-
-### 76. Quanto migliora il SNR con l'averaging?
-**Risposta:** Se il rumore è indipendente e non time-locked, l'errore casuale tende a ridursi approssimativamente con \(1/\sqrt{N}\). La validità di questa approssimazione dipende dalle proprietà reali del rumore. **Stato: 📚.**
+### 36. What determines the focality of stimulation?
+**Answer:** Focality depends on electrode geometry, inter-contact distance, current amplitude, pulse parameters, tissue conductivity, and the spatial organization of nearby fibers. Our group describes bipolar stimulation as relatively focal, but “focal” should not be interpreted as activating only one tract or one microscopic region. Current spread remains a relevant limitation. **Status: ✅/📚 [G4, G5].**
 
 ---
 
-## F. Componenti P0/N0, P1/N1 e misure quantitative
+## C. ECoG recording system
 
-### 77. Come definite P0/N0 e P1/N1?
-**Risposta:** Nel nostro abstract P0/N0 è la componente precoce entro **15 ms** e P1/N1 la successiva entro **50 ms**; il segno P/N indica la polarità osservata. Il criterio algoritmico esatto di identificazione del peak non è descritto. **Stato: ✅/⚠️ [A2].**
+### 37. Which system do we use to record ACEP ECoG?
+**Answer:** The ACEP abstract does not specify the acquisition system. Historical work from our group reports **Comet/Grass** systems for intraoperative ECoG, whereas ISIS/Inomed systems were used for EMG/MEP monitoring. We must verify the exact hardware used for ACEP because amplifier characteristics directly affect artifact handling and early-latency interpretation. **Status: ⚠️ [G4, G5].**
 
-### 78. Cosa significa P rispetto a N?
-**Risposta:** Indica una deflessione positiva o negativa rispetto al riferimento e alla convenzione di plotting. Non equivale automaticamente a eccitazione/inibizione. **Stato: 📚.**
+### 38. What is the ACEP sampling rate?
+**Answer:** It is not reported in the abstract or the material reviewed so far. This is a high-priority technical detail because sampling rate determines temporal resolution and constrains the precision with which components occurring within the first 15 ms can be measured. It should be obtained directly from the raw-data header or acquisition software. **Status: ⚠️.**
 
-### 79. La polarità ha un significato fisiologico semplice?
-**Risposta:** No. Dipende da geometria delle sorgenti, orientamento, reference e posizione degli elettrodi. **Stato: 📚.**
+### 39. What is the corresponding temporal resolution?
+**Answer:** Temporal resolution per sample is \(1/F_s\), where \(F_s\) is the sampling frequency. For example, 1 kHz corresponds to 1 ms per sample and 5 kHz to 0.2 ms per sample. We cannot give the value for our ACEP data until the actual sampling rate is verified. **Status: ⚠️.**
 
-### 80. Il peak viene identificato automaticamente o manualmente?
-**Risposta:** Non documentato. **Stato: ⚠️.**
+### 40. What is the Nyquist frequency?
+**Answer:** The Nyquist frequency is half the sampling rate, \(F_s/2\), and represents the highest frequency that can theoretically be represented without aliasing under appropriate anti-alias filtering. Because our sampling rate is currently unknown, the numerical Nyquist frequency is also unknown. **Status: ⚠️.**
 
-### 81. Misurate peak latency o onset latency?
-**Risposta:** L'abstract riporta finestre temporali delle componenti, ma non chiarisce se i valori siano onset o peak latency. **Stato: ⚠️.**
+### 41. What are the strip characteristics: number of contacts, contact diameter, and spacing?
+**Answer:** The ACEP abstract only states that a strip electrode was used. Historical studies from our group report 4–8 contact subdural strips for ECoG and 4/6-contact strips for MEP monitoring, but the ACEP strip model and geometry must be verified independently. These dimensions matter because they determine spatial sampling and influence recorded amplitude. **Status: ⚠️ [G4, G5, G8].**
 
-### 82. Come definite l'onset?
-**Risposta:** Non documentato. Deve essere formalizzato con una regola riproducibile se viene usato come outcome. **Stato: ⚠️.**
+### 42. Where exactly is the strip positioned in our study?
+**Answer:** The main recording strip is placed over the exposed **superior frontal gyrus**, corresponding to the **lateral pre-SMA** region. Additional recordings from the precentral gyrus serve as a cortical topographic control. This spatial arrangement is central to the interpretation of cortical specificity. **Status: ✅ [A2].**
 
-### 83. Come misurate l'ampiezza?
-**Risposta:** Non documentato se si usa peak, peak-to-peak o media su finestra. **Stato: ⚠️.**
+### 43. How is the lateral pre-SMA localized?
+**Answer:** The ACEP abstract does not describe the exact intraoperative localization procedure for the recording strip. [G1] identifies the relevant region around the SMA/pre-SMA transition using causal mapping and neuronavigation, but we still need the exact method used to position and document the ACEP strip. Ideally, we should know whether localization relies on anatomical landmarks, navigation coordinates, photographs, or a combination. **Status: ⚠️ [G1].**
 
-### 84. Qual è il SNR minimo per chiamare una risposta?
-**Risposta:** Non documentato. **Stato: ⚠️.**
+### 44. What reference is used for ACEP recording?
+**Answer:** This is not reported in the current ACEP material. It is essential because every recorded channel represents a voltage difference relative to the reference, so reference choice can alter apparent amplitude, polarity, and spatial distribution. This detail must be obtained from the acquisition montage. **Status: ⚠️.**
 
-### 85. Perché una componente entro 15 ms viene considerata “early”?
-**Risposta:** Perché emerge molto vicino allo stimolo e precede componenti successive entro 50 ms; questo è compatibile con una via di propagazione relativamente rapida. La latenza breve da sola non identifica il percorso. **Stato: ✅/📚 [A2].**
+### 45. Where is the ground electrode located?
+**Answer:** The ACEP ground location is not documented. Historical HF-DES protocols describe scalp or cranial reference/ground arrangements, but those circuits cannot be assumed to match the ACEP recording montage. We need the actual ACEP wiring diagram or acquisition notes. **Status: ⚠️ [G4, G8].**
 
-### 86. Cosa potrebbe produrre P0/N0?
-**Risposta:** L'ipotesi coerente con il paradigma è una risposta corticale precoce conseguente al reclutamento di fibre sottocorticali; il meccanismo preciso e il numero di sinapsi non sono dimostrati dall'abstract. **Stato: ⚠️ [A2].**
+### 46. Why can the reference change amplitude, polarity, and waveform morphology?
+**Answer:** A channel does not measure an absolute cortical voltage; it measures the difference between an active contact and a reference. If the reference itself contains physiological or artifactual activity, that activity is mathematically subtracted from every referenced channel. Changing the reference can therefore change waveform shape, size, and even apparent polarity without any change in the underlying neural generators. **Status: 📚.**
 
-### 87. Cosa potrebbe produrre P1/N1?
-**Risposta:** Potrebbe riflettere componenti corticali/network successive alla risposta precoce, ma questa interpretazione richiede letteratura e analisi fisiologica dedicate. **Stato: 📚.**
+### 47. Do we use a common reference, common average, or bipolar derivation?
+**Answer:** This has not yet been documented for ACEP. Historical ECoG monitoring in our group used a **monopolar array referenced to a mid-frontal electrode**, but ACEP may use a different montage or offline rereferencing. We should identify both the online reference and any offline rereferencing step. **Status: ⚠️ [G4, G5].**
 
-### 88. Possiamo ricavare la conduction velocity dalla latenza?
-**Risposta:** Non direttamente dalla sola latenza registrata. Servono almeno stima del path length e comprensione dei ritardi di attivazione/sinaptici. **Stato: 📚.**
+### 48. What does “recorded unfiltered” mean in the abstract?
+**Answer:** In the abstract, “unfiltered” means that the reported 1–300 Hz band-pass was applied during postprocessing rather than being the stated acquisition filter. It does not necessarily mean that the analog amplifier had infinite bandwidth or no anti-alias filter. Hardware systems almost always have physical frequency limits, which must be distinguished from offline digital filtering. **Status: ✅/⚠️ [A2].**
 
-### 89. Quali assunzioni servirebbero per stimare conduction velocity?
-**Risposta:** Distanza effettiva lungo il percorso, punto di origine dello spike, target corticale reale, eventuali sinapsi intermedie e accuratezza del timing. **Stato: 📚.**
+### 49. Was the signal truly acquired without filters, or are hardware filters present?
+**Answer:** We do not yet know. The acquisition system may include analog high-pass, low-pass, anti-alias, or protection circuitry even if no digital online band-pass was selected. This must be checked in the amplifier specifications and acquisition settings because hardware filtering cannot be undone offline. **Status: ⚠️.**
 
-### 90. Una maggiore ampiezza significa più fibre reclutate?
-**Risposta:** Non necessariamente. L'ampiezza dipende anche da sincronizzazione, geometria, riferimento, distanza e caratteristiche del target corticale. **Stato: 📚.**
+### 50. What is the amplifier dynamic range?
+**Answer:** It is not documented in the material reviewed. Dynamic range determines how large a voltage excursion can be recorded before clipping or saturation, which is especially important when the stimulation artifact is orders of magnitude larger than the physiological response. We should retrieve the amplifier model and technical specifications. **Status: ⚠️.**
 
-### 91. Perché “ampiezza = forza della connessione” è troppo semplice?
-**Risposta:** Perché l'ampiezza è un prodotto congiunto di stimolazione, recruitment, propagazione, sincronizzazione, volume conduction e montaggio di registrazione. **Stato: 📚.**
-
-### 92. Cosa può significare se aumentando la corrente diminuisce la latenza?
-**Risposta:** Può essere compatibile con recruitment più efficace/rapido o maggiore sincronizzazione, ma bisogna escludere bias di detection e artefatti. **Stato: 📚.**
-
-### 93. Cosa può significare se aumentando la corrente aumenta l'ampiezza?
-**Risposta:** È compatibile con maggiore recruitment della popolazione attivata, ma non è una relazione univoca e può saturare o essere confusa da geometria/artefatto. **Stato: 📚.**
-
-### 94. Cosa significa se cambia la morfologia della waveform?
-**Risposta:** Può indicare che cambiano le popolazioni reclutate, la sincronizzazione o i contributi corticali, ma può anche derivare da preprocessing o artefatti. **Stato: 📚.**
-
-### 95. Cosa significa maggiore temporal dispersion?
-**Risposta:** Arrivi meno sincroni della risposta possono allargare il potenziale; le cause possono includere differenze di velocità di conduzione, percorsi multipli o variabilità del recruitment. **Stato: 📚.**
+### 51. How quickly does the amplifier recover after the stimulation artifact?
+**Answer:** This is also unknown and is particularly important for interpreting P0/N0 components occurring within 15 ms. If the front-end amplifier saturates, the first milliseconds may reflect recovery behavior rather than neural activity. We therefore need either manufacturer specifications or direct inspection of the raw traces around the stimulus. **Status: ⚠️.**
 
 ---
 
-## G. iVSAT, mapping comportamentale e neuroanatomia
+## D. Stimulator–ECoG synchronization
 
-### 96. Come vengono identificati i siti attention-positive?
-**Risposta:** Durante iVSAT, la LF-DES viene applicata corticalmente e sottocorticalmente. Un sito è considerato positivo quando la stimolazione induce un errore riproducibile di omissione target. **Stato: ✅ [G1].**
+### 52. How is the stimulator synchronized with the ECoG recording system?
+**Answer:** The available material does not describe the synchronization chain. We need to know whether a hardware trigger, digital event line, or software event is recorded together with the ECoG. Without this information, the accuracy of latency measurements cannot be fully assessed. **Status: ⚠️.**
 
-### 97. Quale errore deve comparire perché il sito sia positivo?
-**Risposta:** Un target “H” viene omesso durante l'esplorazione della stringa di lettere. Per l'analisi neglect-like viene considerata anche la lateralizzazione spaziale dell'omissione. **Stato: ✅ [G1].**
+### 53. Is there a hardware TTL trigger?
+**Answer:** This has not yet been documented. A TTL trigger recorded directly by the acquisition system would provide a relatively precise event marker, but we must verify whether such a line exists in our setup. The raw file should be inspected for a dedicated stimulation/event channel. **Status: ⚠️.**
 
-### 98. Quante stimolazioni positive servono?
-**Risposta:** Nel protocollo iVSAT il sito è positivo quando l'errore si verifica in **tre trial di stimolazione non consecutivi**. **Stato: ✅ [G1].**
+### 54. Is the event marker generated in software instead?
+**Answer:** This is also unknown. Software markers can be useful, but their timing may include operating-system, communication, or software latency that differs from the actual electrical pulse. We therefore need to distinguish software command time from physical stimulus time. **Status: ⚠️.**
 
-### 99. Quale stimolazione viene usata durante iVSAT?
-**Risposta:** **LF-DES: biphasic square-wave pulses, pulse width 0,5 ms, 60 Hz, train 1–4 s, probe bipolare con 5 mm di distanza inter-tip.** La corrente è individualizzata. **Stato: ✅ [G1].**
+### 55. How do we define \(t=0\) precisely?
+**Answer:** Ideally, \(t=0\) should correspond to the sample marking the actual onset of the delivered electrical pulse, or to a hardware trigger whose latency relative to that pulse is known and stable. At present, the abstract does not specify how this is implemented. This is critical because all reported ACEP latencies are measured relative to this reference point. **Status: ⚠️.**
 
-### 100. Perché la DES iVSAT è diversa dalla stimolazione ACEP?
-**Risposta:** La DES iVSAT usa un train a 60 Hz per interferire transitoriamente con la funzione durante il task; l'ACEP usa single pulses a 1,1 Hz per evocare una risposta elettrofisiologica separabile temporalmente. **Stato: ✅ [A2, G1].**
+### 56. What is the temporal jitter of the trigger?
+**Answer:** The trigger jitter has not been quantified in the available material. If we interpret differences of only a few milliseconds, event timing must be stable enough that trigger variability is much smaller than the physiological effect of interest. This can be assessed from repeated trigger–artifact relationships in the raw data or from device specifications. **Status: ⚠️.**
 
-### 101. Come viene scelta la corrente della DES iVSAT?
-**Risposta:** È la più bassa corrente testata sulla corteccia premotoria ventrale che produce in modo consistente errori durante un task linguistico; la stessa corrente viene mantenuta per il successivo mapping iVSAT corticale e sottocorticale nel paziente. **Stato: ✅ [G1].**
+### 57. Does the trigger mark the stimulation command or the pulse actually delivered to tissue?
+**Answer:** This is not yet known. A command marker may precede the actual current pulse by a fixed or variable device latency, whereas a marker derived from the output stage may better represent true delivery time. The distinction directly affects physiological latency estimates. **Status: ⚠️.**
 
-### 102. Dove sono localizzati i siti attention-positive?
-**Risposta:** Nel lavoro [G1] i siti sono nella sostanza bianca sotto SFG, MFG e IFG; la probabilità più alta di errori neglect-like converge nella regione sotto la transizione **SMA/pre-SMA**, con coinvolgimento del mid-cingulate. **Stato: ✅ [G1].**
+### 58. Do the stimulator and ECoG system share the same clock?
+**Answer:** This is not documented. If they share a clock or the stimulator event is captured directly by the ECoG system, alignment may be straightforward; if they run on independent clocks, synchronization and drift become more important. We need the hardware architecture to answer this confidently. **Status: ⚠️.**
 
-### 103. Quali fasci potrebbero essere coinvolti?
-**Risposta:** [G1] mostra una rete strutturale frontale e connessioni associate ai siti eloquenti, ma l'abstract ACEP non identifica un unico fascio specifico come generatore della risposta. Va distinguere “regione di sostanza bianca stimolata” da “fascio dimostrato”. **Stato: ✅/⚠️ [G1, A2].**
+### 59. Can clock drift occur between the systems?
+**Answer:** In principle, yes, if independent clocks are used over sufficiently long recordings. Whether drift is relevant in our actual setup depends on how the trigger is recorded and whether the systems are synchronized. This is a theoretical possibility until the acquisition chain is known. **Status: ⚠️/📚.**
 
-### 104. Quanto possiamo identificare un fascio senza tractography?
-**Risposta:** Con neuronavigazione e anatomia possiamo localizzare il sito; senza tractography o altri dati convergenti è più prudente parlare di regione/percorso compatibile che assegnare la risposta a un singolo fascio. **Stato: ✅ come cautela metodologica [G1].**
-
-### 105. Perché registrate dal superior frontal gyrus/lateral pre-SMA?
-**Risposta:** Perché il lavoro causale del gruppo identifica la regione SFG/SMA-preSMA e la relativa sostanza bianca come nodo cruciale per errori attentivi neglect-like; l'ACEP testa se i siti sottocorticali iVSAT-positivi hanno una firma corticale su questa regione. **Stato: ✅ [G1, A2].**
-
-### 106. Qual è il ruolo della lateral pre-SMA nell'attenzione visuospaziale?
-**Risposta:** Nel dataset [G1], stimolazioni sotto SFG alla transizione SMA/pre-SMA sono associate con alta probabilità a errori contralesionali/neglect-like; lesione-symptom mapping e DES convergono sulla rilevanza causale di questa regione e connettività. **Stato: ✅ [G1].**
-
-### 107. Perché il nostro studio ACEP riguarda tumori frontali destri?
-**Risposta:** [G1] conferma la rilevanza particolare del network frontale destro per bias contralesionali: nella coorte prospettica, la DES destra produce omissioni iVSAT, mentre la stimolazione sinistra non produce omissioni selettive analoghe. **Stato: ✅ [G1].**
-
-### 108. Qual è la relazione fra neglect e network attentivo frontale?
-**Risposta:** [G1] integra lesion-symptom mapping, DES e tractography mostrando convergenza su una rete frontale destra, soprattutto dorsomediale, la cui lesione/stimolazione altera l'allocazione attentiva contralesionale. **Stato: ✅ [G1].**
-
-### 109. Come si collega il nostro risultato ai modelli DAN/VAN?
-**Risposta:** [G1] discute il modello classico VAN/DAN e mostra che territori frontali dorsomediali, spesso sottorappresentati negli studi stroke, hanno un ruolo causale. L'ACEP aggiunge una misura elettrofisiologica, ma non basta ancora per assegnare la risposta a DAN o VAN in modo esclusivo. **Stato: ✅/⚠️ [G1, A2].**
+### 60. Can we associate every single stimulus with the corresponding ECoG sample?
+**Answer:** This should be a core requirement of the analysis pipeline. For each trial, we ideally want the exact sample index of the stimulation event together with stimulus parameters and recording channels. The abstract does not tell us whether this trial-by-trial association has already been reconstructed, so it must be verified in the raw-data workflow. **Status: ⚠️.**
 
 ---
 
-## H. Controlli sperimentali e specificità
+## E. Stimulation artifact, preprocessing, and signal quality
 
-### 110. Perché i siti attention-negative sono un controllo importante?
-**Risposta:** Perché testano se la risposta corticale compaia genericamente stimolando qualunque sito vicino o sia associata ai siti funzionalmente identificati. Nel nostro abstract non emergono risposte riproducibili dai siti negativi. **Stato: ✅ [A2].**
+### 61. How is the stimulation artifact handled?
+**Answer:** The ACEP abstract does not describe an artifact-removal procedure. This is one of the most urgent technical gaps because the electrical artifact can be much larger than the physiological response and may contaminate the first milliseconds. We need the exact pipeline used before interpreting the early component. **Status: ⚠️.**
 
-### 111. Perché devono essere stimolati a corrente matched?
-**Risposta:** Per evitare che l'assenza di risposta dipenda semplicemente da una dose elettrica inferiore. Il nostro abstract specifica che i siti negativi sono stimolati a intensità matched. **Stato: ✅ [A2].**
+### 62. Does the amplifier saturate during stimulation?
+**Answer:** This has not yet been established. Saturation should be assessed directly in the raw data by looking for clipping, flat-topped waveforms, or prolonged recovery after the pulse. If saturation occurs, the earliest post-stimulus samples require particular caution. **Status: ⚠️.**
 
-### 112. Cosa esclude e cosa non esclude l'assenza di risposta nei siti negativi?
-**Risposta:** Riduce la probabilità che l'ACEP sia un effetto aspecifico della corrente o un artefatto identico in ogni sito. Non elimina differenze anatomiche, distanza, orientamento delle fibre o altre differenze locali. **Stato: ✅/📚 [A2].**
+### 63. How many milliseconds after the stimulus are contaminated by artifact?
+**Answer:** The contaminated window is not reported. It should be empirically defined from the raw signal and may depend on current intensity, pulse shape, electrode geometry, amplifier characteristics, and filtering. This is especially important because our P0/N0 component lies within the first 15 ms. **Status: ⚠️.**
 
-### 113. Perché registrare anche dal precentral gyrus?
-**Risposta:** È un controllo corticale di topografia: testa se la risposta sia diffusa su cortex vicino o preferenzialmente espressa nel target frontale superiore/lateral pre-SMA. **Stato: ✅ [A2].**
+### 64. Do we use blanking, interpolation, template subtraction, or another artifact-removal method?
+**Answer:** No specific method is documented in the abstract. We need to determine whether the artifact is simply excluded, replaced/interpolated, modeled and subtracted, or left in place with a protected analysis window. Each method can influence early waveform morphology differently. **Status: ⚠️.**
 
-### 114. Cosa significa che sul precentrale la risposta è assente o attenuata?
-**Risposta:** Supporta la specificità topografica della risposta verso il superior frontal gyrus rispetto a un'altra sede corticale. **Stato: ✅ [A2].**
+### 65. How do we distinguish an early P0/N0 from residual stimulation artifact?
+**Answer:** The study design provides several supportive features: the response is reproducible, follows functionally positive sites, is absent at matched-current negative sites, and is absent or markedly attenuated at a different cortical recording location. Those controls make a purely nonspecific artifact explanation less likely. However, they do not replace a direct characterization of amplifier recovery, raw artifact morphology, and filtering effects. **Status: ✅/⚠️ [A2].**
 
-### 115. Questo esclude completamente volume conduction?
-**Risposta:** No. Rafforza l'argomento contro un segnale puramente diffuso, ma una dimostrazione completa richiede considerare timing, geometria, reference, distanze e caratteristiche spaziali del segnale. **Stato: 📚.**
+### 66. Can filtering produce ringing?
+**Answer:** Yes. A sharp, high-amplitude stimulation transient contains broad-frequency energy, and band-pass filtering can transform that transient into oscillatory ringing that may resemble a physiological waveform. This is why the unfiltered/raw trace and the exact filter design are essential when interpreting early components. **Status: 📚/⚠️.**
 
-### 116. Come distingui volume conduction da propagazione fisiologica?
-**Risposta:** Si usa convergenza di evidenze: latenza non istantanea, riproducibilità, distribuzione topografica, controlli corticali/sottocorticali, comportamento al variare dello stimolo e analisi dell'artefatto. Il nostro abstract fornisce parte di questi controlli, non tutti. **Stato: ✅/📚 [A2].**
+### 67. Can a filter create apparent activity before or immediately after the stimulus?
+**Answer:** Yes, particularly with non-causal or zero-phase filters, because information can be distributed both forward and backward in time around a sharp transient. This may create pre-ringing or distort the apparent onset of an early component. Therefore, causal properties and impulse response of the filter must be known before making latency claims. **Status: 📚/⚠️.**
 
-### 117. Quali altri controlli rafforzerebbero il risultato?
-**Risposta:** Controlli distance-matched, analisi single-trial, caratterizzazione esplicita dello stimulation artifact, replicazione a differenti intensità, localizzazione anatomica precisa e, idealmente, convergenza con tractography. **Stato: 📚.**
+### 68. Why was a 1–300 Hz band-pass chosen?
+**Answer:** The abstract reports a 1–300 Hz offline band-pass but does not state the rationale. The range is broad enough to retain relatively fast evoked transients while removing very slow drift and high-frequency noise, but that explanation is general rather than source-derived. We should verify whether this range was chosen empirically, historically, or based on prior ACEP/CCEP literature. **Status: ⚠️ [A2].**
 
-### 118. La distanza tra stimolazione e contatti può spiegare differenze?
-**Risposta:** Sì, è un potenziale confondente geometrico e va registrato/controllato. **Stato: 📚.**
+### 69. What type of filter is used: FIR or IIR?
+**Answer:** This is not documented. FIR and IIR filters differ in phase behavior, impulse response, transition characteristics, and susceptibility to ringing. Because the stimulation artifact is a strong transient, the exact filter family is not a trivial implementation detail. **Status: ⚠️.**
 
-### 119. L'impedenza può spiegare differenze di ampiezza?
-**Risposta:** Può contribuire alla qualità e ampiezza del segnale registrato; vanno documentate le condizioni dei contatti. **Stato: 📚/⚠️.**
+### 70. What filter order or transition bandwidth is used?
+**Answer:** This is not reported. Filter order and transition bandwidth determine how sharply frequencies are attenuated and how long the filter impulse response extends in time. Those properties can materially affect the shape of an evoked potential close to a stimulation artifact. **Status: ⚠️.**
 
-### 120. Il brain shift può influenzare la localizzazione?
-**Risposta:** Sì. [G1] registra i siti con neuronavigazione alla fine del mapping sottocorticale **prima del tumour debulking** per ridurre l'impatto dello shift e usa video/anatomia per conferma. Per ACEP va verificato il timing esatto della registrazione. **Stato: ✅/⚠️ [G1].**
+### 71. Is the filter causal or zero-phase?
+**Answer:** This is currently unknown. A causal filter preserves temporal direction but can introduce phase delay, whereas zero-phase filtering avoids net phase shift at the cost of using future samples and potentially producing pre-ringing. For early-latency ACEPs, this distinction must be explicitly known. **Status: ⚠️.**
 
----
+### 72. Do we perform baseline correction?
+**Answer:** The abstract does not say whether each epoch is baseline-corrected. If baseline correction is used, we need the exact pre-stimulus interval and confirmation that it is free of contamination from preceding stimuli or drift. Baseline choice can influence measured amplitude, especially for slow components. **Status: ⚠️.**
 
-## I. Resezione, disconnessione e integrità del circuito
+### 73. What is the epoch time window?
+**Answer:** It is not reported. We need to know the pre-stimulus and post-stimulus duration used for each trial, both to assess baseline quality and to determine whether later responses or filter edge effects are included. The epoch should be long enough to characterize the response without overlapping adjacent stimuli. **Status: ⚠️.**
 
-### 121. Quando registrate ACEP rispetto alla resezione?
-**Risposta:** Non è specificato nell'abstract ACEP con sufficiente precisione. Va definito se la misura avviene prima, durante o dopo una specifica fase di disconnessione. **Stato: ⚠️.**
+### 74. How are noisy or pathological trials rejected?
+**Answer:** No rejection criteria are described in the abstract. We should know whether trials are excluded for amplifier saturation, movement, epileptiform discharges, excessive baseline noise, channel malfunction, or other predefined criteria. A reproducible pipeline should distinguish automated rejection rules from manual inspection. **Status: ⚠️.**
 
-### 122. Il sito stimolato è intatto, parzialmente disconnesso o isolato?
-**Risposta:** Non documentato per ciascuna registrazione ACEP. È un'informazione necessaria per interpretare la risposta fisiologica. **Stato: ⚠️.**
+### 75. Do we inspect single trials or only the averaged waveform?
+**Answer:** The abstract describes reproducible responses but does not specify how trial-level reproducibility is assessed. For technical credibility, we should be able to show that the average is supported by consistent single-trial responses rather than a few outliers. Single-trial inspection is also essential for measuring latency jitter and response probability. **Status: ⚠️ [A2].**
 
-### 123. Cosa accade all'eccitabilità di un assone subito dopo la disconnessione?
-**Risposta:** Il corpus del gruppo fornito non affronta direttamente questo punto neurofisiologico. **Stato: 📚.**
-
-### 124. Cos'è la degenerazione walleriana e su quale scala temporale avviene?
-**Risposta:** Tema non trattato direttamente nei lavori forniti; va studiato con letteratura neurobiologica specifica. **Stato: 📚.**
-
-### 125. Una fibra disconnessa può essere ancora elettricamente eccitabile?
-**Risposta:** È possibile che eccitabilità elettrica e integrità funzionale del circuito non coincidano immediatamente; la dinamica precisa va documentata con letteratura specifica. **Stato: 📚.**
-
-### 126. Una risposta post-resection dimostra un circuito fisiologicamente integro?
-**Risposta:** No, non necessariamente. Una risposta evocabile dimostra eccitabilità/propagazione sufficiente a generare un segnale, non automaticamente un circuito fisiologico normale e funzionalmente integro. **Stato: 📚.**
-
-### 127. Come distinguere “fibre eccitabili” da “network funzionale”?
-**Risposta:** Serve convergenza con comportamento, anatomia, stato della resezione, eventuali outcome e altre misure funzionali; il solo evoked potential non basta. **Stato: 📚.**
+### 76. How does averaging improve signal-to-noise ratio?
+**Answer:** If the physiological response is time-locked and the background noise is independent across trials, averaging preserves the evoked component while random noise tends to cancel. Under ideal assumptions, random noise decreases approximately with \(1/\sqrt{N}\). Real ECoG noise is not perfectly independent, so the empirical SNR gain should still be evaluated. **Status: 📚.**
 
 ---
 
-## J. Statistica, struttura dei dati e dose-response
+## F. P0/N0, P1/N1, and quantitative features
 
-### 128. Perché 20 pazienti non diventano migliaia di osservazioni indipendenti?
-**Risposta:** Perché trial e siti sono annidati negli stessi pazienti e condividono molte fonti di variabilità. L'unità di informazione non coincide con il numero totale di impulsi. **Stato: 📚.**
+### 77. How do we define P0/N0 and P1/N1?
+**Answer:** In our abstract, P0/N0 refers to an early component occurring within **15 ms**, whereas P1/N1 refers to a subsequent component within **50 ms**. P and N describe observed polarity. What remains unknown is the exact algorithm or visual rule used to identify each peak and how ambiguous or multi-peaked responses are handled. **Status: ✅/⚠️ [A2].**
 
-### 129. Perché i trial dello stesso paziente non sono indipendenti?
-**Risposta:** Condividono anatomia, hardware, riferimento, stato fisiologico, anestesia, sito e molte altre caratteristiche. **Stato: 📚.**
+### 78. What do P and N mean?
+**Answer:** P denotes a positive-going deflection and N a negative-going deflection relative to the chosen reference and plotting convention. These labels are descriptive and should not be equated directly with neuronal excitation or inhibition. The same underlying generator can appear with different polarity under a different montage. **Status: 📚.**
 
-### 130. Qual è l'unità statistica corretta: trial, sito o paziente?
-**Risposta:** Dipende dall'ipotesi, ma trial e siti devono essere trattati come livelli gerarchici e non come repliche indipendenti del paziente. **Stato: 📚.**
+### 79. Does waveform polarity have a simple physiological meaning?
+**Answer:** No. Polarity reflects the spatial orientation of current sources and sinks, cortical geometry, electrode position, and the reference montage. Therefore, a positive versus negative deflection is not a direct readout of excitatory versus inhibitory physiology. Interpretation should focus on reproducibility, timing, topography, and context rather than sign alone. **Status: 📚.**
 
-### 131. Come gestire molti trial per sito e molti siti per paziente?
-**Risposta:** Con modelli gerarchici/mixed-effects o strategie equivalenti che rappresentino dipendenze entro sito e paziente. **Stato: 📚.**
+### 80. Are peaks identified automatically or manually?
+**Answer:** This is not specified. We need to know whether peak detection uses a predefined algorithm, a time window with maximum/minimum search, manual marking, or a hybrid approach. This matters for reproducibility and for understanding potential observer bias. **Status: ⚠️.**
 
-### 132. Come confrontereste threshold, latency e amplitude?
-**Risposta:** Definendo outcome a priori e usando modelli coerenti con la distribuzione e la struttura gerarchica dei dati; per esempio effetti fissi della dose e random effects di paziente/sito. **Stato: 📚.**
+### 81. Do we measure peak latency or onset latency?
+**Answer:** The abstract reports temporal windows for the components but does not make clear whether the reported values represent peak timing, onset timing, or simply categorical windows. Peak and onset latency answer different physiological questions and require different detection rules. We should clarify which metric is actually used in the analysis. **Status: ⚠️.**
 
-### 133. Come costruireste una dose-response curve?
-**Risposta:** Per ogni combinazione sito/condizione si associano corrente, pulse width o carica con probabilità di risposta, ampiezza, latenza e/o morfologia, modellando la dipendenza intra-soggetto. **Stato: 📚.**
+### 82. How do we define response onset?
+**Answer:** No operational definition is currently documented. A robust onset measure should use a reproducible criterion, for example deviation from baseline beyond a statistical or amplitude threshold for a minimum duration. Whatever rule is used must also be robust to residual stimulation artifact. **Status: ⚠️.**
 
-### 134. Quali covariate tecniche andrebbero controllate?
-**Risposta:** Corrente, pulse width, numero di trial, posizione/contatto, reference, impedenza, distanza, ordine temporale, qualità del segnale e artifact burden. **Stato: 📚.**
+### 83. How is ACEP amplitude measured?
+**Answer:** The material reviewed does not state whether amplitude is defined as absolute peak, peak-to-peak, mean amplitude in a window, or another feature. This needs to be standardized because different definitions can produce different dose-response relationships. The reference montage must also be reported alongside amplitude measurements. **Status: ⚠️.**
 
-### 135. Quali covariate anatomiche andrebbero controllate?
-**Risposta:** Sito di stimolazione, target corticale, distanza, pathway plausibile, rapporto con tumore/edema/resezione e possibile brain shift. **Stato: 📚.**
+### 84. What SNR threshold is required to call a response present?
+**Answer:** No explicit SNR criterion is reported. If response presence is based on reproducibility rather than an SNR threshold, that rule should be stated clearly. Ideally, detection should be defined prospectively so that response/no-response classification is not subjective. **Status: ⚠️.**
 
-### 136. Come quantificare trial-to-trial variability?
-**Risposta:** Distribuzione di ampiezze e latenze, varianza/SD, jitter, probabilità di risposta, coefficienti di reliability e SNR, oltre all'ispezione dei singoli trial. **Stato: 📚.**
+### 85. Why is a component within 15 ms considered “early”?
+**Answer:** It occurs very close to the stimulation event and precedes the later component observed within 50 ms. Such a short delay is compatible with relatively rapid propagation from the stimulated white matter to the cortical recording site. However, “early” is a temporal description and does not by itself prove a single direct anatomical pathway. **Status: ✅/📚 [A2].**
 
-### 137. Come distinguere un effetto paziente da un effetto stimolazione?
-**Risposta:** Con una struttura statistica che includa il paziente come livello gerarchico/random effect e le caratteristiche dello stimolo come predittori. **Stato: 📚.**
+### 86. What could generate P0/N0?
+**Answer:** Within the proposed ACEP framework, P0/N0 is consistent with an early cortical response following electrically induced propagation along subcortical axons. However, the exact generator, number of synapses, and contribution of local field effects are not established by the abstract alone. Technical exclusion of stimulation artifact is also essential before assigning a physiological interpretation. **Status: ⚠️ [A2].**
 
----
+### 87. What could generate P1/N1?
+**Answer:** The later P1/N1 component may reflect subsequent cortical or network processing after the initial response, potentially including polysynaptic activity or local cortical dynamics. This interpretation is plausible but is not directly established by the current abstract. Dedicated ACEP/CCEP physiology literature is required for a stronger mechanistic claim. **Status: 📚.**
 
-## K. Critica, inferenza e domande difficili da congresso
+### 88. Can we calculate conduction velocity from the measured latency?
+**Answer:** Not directly from latency alone. Conduction velocity requires a meaningful estimate of path length and must account for stimulation-to-axon activation delay, synaptic delay if present, and cortical response-generation time. Without those assumptions, dividing distance by total latency would over-simplify the physiology. **Status: 📚.**
 
-### 138. Qual è il principale limite della nostra interpretazione?
-**Risposta:** L'ACEP supporta una relazione funzionale/eletrofisiologica tra sito sottocorticale e cortex, ma l'attribuzione a una connessione “diretta” specifica richiede cautela. Inoltre la coorte è awake e l'applicabilità asleep è ancora prospettica. **Stato: ✅ [A2].**
+### 89. What assumptions are required to estimate conduction velocity?
+**Answer:** We would need the effective path length actually followed by the activated fibers, the location where the action potential is initiated, the true cortical target, the number of synaptic relays, and accurate stimulus timing. Each uncertainty propagates into the velocity estimate. Therefore, any value should be framed as an approximation rather than a direct measurement unless the pathway is very well constrained. **Status: 📚.**
 
-### 139. Quanto possiamo usare la parola “direct connectivity”?
-**Risposta:** L'abstract conclude che gli ACEP **may identify direct** connectivity. Conviene mantenere questa formulazione probabilistica e non trasformarla in una dimostrazione anatomica definitiva. **Stato: ✅ [A2].**
+### 90. Does a larger ACEP amplitude mean that more fibers were recruited?
+**Answer:** It may be compatible with greater recruitment, but amplitude is not a direct fiber count. It is also influenced by synchrony, cortical generator geometry, distance from the recording contact, reference montage, impedance, and noise. A larger waveform should therefore be interpreted as a larger recorded field potential, not automatically as a larger number of activated axons. **Status: 📚.**
 
-### 140. La breve latenza è sufficiente per dire “direct”?
-**Risposta:** No. È un elemento compatibile, non una prova autonoma. **Stato: 📚.**
+### 91. Why is “amplitude equals connection strength” too simplistic?
+**Answer:** Recorded amplitude is the end product of several stages: electrical recruitment, axonal propagation, temporal synchrony, cortical response generation, volume conduction, and recording montage. Any of these can alter amplitude without changing the underlying anatomical connection. ACEP amplitude is therefore a physiological measurement influenced by connectivity, not a direct scalar measure of structural connection strength. **Status: 📚.**
 
-### 141. Potrebbero esserci sinapsi intermedie?
-**Risposta:** Sì, non sono escluse dal solo dato di latenza. **Stato: 📚.**
+### 92. What might it mean if latency decreases as current increases?
+**Answer:** A shorter latency could reflect more effective recruitment of rapidly conducting fibers, more synchronized activation, or improved detectability of the early component. It could also arise from thresholding bias or changes in artifact morphology. The interpretation therefore requires trial-level data and consistent latency detection. **Status: 📚.**
 
-### 142. Potrebbe essere coinvolto più di un fascio?
-**Risposta:** Sì. Il sito di stimolazione è una regione di sostanza bianca e il current spread può reclutare più popolazioni; l'identificazione di un singolo fascio richiede evidenza anatomica convergente. **Stato: ✅/📚 [G1].**
+### 93. What might it mean if amplitude increases as current increases?
+**Answer:** This pattern would be compatible with recruitment of a larger or more synchronized neural population and would fit a dose-response relationship. However, amplitude can eventually saturate and may also be affected by current-dependent artifact, amplifier behavior, or changing spatial spread. The physiological interpretation should therefore be supported by controls and raw data. **Status: 📚.**
 
-### 143. Il tumore può alterare connettività ed eccitabilità?
-**Risposta:** Il gruppo documenta che i tumori distorcono l'anatomia e usa tractography patient-specific per tenerne conto; l'effetto specifico su eccitabilità ACEP va studiato separatamente. **Stato: ✅/📚 [G2, G1].**
+### 94. What does a change in waveform morphology mean?
+**Answer:** A change in shape may indicate recruitment of additional neural populations, altered synchrony, multiple propagation routes, or different cortical generators. It can also be produced artificially by changes in stimulation artifact, filtering, reference, or SNR. Morphological differences should therefore be interpreted only after the signal-processing pipeline is stable and validated. **Status: 📚.**
 
-### 144. Edema e infiltrazione possono modificare current spread?
-**Risposta:** È biologicamente plausibile, ma non è quantificato nei materiali forniti per il nostro ACEP. **Stato: 📚.**
-
-### 145. Il brain shift può alterare l'interpretazione anatomica?
-**Risposta:** Sì. Per questo [G1] registra coordinate dei siti prima del debulking e verifica localizzazione con anatomia/video. Il nostro protocollo ACEP deve documentare un'analoga strategia. **Stato: ✅/⚠️ [G1].**
-
-### 146. Il campione permette di generalizzare all'asleep surgery?
-**Risposta:** No. Lo studio attuale è in awake surgery; l'asleep è una potenziale applicazione futura. **Stato: ✅ [A2].**
-
-### 147. Perché serve validazione ulteriore?
-**Risposta:** Per verificare replicabilità, standardizzazione, relazione anatomica e utilità clinica in coorti più ampie e durante asleep surgery. È esplicitamente indicato nelle conclusioni degli abstract. **Stato: ✅ [A1, A2].**
-
-### 148. Qual è l'esperimento successivo ideale?
-**Risposta:** Una validazione prospettica più ampia, con protocollo tecnico standardizzato, definizione quantitativa della response threshold, controllo dell'artefatto, single-trial analysis, localizzazione anatomica/tractography e acquisizione durante asleep surgery. **Stato: ✅ per la direzione clinica [A1, A2]; parte metodologica da progettare.**
+### 95. What does greater temporal dispersion mean?
+**Answer:** Greater temporal dispersion means that contributing neural events reach the recording site less synchronously, producing a broader or less sharply defined waveform. Possible causes include heterogeneous conduction velocities, multiple pathways, variable recruitment, or synaptic/network processing. Technical timing jitter must also be excluded before attributing dispersion to physiology. **Status: 📚.**
 
 ---
 
-# Informazioni tecniche già ricavate dal corpus del gruppo
+## G. iVSAT, behavioral mapping, and neuroanatomy
 
-## Mapping iVSAT attuale
-Da [G1]:
+### 96. How are attention-positive sites identified?
+**Answer:** During the iVSAT, low-frequency direct electrical stimulation is applied during cortical and subcortical mapping. A site is considered functionally positive when stimulation reproducibly induces a target-omission error. These behaviorally defined sites are then used as the subcortical targets for the ACEP experiment. **Status: ✅ [G1].**
 
-- LF-DES con **biphasic square-wave pulses**;
-- pulse width **0,5 ms**;
-- frequenza **60 Hz**;
-- train **1–4 s**;
-- probe **bipolare**, distanza inter-tip **5 mm**;
-- corrente individualizzata sulla soglia più bassa che produce errori durante il mapping linguistico sulla corteccia premotoria ventrale;
-- stessa corrente mantenuta durante mapping corticale e sottocorticale iVSAT;
-- sito positivo: errore in **3 trial non consecutivi**;
-- siti controllati anche con naming e praxis;
-- coordinate registrate con **Curve, Brainlab** prima del tumour debulking;
-- siti modellati come ROI sferiche di **5 mm** considerando la risoluzione del probe.
+### 97. What kind of error makes a site attention-positive?
+**Answer:** During iVSAT, the patient searches a letter string for the target “H”. A stimulation-induced omission of the target is the relevant behavioral error, and the spatial side of the omission is used to characterize neglect-like lateralized effects. This provides a direct behavioral criterion for classifying a stimulation site. **Status: ✅ [G1].**
 
-## Standard LF-DES storico del gruppo
-Da [G3, G4, G5]:
+### 98. How many positive stimulations are required to define a site as positive?
+**Answer:** In the iVSAT protocol, a site is classified as positive when the error occurs in **three non-consecutive stimulation trials**. Using non-consecutive trials reduces the likelihood that the result reflects a transient fluctuation or systematic sequence effect. This is a behavioral mapping criterion, not an ACEP response-detection criterion. **Status: ✅ [G1].**
 
-- stimolatore **OSIRIS-NeuroStimulator, Inomed**, integrato nel sistema **ISIS**;
-- constant-current;
-- probe bipolare con **2 ball tips da 2 mm**, separazione **5 mm**;
-- biphasic square wave;
-- **0,5 ms per fase**;
-- **60 Hz**, ISI 16,6 ms;
-- train tipicamente **2–5 s**;
-- range di intensità frequentemente **2–6 mA**.
+### 99. What stimulation protocol is used during iVSAT?
+**Answer:** The iVSAT protocol uses **low-frequency DES with biphasic square-wave pulses, 0.5-ms pulse width, 60 Hz, trains lasting 1–4 seconds, and a bipolar probe with 5-mm inter-tip spacing**. Stimulation current is individualized for each patient. This train-based protocol is designed for transient functional interference rather than evoked-potential acquisition. **Status: ✅ [G1].**
 
-**Nota critica:** questi dettagli descrivono LF-DES storica e non devono essere attribuiti automaticamente al single-pulse ACEP finché non verificati.
+### 100. Why is iVSAT DES different from ACEP stimulation?
+**Answer:** iVSAT DES uses a 60-Hz train delivered during task performance to transiently disrupt the function of a cortical or subcortical site. ACEP stimulation uses isolated pulses at 1.1 Hz so that each stimulus can be aligned with a distinct cortical response. The two protocols therefore answer different questions: “does disrupting this site alter behavior?” versus “what cortical response follows stimulation of this site?” **Status: ✅ [A2, G1].**
 
-## ECoG di monitoraggio storico
-Da [G4, G5]:
+### 101. How is the stimulation current chosen for iVSAT DES?
+**Answer:** In [G1], the current is individualized using the lowest current tested over ventral premotor cortex that consistently produces errors during language mapping. That same current is then maintained for subsequent cortical and subcortical iVSAT mapping within the patient. This approach standardizes mapping intensity within each case while respecting inter-individual variability. **Status: ✅ [G1].**
 
-- sistemi riportati: **Comet / Grass**;
-- strip subdurale **4–8 contatti**;
-- array monopolare riferito a elettrodo mid-frontal;
-- band-pass **1–100 Hz** per il monitoraggio ECoG;
-- scopo principale: attività basale, after-discharges e seizures.
+### 102. Where are the attention-positive sites located?
+**Answer:** In [G1], positive sites are found in frontal white matter beneath the superior, middle, and inferior frontal gyri. The highest probability of neglect-like errors converges in white matter under the **SMA/pre-SMA transition**, with involvement of the mid-cingulate region. This provides the anatomical rationale for focusing ACEP recording on the superior frontal/lateral pre-SMA region. **Status: ✅ [G1].**
 
-**Nota critica:** questo non è necessariamente il sistema con cui vengono acquisiti gli ACEP.
+### 103. Which white-matter tracts might be involved?
+**Answer:** [G1] identifies a frontal structural network and tractography patterns associated with eloquent sites, but the ACEP abstract does not assign each evoked response to one uniquely identified tract. At the congress, it is safer to distinguish “stimulation of a functionally defined white-matter region” from “proof that one named fascicle generated the response.” Tract attribution requires convergent anatomical evidence. **Status: ✅/⚠️ [G1, A2].**
 
-## Protocollo ACEP del nostro abstract
-Da [A2] + [PROTO]:
+### 104. How confidently can we identify a specific tract without tractography?
+**Answer:** Neuronavigation and anatomical landmarks can localize the stimulation site, but they do not by themselves prove that only one tract was stimulated. Without tractography or another convergent anatomical method, the most defensible language is that the site is compatible with a given pathway or white-matter region. Over-specific tract labeling would exceed the direct evidence. **Status: ✅ as a methodological caution [G1].**
 
-- siti: subcorticali **attention-positive** identificati con iVSAT;
+### 105. Why do we record from the superior frontal gyrus/lateral pre-SMA?
+**Answer:** Our group’s causal mapping work identifies the superior frontal/SMA-preSMA region and its underlying white matter as a critical node for stimulation-induced neglect-like attentional errors. The ACEP experiment asks whether functionally positive subcortical sites produce a reproducible cortical electrophysiological signature in this region. Thus, the recording site is grounded in prior causal neuroanatomy rather than chosen arbitrarily. **Status: ✅ [G1, A2].**
+
+### 106. What is the role of the lateral pre-SMA in visuospatial attention?
+**Answer:** In [G1], stimulation of white matter beneath the superior frontal region around the SMA/pre-SMA transition is strongly associated with contralesional, neglect-like attentional errors. Lesion-symptom mapping, DES, and structural connectivity analyses converge on the causal relevance of this dorsomedial frontal region. The ACEP study extends that framework by adding an electrophysiological connectivity measure. **Status: ✅ [G1].**
+
+### 107. Why does our ACEP study focus on right frontal tumors?
+**Answer:** The right frontal attention network is particularly relevant for contralesional visuospatial bias. In [G1], right-sided stimulation produces selective iVSAT omissions consistent with neglect-like disruption, whereas the corresponding left-sided stimulation does not show the same pattern. This provides a causal rationale for restricting the ACEP attention study to right frontal cases. **Status: ✅ [G1].**
+
+### 108. What is the relationship between neglect and the frontal attention network?
+**Answer:** [G1] combines lesion-symptom mapping, intraoperative DES, and tractography to show that a right frontal, especially dorsomedial, network contributes causally to contralesional attentional allocation. This broadens classical neglect models that emphasize posterior regions by demonstrating an important frontal component. Our ACEP experiment probes the electrophysiological organization of that frontal network. **Status: ✅ [G1].**
+
+### 109. How does our result relate to the dorsal and ventral attention network models?
+**Answer:** [G1] discusses classical DAN/VAN models and shows that dorsomedial frontal territories, often underrepresented in stroke-based models, have a causal role in selective visuospatial attention. ACEP adds a task-independent electrophysiological readout of connectivity within this frontal system. However, the current ACEP data are not sufficient to assign the evoked response exclusively to DAN or VAN. **Status: ✅/⚠️ [G1, A2].**
+
+---
+
+## H. Experimental controls and specificity
+
+### 110. Why are attention-negative subcortical sites an important control?
+**Answer:** They test whether a cortical response is produced simply by stimulating any nearby white-matter location or whether it is associated specifically with sites identified as functionally relevant by iVSAT. In our abstract, matched-current stimulation of attention-negative sites does not produce reproducible ACEPs. This strengthens the argument that the response is not a generic consequence of current delivery. **Status: ✅ [A2].**
+
+### 111. Why must negative sites be stimulated at matched current?
+**Answer:** If negative sites were stimulated at a lower current, failure to obtain a response could simply reflect insufficient stimulation dose. Matching current reduces that confound and makes the positive-versus-negative site comparison more interpretable. It does not eliminate all anatomical differences, but it controls one major technical variable. **Status: ✅ [A2].**
+
+### 112. What does the absence of a response at negative sites rule out, and what does it not rule out?
+**Answer:** It argues against a response that is produced nonspecifically by the same electrical current at any subcortical location. However, it does not control for every local difference in fiber density, distance, orientation, conductivity, or proximity to the recorded cortex. Therefore, it supports functional specificity without proving that functional status is the only determinant of response. **Status: ✅/📚 [A2].**
+
+### 113. Why do we also record from the precentral gyrus?
+**Answer:** The precentral recording serves as a cortical topographic control. It tests whether the evoked signal is broadly distributed across nearby exposed cortex or preferentially expressed over the superior frontal/lateral pre-SMA target. This complements the subcortical negative-site control by testing specificity on the recording side of the experiment. **Status: ✅ [A2].**
+
+### 114. What does an absent or markedly attenuated precentral response imply?
+**Answer:** It supports topographic specificity of the cortical response toward the superior frontal recording region. A truly nonspecific field spread or global artifact would be expected to appear more similarly across recording sites, although geometry and reference effects still need consideration. Thus, the precentral control strengthens but does not by itself prove pathway-specific propagation. **Status: ✅ [A2].**
+
+### 115. Does the precentral control completely exclude volume conduction?
+**Answer:** No. It makes a purely widespread passive signal less likely, but volume conduction must also be assessed using latency, spatial gradients, electrode geometry, reference montage, and the shape of the response. A single negative cortical control cannot fully solve the volume-conduction problem. **Status: 📚.**
+
+### 116. How can we distinguish passive volume conduction from physiological propagation?
+**Answer:** No single criterion is sufficient. The strongest case comes from converging evidence: a non-zero physiological latency, reproducibility, spatial specificity, different behavior at positive and negative sites, dose-response properties, and direct characterization of the stimulation artifact. Our abstract already provides some of these controls, but not the complete technical validation. **Status: ✅/📚 [A2].**
+
+### 117. What additional controls would strengthen the study?
+**Answer:** Useful additions would include distance-matched negative sites, systematic single-trial analysis, explicit quantification of the stimulation artifact, multiple stimulation intensities, precise anatomical localization, and convergence with patient-specific tractography. Repeating the protocol under asleep conditions would also directly test the proposed clinical translation. **Status: 📚.**
+
+### 118. Could distance between the stimulation site and recording contacts explain response differences?
+**Answer:** Yes. Distance affects both the probability of stimulating fibers linked to the recording region and the amplitude of signals detected at the cortical surface. Therefore, stimulation-to-recording distance should ideally be measured and considered as a covariate rather than assumed to be equivalent across sites. **Status: 📚.**
+
+### 119. Could electrode impedance explain amplitude differences?
+**Answer:** It can contribute to recording quality, noise level, and effective signal amplitude, especially if contacts differ markedly in impedance. Impedance should therefore be documented together with channel quality. It is unlikely to be the sole explanation for a reproducible, anatomically specific pattern, but it remains a technical confound. **Status: 📚/⚠️.**
+
+### 120. Can brain shift affect anatomical localization?
+**Answer:** Yes. As resection proceeds, the relationship between preoperative imaging and the actual intraoperative anatomy can change. In [G1], stimulation coordinates are recorded before tumor debulking and confirmed using anatomy/video to reduce this problem. For ACEP, we need the exact timing and localization procedure to know how strongly brain shift may affect our anatomical interpretation. **Status: ✅/⚠️ [G1].**
+
+---
+
+## I. Resection, disconnection, and circuit integrity
+
+### 121. When are ACEPs recorded relative to tumor resection?
+**Answer:** The abstract does not define this with enough precision. We need to know whether the recording occurs before major disconnection, during progressive resection, or after a specific cortical/subcortical component has already been removed. This timing is essential because the physiological meaning of an evoked response depends on the structural state of the circuit. **Status: ⚠️.**
+
+### 122. Is the stimulated pathway intact, partially disconnected, or isolated at the time of recording?
+**Answer:** This is not documented for each ACEP acquisition. Without that information, it is difficult to know whether a response reflects an intact physiological network or electrical excitability of residual fibers after partial disconnection. The surgical stage should therefore be linked to each recording whenever possible. **Status: ⚠️.**
+
+### 123. What happens to axonal excitability immediately after disconnection?
+**Answer:** The supplied group literature does not directly address this neurophysiological question. In general, structural disconnection and immediate loss of electrical excitability are not identical processes, so an axonal segment may remain excitable for some time after being disconnected from its normal circuit. The exact time course requires dedicated literature. **Status: 📚.**
+
+### 124. What is Wallerian degeneration, and over what time scale does it occur?
+**Answer:** Wallerian degeneration is the progressive degeneration of the distal axonal segment after axonal injury or transection. It is not an instantaneous event and evolves over time rather than occurring at the moment of disconnection. The precise human central nervous system time course should be learned from dedicated neurobiology literature rather than inferred from our ACEP data. **Status: 📚.**
+
+### 125. Can a disconnected fiber remain electrically excitable?
+**Answer:** Potentially yes, at least transiently, because membrane excitability and participation in an intact functional circuit are different properties. Therefore, an electrically evoked response after disconnection does not automatically mean that the original physiological network remains functionally intact. This distinction is important when interpreting intraoperative responses obtained after partial resection. **Status: 📚.**
+
+### 126. Does a post-resection evoked response prove that the physiological circuit is intact?
+**Answer:** No. It proves that the stimulation can still recruit excitable neural elements and generate a measurable response under the tested conditions. Functional integrity requires broader evidence, including the structural state of the pathway, behavior, and ideally postoperative outcome or complementary physiological measures. **Status: 📚.**
+
+### 127. How do we distinguish “electrically excitable fibers” from a “functionally intact network”?
+**Answer:** We need convergent evidence. Electrical excitability is established by the ability to evoke a response, whereas functional integrity requires preserved behavioral function, appropriate anatomy, and a circuit capable of operating in its normal physiological context. An ACEP alone cannot establish all of these levels simultaneously. **Status: 📚.**
+
+---
+
+## J. Statistics, hierarchical data, and dose-response
+
+### 128. Why do 20 patients not become thousands of independent observations simply because we deliver many stimuli?
+**Answer:** Because multiple trials from the same site and multiple sites from the same patient share common biological and technical factors. They are correlated observations, not independent replications of the experiment. Treating every pulse as an independent sample would artificially inflate the effective sample size and underestimate uncertainty. **Status: 📚.**
+
+### 129. Why are trials from the same patient not independent?
+**Answer:** They share the same brain anatomy, pathology, recording hardware, reference, physiological state, surgical conditions, and often the same stimulation site. Those shared factors create within-patient correlation. Statistical models must therefore account for clustering rather than assuming that every trial comes from a new independent individual. **Status: 📚.**
+
+### 130. What is the correct statistical unit: trial, site, or patient?
+**Answer:** It depends on the scientific question, but the hierarchy must be respected. Trials are nested within stimulation sites, and sites are nested within patients, so none of these levels should be treated as interchangeable. Patient-level inference generally requires explicit modeling of the lower-level repeated measures. **Status: 📚.**
+
+### 131. How should we analyze many trials per site and many sites per patient?
+**Answer:** A natural approach is a hierarchical or mixed-effects model that includes the repeated structure of the data. Patient can be modeled as a random effect, with site as another nested level when appropriate, while stimulation parameters and anatomical factors are entered as fixed effects. The exact model should match the outcome distribution and hypothesis. **Status: 📚.**
+
+### 132. How should threshold, latency, and amplitude be compared statistically?
+**Answer:** Each outcome should be defined prospectively and modeled according to its scale and distribution. For example, current or pulse width could be fixed predictors, while patient and site contribute random effects. The key principle is to avoid reducing the data to apparently independent trial-level comparisons when the measurements are clustered. **Status: 📚.**
+
+### 133. How would we build an electrophysiological dose-response curve?
+**Answer:** For each site and patient, we would relate stimulation dose — current, pulse width, or charge — to outcomes such as response probability, amplitude, latency, and waveform features. The analysis should model repeated observations within site and patient and allow for non-linear behavior or saturation. This would convert the 250–500–800 µs comparison into a mechanistic experiment rather than a descriptive one. **Status: 📚.**
+
+### 134. Which technical covariates should we control for?
+**Answer:** Relevant variables include current, pulse width, number of averaged trials, stimulation and recording contact identity, reference montage, impedance, stimulation-to-recording distance, acquisition order, artifact burden, and signal quality. If these factors vary systematically across conditions, they can mimic or obscure a true physiological effect. **Status: 📚.**
+
+### 135. Which anatomical covariates should we control for?
+**Answer:** Important anatomical variables include stimulation site, cortical recording site, distance, likely white-matter pathway, relation to tumor and edema, extent of resection, and possible brain shift. These variables may alter both the electric field and the physiological connectivity being tested. Patient-specific anatomy is therefore not just descriptive context; it can be a model covariate. **Status: 📚.**
+
+### 136. How should trial-to-trial variability be quantified?
+**Answer:** We can examine the full distributions of amplitude and latency, their variance or standard deviation, latency jitter, response probability, reliability metrics, SNR, and outlier structure. Visualizing single trials is important because two conditions may have the same average waveform but very different consistency. Variability itself may also contain physiological information. **Status: 📚.**
+
+### 137. How can we separate a patient effect from a stimulation effect?
+**Answer:** We need a statistical model that explicitly represents patient-to-patient variability, typically through random effects, while estimating the effect of stimulation parameters as predictors. If enough data are available, random slopes can test whether dose-response relationships differ across patients. This prevents stable individual differences from being mistaken for stimulation effects. **Status: 📚.**
+
+---
+
+## K. Critical appraisal, inference, and difficult congress questions
+
+### 138. What is the main limitation of our interpretation?
+**Answer:** ACEPs support an electrophysiological relationship between a functionally identified subcortical site and a cortical recording region, but they do not by themselves prove one specific direct anatomical pathway. In addition, our cohort was studied during awake surgery, while asleep use remains prospective. The strongest interpretation is therefore “a reproducible task-independent electrophysiological signature compatible with functional connectivity,” not definitive tract proof. **Status: ✅ [A2].**
+
+### 139. How strongly can we use the term “direct connectivity”?
+**Answer:** The abstract appropriately states that ACEPs **may identify direct** connectivity. That probabilistic wording should be maintained because short latency and topographic specificity support directness but do not establish monosynaptic anatomy with certainty. At the congress, “compatible with relatively direct connectivity” is safer than “proves a direct connection.” **Status: ✅ [A2].**
+
+### 140. Is short latency alone sufficient to call the connection “direct”?
+**Answer:** No. Short latency is supportive because it limits the amount of time available for prolonged network processing, but it does not exclude one or more fast synaptic relays or parallel pathways. Directness is best argued from converging latency, anatomy, topography, and control data rather than latency alone. **Status: 📚.**
+
+### 141. Could intermediate synapses be involved?
+**Answer:** Yes. The observed latency does not independently rule out intermediate synapses, especially if the pathway is short and synaptic delays are small. The current data therefore support rapid connectivity but do not directly count the number of synaptic relays. **Status: 📚.**
+
+### 142. Could more than one white-matter tract be recruited?
+**Answer:** Yes. The stimulation site is a region of white matter, and the electric field may recruit multiple nearby axonal populations depending on geometry and current spread. Assigning the response to a single tract requires additional anatomical evidence such as patient-specific tractography or highly constrained anatomy. **Status: ✅/📚 [G1].**
+
+### 143. Can the tumor alter connectivity and excitability?
+**Answer:** Our group’s work shows that tumors can distort patient-specific anatomy and motivates the use of individualized tractography and intraoperative mapping. The exact effect of infiltration or plasticity on ACEP excitability is not directly quantified in the current material. Therefore, tumor-related reorganization should be considered a biologically plausible source of inter-patient variability. **Status: ✅/📚 [G2, G1].**
+
+### 144. Can edema and tumor infiltration modify current spread?
+**Answer:** It is plausible because tissue conductivity and local anatomy can influence the electric field, but the current ACEP material does not quantify this effect. We should not claim a measured edema effect unless we analyze it directly. For now, it is best treated as a potential biophysical confound and a possible source of between-site variability. **Status: 📚.**
+
+### 145. Can brain shift alter our anatomical interpretation?
+**Answer:** Yes. Brain shift can progressively reduce the accuracy of preoperative image-to-brain registration. [G1] reduces this problem by recording stimulation coordinates before major debulking and confirming location with intraoperative anatomy/video. We need to document whether the ACEP protocol uses the same or a comparable strategy. **Status: ✅/⚠️ [G1].**
+
+### 146. Can our current sample be generalized to asleep surgery?
+**Answer:** No, not yet. The present attention study was conducted during awake surgery, and the proposed asleep application is a translational hypothesis. A dedicated asleep cohort is needed to show that the signal remains reliable under different anesthetic and physiological conditions and that it retains clinical usefulness. **Status: ✅ [A2].**
+
+### 147. Why is further validation required?
+**Answer:** Further validation is needed to establish reproducibility across patients and centers, standardize stimulation and recording parameters, define response-detection criteria, clarify anatomical specificity, and test whether the method adds clinically useful information. The abstracts also explicitly identify larger cohorts and asleep surgery as important next steps. **Status: ✅ [A1, A2].**
+
+### 148. What would be the ideal next experiment?
+**Answer:** A strong next study would be a larger prospective validation with a fully standardized technical protocol, predefined response-threshold criteria, explicit stimulation-artifact handling, trial-level analysis, precise anatomical localization, and patient-specific tractography. It should also test the paradigm during asleep surgery and relate electrophysiological markers to functional outcomes. That design would address both mechanistic validity and clinical translation. **Status: ✅ for the clinical direction [A1, A2]; methodological details remain to be designed.**
+
+---
+
+# Technical information already extracted from the group corpus
+
+## Current iVSAT mapping protocol
+From [G1]:
+
+- LF-DES with **biphasic square-wave pulses**;
+- pulse width **0.5 ms**;
+- frequency **60 Hz**;
+- train duration **1–4 s**;
+- **bipolar** probe with **5-mm inter-tip distance**;
+- current individualized using the lowest intensity that consistently produces errors during language mapping over ventral premotor cortex;
+- the same current maintained during subsequent cortical and subcortical iVSAT mapping;
+- positive site: error in **3 non-consecutive trials**;
+- sites also checked with naming and praxis;
+- coordinates recorded with **Curve, Brainlab** before tumor debulking;
+- sites modeled as **5-mm spherical ROIs**, reflecting probe spatial resolution.
+
+## Historical LF-DES standard in the group
+From [G3, G4, G5]:
+
+- **OSIRIS NeuroStimulator, Inomed**, integrated with **ISIS**;
+- constant-current stimulation;
+- bipolar probe with **two 2-mm ball tips**, **5-mm separation**;
+- biphasic square-wave pulses;
+- **0.5 ms per phase**;
+- **60 Hz**, ISI 16.6 ms;
+- trains typically **2–5 s**;
+- stimulation intensities commonly in the **2–6 mA** range.
+
+**Critical note:** these parameters describe historical LF-DES protocols and must not be automatically attributed to the current single-pulse ACEP protocol until directly verified.
+
+## Historical ECoG monitoring setup
+From [G4, G5]:
+
+- reported systems: **Comet / Grass**;
+- subdural strips with **4–8 contacts**;
+- monopolar array referenced to a mid-frontal electrode;
+- **1–100 Hz** band-pass for monitoring ECoG;
+- main purpose: baseline activity, after-discharges, and seizure monitoring.
+
+**Critical note:** this is not necessarily the same hardware or montage used for ACEP acquisition.
+
+## ACEP protocol from our abstract
+From [A2] + [PROTO]:
+
+- subcortical **attention-positive** sites identified with iVSAT;
 - single **biphasic pulses**;
-- **1,1 Hz**;
-- pulse width **0,5 ms**;
-- partenza da **20 mA** e riduzione progressiva;
-- response threshold nel nostro campione: **2–5 mA**;
-- registrazione **unfiltered** da strip sul **superior frontal gyrus/lateral pre-SMA**;
-- postprocessing **1–300 Hz**;
-- controllo corticale: **precentral gyrus**;
-- controllo sottocorticale: siti **attention-negative** a corrente matched;
-- P0/N0: **entro 15 ms**;
-- P1/N1: **entro 50 ms**;
-- risposta non riproducibile nei siti negativi e assente/marcamente attenuata sul precentrale.
+- **1.1 Hz**;
+- pulse width **0.5 ms**;
+- starting at **20 mA** and progressively decreasing;
+- ACEP response threshold in our cohort: **2–5 mA**;
+- **unfiltered** recording from a strip over the **superior frontal gyrus/lateral pre-SMA**;
+- offline **1–300 Hz** band-pass;
+- cortical control: **precentral gyrus**;
+- subcortical control: **attention-negative sites** stimulated at matched current;
+- P0/N0: **within 15 ms**;
+- P1/N1: **within 50 ms**;
+- no reproducible response from negative subcortical sites and absent/markedly attenuated responses over precentral cortex.
 
 ---
 
-# Gap tecnici prioritari da chiudere prima del congresso
+# Priority technical gaps to close before the congress
 
-Questi sono i dati che non risultano ancora documentati nei materiali esaminati e che vanno recuperati direttamente dal setup o dalla pipeline ACEP:
+The following details are still not documented in the material reviewed and should be recovered directly from the ACEP setup, acquisition software, raw files, or team protocol:
 
-1. modello esatto dello stimolatore ACEP;
-2. constant-current vs constant-voltage nel protocollo ACEP;
-3. modello/geometria del probe ACEP;
-4. monopolare vs bipolare come configurazione spaziale ACEP;
-5. significato preciso di **0,5 ms**: per fase o totale;
-6. polarità della prima fase e simmetria delle due fasi;
-7. step di riduzione da 20 mA alla soglia;
-8. definizione operativa di **response threshold**;
-9. numero di impulsi/trial per condizione;
-10. sistema di registrazione ACEP;
+1. exact ACEP stimulator model;
+2. constant-current vs constant-voltage mode;
+3. exact ACEP probe model and geometry;
+4. monopolar vs bipolar spatial stimulation configuration;
+5. exact meaning of **0.5 ms**: per phase or total biphasic duration;
+6. first-phase polarity and symmetry of the biphasic waveform;
+7. current decrement steps from 20 mA to threshold;
+8. operational definition of **response threshold**;
+9. number of pulses/trials per condition;
+10. exact ACEP recording system;
 11. sampling rate;
-12. geometria completa dello strip;
-13. reference e ground;
-14. filtri hardware/anti-aliasing;
-15. range dinamico e recovery dell'amplificatore;
-16. modalità di trigger e definizione di \(t=0\);
-17. verifica dell'effettivo 1,1 Hz sui timestamp;
-18. gestione dello stimulation artifact;
-19. epoch window e baseline;
-20. tipo/ordine/modalità del filtro 1–300 Hz;
-21. rejection dei trial;
-22. metodo di averaging;
-23. criterio di definizione dei peak P0/N0 e P1/N1;
-24. misura di amplitude e latency;
-25. timing ACEP rispetto alla resezione;
-26. localizzazione esatta dei contatti e del sito stimolato.
+12. complete strip geometry;
+13. online reference and ground;
+14. hardware/anti-alias filtering;
+15. amplifier dynamic range and post-stimulus recovery;
+16. trigger pathway and precise definition of \(t=0\);
+17. verification of the actual 1.1-Hz timing from recorded timestamps;
+18. stimulation-artifact management;
+19. epoch window and baseline interval;
+20. filter type/order/phase properties for the 1–300 Hz postprocessing;
+21. trial-rejection rules;
+22. averaging procedure;
+23. operational definition of P0/N0 and P1/N1 peaks;
+24. amplitude and latency measurement rules;
+25. exact timing of ACEP acquisition relative to resection;
+26. exact localization of stimulation sites and recording contacts.
 
-Questa lista dei gap è il prossimo obiettivo operativo: una volta recuperati questi dati, la maggior parte delle domande tecniche più pericolose da congresso diventa difendibile.
+Closing these gaps is the next operational objective. Once these parameters are documented, the most technically challenging congress questions will become much easier to answer with confidence.
