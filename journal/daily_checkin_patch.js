@@ -43,8 +43,9 @@ function parseTasks(content){
  let section='',out=[];
  for(const line of String(content||'').split(/\r?\n/)){
   const x=line.trim();
-  if(['OGGI','URGENTE','PIÙ AVANTI','CONGRESSI'].includes(x)){section=x;continue}
-  if(['OGGI','URGENTE'].includes(section)&&x.startsWith('- '))out.push(x.slice(2));
+  // Do not accidentally classify an upcoming dated section as OGGI.
+  if(!x.startsWith('- ')&&x===x.toLocaleUpperCase('it-IT')&&/^[A-ZÀ-Ü0-9 .–—/-]+$/.test(x)){section=x;continue}
+  if((section==='OGGI'||section==='URGENTE'||/^ENTRO\b/.test(section))&&x.startsWith('- ')&&!/^[-]\s*\[[xX]\]/.test(x))out.push(x.slice(2));
  }
  return out.slice(0,25);
 }
