@@ -244,6 +244,88 @@
   }
   todoInput.addEventListener('input',todoQueueHolidayCheck);
 
+
+  // LifeOS: traduce solo scadenze ESPLICITE della lista libera in righe strutturate.
+  // Non deduce date da semplici eventi, note o scadenze legali non verificate.
+  const lifeosMonths={gennaio:1,febbraio:2,marzo:3,aprile:4,maggio:5,giugno:6,luglio:7,agosto:8,settembre:9,ottobre:10,novembre:11,dicembre:12};
+  function lifeosDate(day,month,year){
+    const m=Number(month)||lifeosMonths[String(month||'').toLowerCase()],d=Number(day),y=Number(year);
+    if(!m||!d||!y||y<2026||y>2100)return null;
+    const date=new Date(Date.UTC(y,m-1,d));
+    return date.getUTCFullYear()===y&&date.getUTCMonth()===m-1&&date.getUTCDate()===d
+      ?String(y)+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0'):null;
+  }
+  function lifeosParseDate(value){
+    const text=String(value||'').toLowerCase().trim();
+    const iso=text.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
+    if(iso)return lifeosDate(iso[3],iso[2],iso[1]);
+    const numeric=text.match(/\b(\d{1,2})[/.](\d{1,2})[/.](\d{4})\b/);
+    if(numeric)return lifeosDate(numeric[1],numeric[2],numeric[3]);
+    const named=text.match(/\b(\d{1,2})\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\s+(\d{4})\b/);
+    return named?lifeosDate(named[1],named[2],named[3]):null;
+  }
+  function lifeosDatedTasks(content){
+    let headingDate=null;const detected=new Map();
+    for(const raw of String(content||'').split(/\r?\n/)){
+      const line=raw.trim();
+      if(!line)continue;
+      if(!/^(?:[-*]\s+|\d+[.)]\s+)/.test(line)){
+        // Only heading sections explicitly introduced by ENTRO establish a task deadline.
+        if(/^ENTRO\s/i.test(line))headingDate=lifeosParseDate(line);
+        else if(line===line.toLocaleUpperCase('it-IT'))headingDate=null;
+        continue;
+      }
+      if(/^[-*]\s*\[[xX]\]/.test(line))continue;
+      let title=line.replace(/^(?:[-*]\s+|\d+[.)]\s+)/,'').replace(/^\[\s*\]\s*/,'').trim();
+      let due=headingDate;
+      const match=title.match(/\bentro(?:\s+il)?\s+((?:\d{4}-\d{2}-\d{2})|(?:\d{1,2}[/.]\d{1,2}[/.]\d{4})|(?:\d{1,2}\s+(?:gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\s+\d{4}))\b/i);
+      if(match){due=lifeosParseDate(match[1]);title=title.replace(match[0],'').replace(/[—–:,\s]+$/,'').trim();}
+      if(!due)continue;
+      title=title.replace(/\s+\((?:da fare|da completare|preferibilmente)[^)]*\)\s*$/i,'').slice(0,200).trim();
+      if(title)detected.set(title.toLocaleLowerCase('it-IT'),{title,due});
+    }
+    return [...detected.values()];
+  }
+  function lifeosReminderDays(due){
+    const days=Math.round((Date.parse(due+'T12:00:00Z')-Date.parse(todoTodayRome()+'T12:00:00Z'))/86400000);
+    if(days<0)return [0];
+    if(days>7)return [7,3,1,0];
+    if(days>3)return [...new Set([days-1,3,1,0])].sort((a,b)=>b-a);
+    return [...new Set([days,1,0])].filter(n=>n<=days).sort((a,b)=>b-a);
+  }
+  async function lifeosSyncTodoDeadlines(content){
+    const dated=lifeosDatedTasks(content);
+    if(!dated.length)return 0;
+    const {data:existing,error:readError}=await supabaseClient.from('journal_deadlines')
+      .select('id,title,notes,due_on,status,reminder_days').eq('user_id',sectionUser.id);
+    if(readError)throw readError;
+    const known=new Map((existing||[]).map(r=>[r.title.trim().toLocaleLowerCase('it-IT'),r]));
+    let changed=0;
+    for(const task of dated){
+      const key=task.title.toLocaleLowerCase('it-IT'),found=known.get(key);
+      if(found){
+        // Never overwrite separately-managed deadlines or reopen completed tasks.
+        if(found.notes?.includes('[LifeOS:DaFare]')&&found.status==='pending'&&found.due_on!==task.due){
+          const {error}=await supabaseClient.from('journal_deadlines')
+            .update({due_on:task.due,reminder_days:lifeosReminderDays(task.due),last_notified_on:null,updated_at:new Date().toISOString()})
+            .eq('user_id',sectionUser.id).eq('id',found.id);
+          if(error)throw error;
+          changed++;
+        }
+        continue;
+      }
+      const {error}=await supabaseClient.from('journal_deadlines').insert({
+        user_id:sectionUser.id,title:task.title,category:'altro',due_on:task.due,
+        status:'pending',reminder_days:lifeosReminderDays(task.due),
+        notes:'[LifeOS:DaFare] Scadenza operativa dichiarata nella lista Da fare (non è un evento di calendario).'
+      });
+      if(error)throw error;
+      known.set(key,{title:task.title,due_on:task.due,status:'pending',notes:'[LifeOS:DaFare]'});
+      changed++;
+    }
+    return changed;
+  }
+
   async function loadTodo(){
     if(!sectionUser)return;
     todoStatus.textContent='Caricamento...';
@@ -367,8 +449,14 @@
     }else{
       savedTodoContent=content;
       todoLoaded=true;
-      todoStatus.textContent='Salvato';
-      toastMessage('Da fare salvato su Supabase');
+      try{
+        const synced=await lifeosSyncTodoDeadlines(content);
+        todoStatus.textContent='Salvato';
+        toastMessage(synced?'Da fare salvato · '+synced+' scadenze sincronizzate':'Da fare salvato su Supabase');
+      }catch(syncError){
+        todoStatus.textContent='Lista salvata · sincronizzazione scadenze non riuscita';
+        toastMessage('Da fare salvato. Verifica Scadenze: '+(syncError.message||'errore'));
+      }
       setTimeout(()=>{if(todoStatus.textContent==='Salvato')todoStatus.textContent=''},1800);
     }
     todoSaveBtn.disabled=false;
