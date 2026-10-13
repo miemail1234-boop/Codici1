@@ -1,7 +1,7 @@
 {
-  "name": "Life Tracker",
-  "short_name": "Tracker",
-  "description": "Monitoraggio personale di workout, alimentazione e diario.",
+  "name": "Life Tracker 3.1 · LifeOS",
+  "short_name": "Life Tracker",
+  "description": "Modulo di LifeOS per monitoraggio personale, attività, allenamento e alimentazione. LifeOS è il sistema operativo personale integrato.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f4f1eb",
