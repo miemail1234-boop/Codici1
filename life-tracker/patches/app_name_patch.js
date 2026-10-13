@@ -11,7 +11,8 @@
   }
 
   function applyAppName() {
-    document.title = APP_NAME;
+    // Life Tracker resta il nome del modulo; LifeOS identifica il sistema complessivo.
+    document.title = APP_NAME + " · LifeOS";
     const headerTitle = document.querySelector(".topbar h1");
     if (headerTitle) headerTitle.textContent = APP_NAME;
 
