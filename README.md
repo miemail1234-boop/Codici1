@@ -20,6 +20,7 @@
 - **Sera, 21:30:** verifica attività svolte/non svolte, proposte di ripianificazione, ora *prevista* di andare a letto e nota. La lista Da fare non viene modificata automaticamente.
 - **Monitoraggi:** obiettivi e rilevazioni strutturate, con revisioni dei progressi e separazione dei giorni privi di dati.
 - **Scadenze:** date accertate, categoria, stato e preavvisi. Una voce con data ignota non riceve una data inventata.
+- **Attività con scadenza:** le attività inserite nella lista «Da fare» sotto intestazioni `ENTRO <giorno mese anno>` oppure con un `entro <data>` esplicito vengono sincronizzate dal sito in `journal_deadlines` al salvataggio. La sincronizzazione esterna via ChatGPT deve aggiornare entrambe le tabelle secondo `journal_instructions`; i promemoria sono progressivi (fino a 7, 3, 1, 0 giorni, adattati all'orizzonte). Le scadenze non creano eventi Calendar. Le automazioni programmate e le notifiche ChatGPT sono componenti separati: verificare che le notifiche siano abilitate, non presumere invii push/email.
 - **Pianificazione:** confronto degli eventi fino a 28 giorni, gestione delle sovrapposizioni confermate/potenziali e controllo obbligatorio delle festività nazionali italiane, delle domeniche e delle festività milanesi applicabili.
 - **Revisione:** sintesi settimanale e, quando utile, mensile. Le analisi vengono salvate soltanto quando le fonti e le conferme sono disponibili.
 
