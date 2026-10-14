@@ -9,7 +9,7 @@
 | **LifeOS** | Sistema completo di gestione personale | `/` (hub e documentazione) |
 | **Life Tracker 3.1** | App/modulo di monitoraggio e dashboard, inclusi allenamento e nutrizione | `/life-tracker/` |
 | **Journal** | Diario, Da fare, Check-in, Monitoraggi, Scadenze, Pianificazione e Festività | `/journal/` |
-| **Google Calendar** | Fonte autorevole di appuntamenti (calendari Lavoro e Attività clinica) | Connettore esterno; non viene copiato interamente in Journal |
+| **Google Calendar** | Fonte autorevole degli appuntamenti (solo calendari «Lavoro», personale, e «Calendario Neuropsi Galeazzi», condiviso) | Connettore esterno; non viene copiato interamente in Journal |
 | **Automazioni ChatGPT** | Briefing, check-in serale, controlli scadenze e revisioni | Funzioni programmate separate dal sito |
 
 **Compatibilità:** le directory, gli URL, le tabelle esistenti e il nome del modulo *Life Tracker* rimangono invariati. Modificare soltanto l'identità visibile e le istruzioni non interrompe i collegamenti preesistenti.
@@ -57,3 +57,12 @@ Per implementazione e limiti dei moduli consultare [documentazione Journal](jour
 
 Applicazione web pubblicata su GitHub Pages dal repository `miemail1234-boop/Codici1`. La pagina radice è l'hub **LifeOS**. Il contenuto privato viene letto da Supabase soltanto dopo autenticazione; i dati personali non sono nel repository. L'integrazione di Google Calendar e le automazioni non funzionano direttamente dal solo browser, ma attraverso connettori e pianificazioni esterne.
 
+
+
+## Regola operativa dei calendari (14 ottobre 2026)
+
+LifeOS consulta come fonti per gli appuntamenti **solo «Lavoro» e «Calendario Neuropsi Galeazzi»**. «Lavoro» è il calendario personale dell'utente; «Calendario Neuropsi Galeazzi» è condiviso, quindi gli eventi che vi compaiono non vanno attribuiti automaticamente all'utente senza verifica. Il calendario «Attività clinica» è dismesso dal flusso LifeOS e va **sempre escluso** da lettura, briefing, controlli di conflitti e nuove scritture. Il calendario delle festività può essere usato soltanto come ausilio normativo, non come calendario di appuntamenti.
+
+**Qualsiasi nuovo evento o modifica di calendario autorizzata dall'utente va eseguita per impostazione predefinita su «Lavoro», anche per gli appuntamenti clinici.** Usare o modificare «Calendario Neuropsi Galeazzi» soltanto quando l'utente lo richiede espressamente; non scegliere il calendario di destinazione deducendolo dal tipo di attività. Nessun evento va creato o modificato senza richiesta o autorizzazione specifica.
+
+Il briefing mattutino deve incrociare i due calendari con gli appuntamenti menzionati nei check-in e segnalare gli impegni confermati ma **non ancora calendarizzati**, senza considerarli automaticamente salvati in Google Calendar. Il check-in serale verifica gli appuntamenti di domani e chiede autorizzazione per quelli mancanti. Le impostazioni tecniche aggiornate e gli ID dei calendari sono registrati in Supabase, in `public.lifeos_system_registry.components.integrations.calendar_policy` e nella versione corrente di `public.journal_instructions`.
