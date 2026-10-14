@@ -47,3 +47,9 @@ Il check-in serale non modifica automaticamente il testo della sezione Da fare; 
 
 ## Richieste future all'assistente
 Quando l'utente dice **LifeOS**, deve essere inteso il sistema completo. Se i connettori sono disponibili, leggere prima `public.lifeos_system_registry` e la versione corrente di `public.journal_instructions`, poi le tabelle operative e Google Calendar soltanto se necessario. La definizione persistente non significa che ChatGPT recuperi automaticamente lo stato in qualsiasi conversazione: deve essere interrogata quando pertinente.
+
+## Politica dei calendari LifeOS — aggiornata il 14 ottobre 2026
+
+Per impegni e verifiche di pianificazione sono rilevanti esclusivamente i calendari Google **«Lavoro»** (personale e principale) e **«Calendario Neuropsi Galeazzi»** (condiviso). Non attribuire automaticamente all'utente ogni evento del condiviso. Il calendario **«Attività clinica» è escluso** da letture, briefing e scritture LifeOS. Per tutti i nuovi appuntamenti autorizzati, anche clinici, **scrivere su «Lavoro» per impostazione predefinita**; «Calendario Neuropsi Galeazzi» è destinazione valida solo quando espressamente richiesta. Le festività sono un riferimento normativo e non un terzo calendario di appuntamenti. Le istruzioni canoniche e gli ID dei calendari sono mantenuti in `public.journal_instructions` e `public.lifeos_system_registry`.
+
+Nel briefing mattutino verificare i due calendari insieme al check-in serale del giorno precedente, evidenziando separatamente eventuali appuntamenti confermati ma assenti da Google Calendar. Al check-in serale chiedere consenso prima di creare gli eventi del giorno successivo non calendarizzati. Non confondere check-in giornaliero e conferma di calendario.
