@@ -70,3 +70,15 @@ Il briefing mattutino deve incrociare i due calendari con gli appuntamenti menzi
 ## LifeOS Voice Bridge — lettura resiliente
 
 Il recupero contestuale per Voice Live è regolato dalle istruzioni Supabase correnti. Per il protocollo tecnico di lettura selettiva, gestione dei blocchi intermittenti e checklist di verifica, consultare [Voice Bridge — runbook](journal/voice_bridge_runbook.md). Un blocco parziale del connettore non rende automaticamente inaccessibile l'intero Journal; i dati mancanti devono comunque essere dichiarati.
+
+
+
+## LifeOS 4: contextual check-ins
+
+The Check-in tab reads life directions from the authenticated user's `lifeos_system_registry.components.life_direction_model`. It reads and exports the latest private `lifeos_context_snapshots` document. No personal objectives or snapshots are embedded in public source code.
+
+New optional JSON answer keys: `health_1_10`, `wake_energy_1_10`, `day_energy_1_10`, `weight_kg`, `symptoms`, actual `bed_time`/`wake_time`, separately reported `actual_sleep_hours`, training fields, actual dinner, intended bedtime, actual results, strategic minutes, task outcomes and contextual pillar contributions. Historical `energy_1_5` and unknown fields are preserved unchanged. Existing date/phase records are prefilled. Updates require confirmation and use an `updated_at` concurrency condition; inserts rely on the existing unique user/date/phase constraint. Blank untouched fields remain absent, not zero. Task completion is never automatic.
+
+Canonical assistant behavior remains in private `journal_instructions`: compare planned/actual/results/goals, preserve autonomy, use verified local time when tools allow, and separate archived context from conversation updates and verified writes. Scheduled tasks launch that same protocol. New measurements are stored in check-ins; readers must combine them with historical monitoring logs and deduplicate observations. Weight is not automatically copied into a second table.
+
+Run browser regression tests with `node tests/checkin.cjs` after installing Playwright and its Chromium browser. Tests use a mocked backend and never write personal data.

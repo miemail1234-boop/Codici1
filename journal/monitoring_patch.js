@@ -61,6 +61,26 @@ function weekSummary(end,items,g){
 }
 
 let user=null,goals=[],goal=null,logs=[],reviews=[];
+
+async function withCheckins(items,from,to){
+ if(goal?.metric_type!=='sleep')return items;
+ const q=await db.from('journal_daily_checkins').select('checkin_date,phase,answers,note,updated_at').eq('user_id',user.id).gte('checkin_date',from).lte('checkin_date',to).order('updated_at');
+ if(q.error)throw q.error;
+ const merged=new Map(items.map(x=>[x.observed_on,{...x,metrics:{...x.metrics}}]));
+ for(const c of q.data||[]){
+  const a=c.answers||{},keys=['bed_time','wake_time','wake_energy_1_10','energy_1_5','actual_sleep_hours'];
+  if(!keys.some(k=>a[k]!=null&&a[k]!==''))continue;
+  const row=merged.get(c.checkin_date)||{observed_on:c.checkin_date,metrics:{},note:'Fonte: check-in'};
+  for(const k of keys)if(a[k]!=null&&a[k]!==''){
+   // A conflicting manual log is not silently replaced by a check-in.
+   if(row.metrics[k]==null||row.metrics[k]==='')row.metrics[k]=a[k];
+   else if(row.metrics[k]!==a[k])row.note=(row.note||'')+' [Conflitto '+k+' con check-in: '+a[k]+']';
+  }
+  merged.set(c.checkin_date,row);
+ }
+ return [...merged.values()].sort((a,b)=>b.observed_on.localeCompare(a.observed_on));
+}
+
 const error=e=>$('mStatus').textContent=e?.message||String(e);
 async function load(){if(!user)return;
 const q=await db.from('journal_monitoring_goals').select('*').eq('user_id',user.id).order('created_at');if(q.error)throw q.error;
@@ -72,7 +92,7 @@ await select(goal?.id);
 async function select(id){
 goal=goals.find(g=>g.id===id)||null;$('mDetail').hidden=!goal;if(!goal)return;
 const [l,r]=await Promise.all([db.from('journal_monitoring_logs').select('*').eq('user_id',user.id).eq('goal_id',id).order('observed_on',{ascending:false}).limit(100),db.from('journal_monitoring_reviews').select('*').eq('user_id',user.id).eq('goal_id',id).order('review_on',{ascending:false}).limit(30)]);
-if(l.error||r.error)throw l.error||r.error;logs=l.data||[];reviews=r.data||[];
+if(l.error||r.error)throw l.error||r.error;logs=await withCheckins(l.data||[],goal.start_date||add(today(),-99),today());reviews=r.data||[];
 $('mTitle').textContent=goal.title;$('mDue').textContent='Prossima revisione: '+(goal.next_review_on||'non pianificata')+(goal.status==='active'&&goal.next_review_on&&goal.next_review_on<=today()?' (da effettuare)':'');
 $('mSleep').hidden=goal.metric_type!=='sleep';$('mOther').hidden=goal.metric_type==='sleep';
 $('mBed').required=$('mWake').required=goal.metric_type==='sleep';$('mValue').required=goal.metric_type!=='sleep';
@@ -95,7 +115,7 @@ $('mDraft').onclick=async()=>{
   const start=add(day,-6);
   const q=await db.from('journal_monitoring_logs').select('observed_on,metrics').eq('user_id',user.id).eq('goal_id',goal.id).gte('observed_on',start).lte('observed_on',day);
   if(q.error)return error(q.error);
-  $('mSummary').value=weekSummary(day,q.data||[],goal)+' Valutazione e modifiche da considerare: ';
+  $('mSummary').value=weekSummary(day,await withCheckins(q.data||[],start,day),goal)+' Valutazione e modifiche da considerare: ';
 };
 $('mReview').addEventListener('submit',async e=>{e.preventDefault();if(!goal)return;const d=$('mReviewDay').value;if(!validDate(d)||d>today()||d<goal.start_date)return error('Seleziona una data di revisione valida.');
 const x=await db.from('journal_monitoring_reviews').upsert({user_id:user.id,goal_id:goal.id,review_on:d,period_from:add(d,-6),period_to:d,summary:$('mSummary').value.trim()},{onConflict:'user_id,goal_id,review_on'});if(x.error)return error(x.error);

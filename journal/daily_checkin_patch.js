@@ -2,115 +2,27 @@
 'use strict';
 const db=supabaseClient,nav=document.getElementById('sectionNav'),main=document.querySelector('main');
 if(!db||!nav||!main)return;
-const tab=document.createElement('button');tab.id='dailyTab';tab.type='button';tab.className='section-tab';tab.textContent='Check-in';
-nav.insertBefore(tab,document.getElementById('monTab'));
+const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+const fields={morning:[['weight_kg','Peso misurato (kg)','number'],['health_1_10','Salute (1 peggiore, 10 migliore)','scale'],['symptoms','Sintomi','text'],['wake_energy_1_10','Energia al risveglio (1–10)','scale'],['bed_time','Coricamento effettivo della sera precedente','time'],['wake_time','Risveglio effettivo','time'],['actual_sleep_hours','Sonno effettivo in ore, solo se misurato o dichiarato','number']],evening:[['additional_completed','Attività effettivamente completate','text'],['partial_tasks','Attività parziali','text'],['deferred_tasks','Attività rinviate','text'],['unaddressed_tasks','Attività importanti non affrontate','text'],['unexpected_events','Imprevisti','text'],['actual_results','Risultati concreti','text'],['strategic_minutes','Minuti effettivi sulle attività strategiche','number'],['training_performed','Allenamento svolto','boolean'],['training_type','Tipo di allenamento','text'],['training_minutes','Durata allenamento (minuti)','number'],['training_intensity','Intensità, se utile','text'],['dinner_time','Cena effettiva','time'],['day_energy_1_10','Energia della giornata (1–10)','scale'],['symptoms','Sintomi / evoluzione','text'],['bed_time','Coricamento della notte precedente, se mancante','time'],['wake_time','Risveglio della mattina, se mancante','time'],['planned_bedtime','Coricamento previsto per stanotte','time'],['science_contribution','Contributo scientifico, se pertinente','text'],['relationships_contribution','Relazioni / solitudine scelta, se pertinente','text'],['health_contribution','Cura di sé, se pertinente','text']]};
+const tab=document.createElement('button');tab.id='dailyTab';tab.type='button';tab.className='section-tab';tab.textContent='Check-in';nav.insertBefore(tab,$('monTab'));
 const panel=document.createElement('section');panel.id='dailyPanel';panel.className='panel daily-panel';panel.hidden=true;
-panel.innerHTML=`<h2>Check-in quotidiano</h2><p>Mattino: dati reali della notte. Sera: bilancio delle attività e pianificazione.</p><div id="dailyStatus" role="status"></div>
-<div class="daily-grid">
-<form id="morningForm"><h3>Mattino</h3><label>Data del risveglio<input id="morningDate" type="date" required></label>
-<label>A che ora sei andato a letto ieri sera?<input id="actualBed" type="time" required></label>
-<label>A che ora ti sei svegliato?<input id="actualWake" type="time" required></label>
-<label>Energia (1 = molto bassa, 5 = molto alta)<select id="actualEnergy" required><option value="">Seleziona</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
-<div id="otherGoals"></div><label>Nota facoltativa<textarea id="morningNote" rows="2"></textarea></label><button class="button primary">Salva check-in mattutino</button></form>
-<form id="eveningForm"><h3>Sera</h3><label>Data<input id="eveningDate" type="date" required></label><p>Quali attività di oggi hai completato?</p>
-<div id="dailyTasks"></div><label>Altre attività completate<textarea id="moreCompleted" rows="2"></textarea></label>
-<label>Cosa è rimasto da fare? Cosa riprogrammare?<textarea id="toCarry" rows="2"></textarea></label>
-<label>A che ora prevedi di andare a letto? (non è l'ora effettiva)<input id="bedPlan" type="time" value="23:00"></label>
-<label>Nota facoltativa<textarea id="eveningNote" rows="2"></textarea></label><button class="button primary">Salva check-in serale</button></form>
-</div><h3>Storico recente</h3><div id="dailyHistory"></div>`;
-main.appendChild(panel);
-const css=document.createElement('style');css.textContent=`
-.daily-panel{margin:18px;padding:22px}.daily-panel>p{color:#697783}.daily-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
-.daily-grid form{display:grid;gap:12px;align-content:start;padding:16px;border:1px solid #dbe1e3;border-radius:15px}
-.daily-grid h3{margin:0}.daily-grid form>p{margin:0;color:#697783}
-.daily-grid label{display:grid;gap:4px;font-size:.9rem;font-weight:650}
-.daily-grid input,.daily-grid select,.daily-grid textarea{width:100%;font:inherit;border:1px solid #cad3d7;border-radius:9px;padding:9px;min-width:0}
-.daily-grid .button{justify-self:start}
-.daily-task{display:flex!important;flex-direction:row!important;align-items:start;gap:8px;font-weight:450!important;padding:4px 0}
-.daily-task input{width:auto!important;margin-top:3px}
-.daily-record{border-bottom:1px solid #dbe1e3;padding:9px 0;white-space:pre-wrap;overflow-wrap:anywhere}
-.daily-record small{display:block;color:#697783}
-#dailyStatus{min-height:24px;color:#0f766e;font-weight:700}
-@media(max-width:800px){.daily-grid{grid-template-columns:1fr}.daily-panel{margin:10px;padding:15px}}`;
-document.head.appendChild(css);
-const $=id=>document.getElementById(id);
-const html=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const today=()=>{const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Rome',day:'2-digit',month:'2-digit',year:'numeric'}).formatToParts(new Date());const v=x=>parts.find(p=>p.type===x).value;return v('year')+'-'+v('month')+'-'+v('day')};
-let user=null,active=false,goals=[],tasks=[],history=[];
-const status=(msg,error=false)=>{$('dailyStatus').textContent=msg||'';$('dailyStatus').style.color=error?'#a33a31':'#0f766e'};
+const field=([key,label,type],phase)=>`<label>${label}${type==='text'?`<textarea name="${key}" rows="2"></textarea>`:type==='boolean'?`<select name="${key}"><option value="">Non rilevato</option><option value="true">Sì</option><option value="false">No</option></select>`:`<input name="${key}" type="${type==='scale'?'number':type}" ${type==='scale'?'min="1" max="10" step="1"':type==='number'?'min="0" step="any"':''}>`}</label>`;
+panel.innerHTML=`<h2>Check-in LifeOS</h2><p id="dailyClock"></p><p>Compila soltanto ciò che sai. Campi facoltativi; 1 = peggiore, 10 = migliore. L'intervallo a letto non è sonno misurato.</p><div id="dailyStatus" role="status"></div><div id="dailyDirections"></div><div id="dailySnapshot"></div><details><summary>Da fare: contesto, non prova di esecuzione</summary><pre id="dailyTasks"></pre></details><div class="daily-grid">${['morning','evening'].map(p=>`<form id="${p}Form"><h3>${p==='morning'?'Mattino':'Sera'}</h3><label>${p==='morning'?'Data del risveglio':'Data'}<input name="date" type="date" required value="${today()}"></label><p class="legacy"></p>${fields[p].map(f=>field(f,p)).join('')}<label>Nota facoltativa<textarea name="note" rows="2"></textarea></label><button type="submit" class="button primary">Salva check-in</button></form>`).join('')}</div><h3>Storico recente (scale originali)</h3><div id="dailyHistory"></div>`;
+main.appendChild(panel);const css=document.createElement('style');css.textContent='.daily-panel{margin:18px;padding:22px}.daily-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}.daily-grid form{display:grid;gap:12px;align-content:start;padding:16px;border:1px solid #dbe1e3;border-radius:15px}.daily-grid label{display:grid;gap:4px}.daily-grid input,.daily-grid textarea,.daily-grid select{width:100%;box-sizing:border-box;padding:9px;font:inherit}.daily-record,#dailyTasks{white-space:pre-wrap;overflow-wrap:anywhere}.daily-record{border-bottom:1px solid #ccc;padding:9px 0}#dailyStatus{min-height:24px}.legacy{color:#687780}@media(max-width:800px){.daily-grid{grid-template-columns:1fr}}';document.head.appendChild(css);
+let user=null,active=false,epoch=0,snapshot=null;const baselines={};
+const status=(s,error=false)=>{$('dailyStatus').textContent=s;$('dailyStatus').style.color=error?'#a33a31':'#0f766e'};
 const fail=e=>status(e?.message||String(e),true);
-function parseTasks(content){
- let section='',out=[];
- for(const line of String(content||'').split(/\r?\n/)){
-  const x=line.trim();
-  // Do not accidentally classify an upcoming dated section as OGGI.
-  if(!x.startsWith('- ')&&x===x.toLocaleUpperCase('it-IT')&&/^[A-ZÀ-Ü0-9 .–—/-]+$/.test(x)){section=x;continue}
-  if((section==='OGGI'||section==='URGENTE'||/^ENTRO\b/.test(section))&&x.startsWith('- ')&&!/^[-]\s*\[[xX]\]/.test(x))out.push(x.slice(2));
- }
- return out.slice(0,25);
-}
-async function refresh(){
- if(!user)return;
- const [g,t,h]=await Promise.all([
-  db.from('journal_monitoring_goals').select('id,title,metric_type').eq('user_id',user.id).eq('status','active'),
-  db.from('journal_todo_single').select('content').eq('user_id',user.id).maybeSingle(),
-  db.from('journal_daily_checkins').select('*').eq('user_id',user.id).order('checkin_date',{ascending:false}).limit(28)
- ]);
- if(g.error||t.error||h.error)throw(g.error||t.error||h.error);
- goals=g.data||[];tasks=parseTasks(t.data?.content);history=h.data||[];
- $('dailyTasks').innerHTML=tasks.length?tasks.map((s,i)=>`<label class="daily-task"><input type="checkbox" value="${i}"><span>${html(s)}</span></label>`).join(''):'Nessuna attività in OGGI o URGENTE.';
- $('otherGoals').innerHTML=goals.filter(x=>x.metric_type!=='sleep').map(g=>`<label>${html(g.title)} (facoltativo)<input class="otherMetric" type="text" data-goal="${g.id}" maxlength="120" placeholder="Valore osservato"></label>`).join('');
- $('dailyHistory').innerHTML=history.map(h=>`<div class="daily-record"><b>${html(h.checkin_date)} — ${h.phase==='morning'?'Mattino':'Sera'}</b><small>${html(JSON.stringify(h.answers))}</small>${h.note?html(h.note):''}</div>`).join('')||'Nessun check-in registrato.';
-}
-function activate(){
- if(!user)return;
- $('journalTab').click();
- ['journalLayout','errorsPanel','changePanel','todoPanel','tagsPanel','instructionsPanel','monPanel'].forEach(id=>{if($(id))$(id).hidden=true});
- nav.querySelectorAll('button').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-selected','false')});
- tab.classList.add('active');tab.setAttribute('aria-selected','true');panel.hidden=false;active=true;
- refresh().then(()=>status('Dati aggiornati.')).catch(fail);
-}
-tab.addEventListener('click',activate);
-nav.querySelectorAll('button').forEach(b=>{if(b!==tab)b.addEventListener('click',()=>{active=false;panel.hidden=true;tab.classList.remove('active');tab.setAttribute('aria-selected','false')})});
-const validDay=d=>{if(!d||d>today())throw Error('Inserisci una data non futura.')};
-async function write(phase,date,answers,note){
- const {error}=await db.from('journal_daily_checkins').upsert({user_id:user.id,checkin_date:date,phase,answers,note,updated_at:new Date().toISOString()},{onConflict:'user_id,checkin_date,phase'});
- if(error)throw error;
-}
-$('morningForm').addEventListener('submit',async e=>{
- e.preventDefault();if(!user)return;
- const d=$('morningDate').value,bed=$('actualBed').value,wake=$('actualWake').value,energy=Number($('actualEnergy').value);
- const button=e.target.querySelector('button[type="submit"]');button.disabled=true;
- try{
-  validDay(d);if(!bed||!wake||!Number.isInteger(energy)||energy<1||energy>5)throw Error('Compila orari ed energia.');
-  const extra={};
-  for(const x of $('otherGoals').querySelectorAll('.otherMetric'))if(x.value.trim())extra[x.dataset.goal]=x.value.trim();
-  await write('morning',d,{bed_time:bed,wake_time:wake,energy_1_5:energy,other_metrics:extra},$('morningNote').value.trim());
-  const sleep=goals.find(x=>x.metric_type==='sleep');
-  if(sleep){
-   const old=await db.from('journal_monitoring_logs').select('metrics').eq('user_id',user.id).eq('goal_id',sleep.id).eq('observed_on',d).maybeSingle();
-   if(old.error)throw old.error;
-   const {error}=await db.from('journal_monitoring_logs').upsert({user_id:user.id,goal_id:sleep.id,observed_on:d,metrics:{...(old.data?.metrics||{}),bed_time:bed,wake_time:wake,energy_1_5:energy},note:$('morningNote').value.trim(),updated_at:new Date().toISOString()},{onConflict:'user_id,goal_id,observed_on'});
-   if(error)throw error;
-  }
-  for(const [goalId,value] of Object.entries(extra)){
-   const {error}=await db.from('journal_monitoring_logs').upsert({user_id:user.id,goal_id:goalId,observed_on:d,metrics:{value},updated_at:new Date().toISOString()},{onConflict:'user_id,goal_id,observed_on'});
-   if(error)throw error;
-  }
-  await refresh();status('Check-in mattutino registrato.'); 
- }catch(err){fail(err)}finally{button.disabled=false}
-});
-$('eveningForm').addEventListener('submit',async e=>{
- e.preventDefault();if(!user)return;
- const button=e.target.querySelector('button[type="submit"]');button.disabled=true;
- try{
-  const d=$('eveningDate').value;validDay(d);
-  const done=[...$('dailyTasks').querySelectorAll('input:checked')].map(x=>tasks[Number(x.value)]).filter(Boolean);
-  await write('evening',d,{completed_tasks:done,additional_completed:$('moreCompleted').value.trim(),carry_over:$('toCarry').value.trim(),planned_bedtime:$('bedPlan').value},$('eveningNote').value.trim());
-  await refresh();status('Check-in serale registrato. Nessuna attività è stata modificata automaticamente.');
- }catch(err){fail(err)}finally{button.disabled=false}
-});
-$('morningDate').value=today();$('eveningDate').value=today();
-db.auth.getSession().then(({data})=>user=data?.session?.user||null).catch(fail);
-db.auth.onAuthStateChange((_event,session)=>{user=session?.user||null;if(!user){active=false;panel.hidden=true}else if(active)refresh().catch(fail)});
+const form=p=>$(p+'Form');
+async function loadForm(p){const f=form(p),date=f.elements.date.value,token=epoch,uid=user?.id;f.querySelector('button').disabled=true;try{if(!uid)return;const r=await db.from('journal_daily_checkins').select('*').eq('user_id',uid).eq('checkin_date',date).eq('phase',p).maybeSingle();if(r.error)throw r.error;if(token!==epoch||uid!==user?.id||date!==f.elements.date.value)return;baselines[p]={date,row:r.data};for(const [k]of fields[p])f.elements[k].value=String(r.data?.answers?.[k]??'');f.elements.note.value=r.data?.note||'';f.querySelector('.legacy').textContent=r.data?'Dati già salvati caricati. Le modifiche richiedono conferma. '+(r.data.answers?.energy_1_5!=null?'Energia storica: '+r.data.answers.energy_1_5+'/5, preservata.':''):'Nessun check-in per questa fase. Non ripetere dati già noti altrove.';}finally{f.querySelector('button').disabled=!user;}}
+async function refresh(){if(!user)return;const uid=user.id,token=epoch;const results=await Promise.all([db.from('journal_todo_single').select('content').eq('user_id',uid).maybeSingle(),db.from('journal_daily_checkins').select('*').eq('user_id',uid).order('checkin_date',{ascending:false}).limit(28),db.from('lifeos_system_registry').select('components').eq('user_id',uid).maybeSingle(),db.from('lifeos_context_snapshots').select('id,snapshot_date,revision,generated_at,file_name').eq('user_id',uid).order('snapshot_date',{ascending:false}).order('revision',{ascending:false}).limit(1)]);if(token!==epoch||user?.id!==uid)return;for(const r of results)if(r.error)throw r.error;const[t,h,r,s]=results;$('dailyTasks').textContent=t.data?.content||'Nessuna lista disponibile.';$('dailyHistory').innerHTML=(h.data||[]).map(x=>`<div class="daily-record"><b>${esc(x.checkin_date)} — ${esc(x.phase)}</b><div>${esc(JSON.stringify(x.answers))}</div>${esc(x.note)}</div>`).join('')||'Nessun check-in.';$('dailyDirections').innerHTML='<h3>Direzioni di vita</h3>'+((r.data?.components?.life_direction_model?.directions)||[]).map(x=>`<p>${esc(x.title)}</p>`).join('');snapshot=s.data?.[0]||null;$('dailySnapshot').innerHTML=snapshot?`<p>Contesto archiviato: ${esc(snapshot.snapshot_date)}, revisione ${snapshot.revision}${snapshot.snapshot_date!==today()?' — non odierno':''}. <button type="button" id="downloadDailyContext">Scarica MD</button></p>`:'Nessun contesto archiviato.';if(snapshot)$('downloadDailyContext').onclick=download;await Promise.all(['morning','evening'].map(loadForm));}
+async function download(){try{const uid=user?.id,id=snapshot?.id;if(!uid||!id)return;const r=await db.from('lifeos_context_snapshots').select('content,file_name').eq('user_id',uid).eq('id',id).single();if(r.error)throw r.error;if(user?.id!==uid)return;const url=URL.createObjectURL(new Blob([r.data.content],{type:'text/markdown;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download=r.data.file_name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){fail(e)}}
+async function save(p,e){e.preventDefault();if(!user)return;const f=form(p),b=f.querySelector('button[type="submit"]');b.disabled=true;try{const uid=user.id,date=f.elements.date.value,base=baselines[p];if(!date||date>today())throw Error('Inserisci una data non futura.');if(!base||base.date!==date)throw Error('Attendi il caricamento della data o riapri il check-in.');const answers={...(base.row?.answers||{})};let changed=false;for(const[k,,type]of fields[p]){const raw=f.elements[k].value.trim(),old=base.row?.answers?.[k];const value=raw===''?null:type==='boolean'?raw==='true':['number','scale'].includes(type)?Number(raw):raw;if(raw!==''&&['number','scale'].includes(type)&&(!Number.isFinite(value)||value<0||(type==='scale'&&(!Number.isInteger(value)||value<1||value>10))))throw Error('Controlla le scale 1–10 e i valori numerici.');if(String(old??'')!==String(value??'')){answers[k]=value;changed=true;}}
+const note=f.elements.note.value.trim();if(note!==(base.row?.note||''))changed=true;if(!changed){status('Nessuna modifica da salvare.');return;}if(base.row&&!confirm('Aggiornare questo check-in? I campi storici non modificati saranno preservati.'))return;
+const payload={answers,note,updated_at:new Date().toISOString()};let query;if(base.row)query=db.from('journal_daily_checkins').update(payload).eq('id',base.row.id).eq('user_id',uid).eq('updated_at',base.row.updated_at);else query=db.from('journal_daily_checkins').insert({...payload,user_id:uid,checkin_date:date,phase:p});const result=await query.select('*').single();if(result.error)throw Error('Salvataggio non confermato: '+result.error.message+'. Riapri il check-in per verificare eventuali modifiche concorrenti.');if(user?.id!==uid)return;await refresh();status('Check-in salvato e verificato. Nessuna attività o appuntamento modificato.');}catch(err){fail(err)}finally{b.disabled=!user;}}
+for(const p of ['morning','evening']){form(p).addEventListener('submit',e=>save(p,e));form(p).elements.date.addEventListener('change',()=>{delete baselines[p];loadForm(p).catch(fail)});}
+tab.addEventListener('click',()=>{if(!user)return;$('journalTab')?.click();main.querySelectorAll(':scope > section,:scope > .journal-layout').forEach(el=>{if(el!==panel)el.hidden=true});['journalLayout','errorsPanel','changePanel','todoPanel','tagsPanel','instructionsPanel','monPanel','deadlinesPanel','planningPanel','holidaysPanel'].forEach(id=>{if($(id))$(id).hidden=true});nav.querySelectorAll('button').forEach(b=>{b.classList.toggle('active',b===tab);b.setAttribute('aria-selected',String(b===tab))});active=true;panel.hidden=false;$('dailyClock').textContent=new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',dateStyle:'full',timeStyle:'short'}).format(new Date())+' · Europe/Rome';refresh().then(()=>status('Dati caricati.')).catch(fail);});
+nav.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&b!==tab){active=false;panel.hidden=true;tab.classList.remove('active')}});
+function auth(session){const next=session?.user||null;if(next?.id!==user?.id){epoch++;Object.keys(baselines).forEach(k=>delete baselines[k]);for(const p of ['morning','evening'])form(p).reset();['dailyHistory','dailyTasks','dailyDirections','dailySnapshot','dailyStatus'].forEach(id=>$(id).textContent='');snapshot=null;panel.hidden=true;active=false;}user=next;}
+db.auth.getSession().then(({data,error})=>{if(error)throw error;auth(data?.session)}).catch(fail);db.auth.onAuthStateChange((_e,s)=>auth(s));
 })();
