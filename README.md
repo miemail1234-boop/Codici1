@@ -16,7 +16,7 @@
 
 ## Componenti e flussi
 
-- **Mattino, 08:00:** briefing con attività di Journal, Google Calendar, scadenze verificate, conflitti di pianificazione e domande di monitoraggio. Per il sonno: orario *effettivo* di coricamento della sera precedente, risveglio, energia da 1 a 5 e nota facoltativa.
+- **Mattino, 07:00:** briefing con attività di Journal, Google Calendar, scadenze verificate, conflitti di pianificazione e domande di monitoraggio. Per il sonno: orario *effettivo* di coricamento della sera precedente, risveglio, energia da 1 a 5 e nota facoltativa.
 - **Sera, 21:30:** verifica attività svolte/non svolte, proposte di ripianificazione, ora *prevista* di andare a letto e nota. La lista Da fare non viene modificata automaticamente.
 - **Monitoraggi:** obiettivi e rilevazioni strutturate, con revisioni dei progressi e separazione dei giorni privi di dati.
 - **Scadenze:** date accertate, categoria, stato e preavvisi. Una voce con data ignota non riceve una data inventata. Un'unica automazione ChatGPT **LifeOS — scadenze e attività** consulta la lista «Da fare» e le scadenze strutturate ogni giorno (Europe/Rome), deduplica e invia al massimo un riepilogo se ci sono elementi rilevanti. Il briefing mattutino non duplica questi avvisi. Le modifiche via SQL o ChatGPT a `journal_todo_single` devono essere sincronizzate anche su `journal_deadlines`: il JavaScript dell'interfaccia non viene eseguito automaticamente da scritture esterne. Le notifiche push/email devono essere abilitate nell'account per ricevere gli avvisi.
@@ -66,3 +66,7 @@ LifeOS consulta come fonti per gli appuntamenti **solo «Lavoro» e «Calendario
 **Qualsiasi nuovo evento o modifica di calendario autorizzata dall'utente va eseguita per impostazione predefinita su «Lavoro», anche per gli appuntamenti clinici.** Usare o modificare «Calendario Neuropsi Galeazzi» soltanto quando l'utente lo richiede espressamente; non scegliere il calendario di destinazione deducendolo dal tipo di attività. Nessun evento va creato o modificato senza richiesta o autorizzazione specifica.
 
 Il briefing mattutino deve incrociare i due calendari con gli appuntamenti menzionati nei check-in e segnalare gli impegni confermati ma **non ancora calendarizzati**, senza considerarli automaticamente salvati in Google Calendar. Il check-in serale verifica gli appuntamenti di domani e chiede autorizzazione per quelli mancanti. Le impostazioni tecniche aggiornate e gli ID dei calendari sono registrati in Supabase, in `public.lifeos_system_registry.components.integrations.calendar_policy` e nella versione corrente di `public.journal_instructions`.
+
+## LifeOS Voice Bridge — lettura resiliente
+
+Il recupero contestuale per Voice Live è regolato dalle istruzioni Supabase correnti. Per il protocollo tecnico di lettura selettiva, gestione dei blocchi intermittenti e checklist di verifica, consultare [Voice Bridge — runbook](journal/voice_bridge_runbook.md). Un blocco parziale del connettore non rende automaticamente inaccessibile l'intero Journal; i dati mancanti devono comunque essere dichiarati.
