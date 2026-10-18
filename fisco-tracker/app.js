@@ -26,6 +26,7 @@
     { key: 'ordine-psicologi', month: 2, day: 28, title: 'Ordine Psicologi Lombardia', desc: 'Quota annuale iscrizione ordine.', assets: ['enpap'], payment: true, explanation: 'Promemoria per quota di iscrizione professionale.', paymentInfo: 'Pagamento secondo avviso dell’Ordine.' },
   ];
 
+  window.fiscoDeadlineTemplates = templates;
   let state = loadState();
 
   const $ = id => document.getElementById(id);
