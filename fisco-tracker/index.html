@@ -41,6 +41,12 @@
 
       <section id="data" class="view">
         <header class="page-head"><div><p class="eyebrow">Backup</p><h1>Dati locali</h1><p class="muted">Questa versione web non pubblica i tuoi dati: usa localStorage e backup JSON manuale.</p></div></header>
+        <div class="card data-card" id="fiscoCloud" data-logged="false" style="margin-bottom:18px">
+          <h2>Supabase · LifeOS</h2><p id="fiscoCloudStatus" role="status">Verifica accesso...</p>
+          <label>Email <input id="fiscoEmail" type="email" placeholder="Email account LifeOS"></label>
+          <div class="actions"><button id="fiscoLogin" class="primary">Invia link di accesso</button><button id="fiscoLogout">Esci</button><button id="fiscoSave" class="primary">Salva su Supabase</button><button id="fiscoLoad">Carica da Supabase</button><button id="fiscoPush">Invia scadenze modificate a LifeOS</button><button id="fiscoPull">Aggiorna completamenti da LifeOS</button></div>
+          <p>Gli allegati rimangono nel browser. Le date dei modelli sono indicative: in LifeOS le scadenze importate restano senza data finché non sono verificate.</p>
+        </div>
         <div class="card data-card">
           <div class="actions"><button id="exportBtn" class="primary">Esporta JSON</button><label class="file-btn">Importa JSON<input id="importInput" type="file" accept="application/json,.json"></label><button id="wipeBtn" class="danger">Cancella dati locali</button></div>
           <p class="muted">Puoi importare il vecchio <code>data.json</code> dell'app locale: l'app riconosce completamenti, importi, note e allegati.</p>
@@ -57,6 +63,8 @@
     </article>
   </template>
 
-  <script src="app.js?v=1"></script>
+  <script src="../vendor/supabase.js"></script>
+  <script src="app.js?v=2"></script>
+  <script src="cloud_sync.js?v=1"></script>
 </body>
 </html>
