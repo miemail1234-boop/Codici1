@@ -9,3 +9,11 @@ host.querySelector('[data-year]').value='2025';host.querySelector('[data-year]')
 });
 test('Google adapter blocks edits to unrelated existing events',async()=>{const dom=new JSDOM('',{runScripts:'outside-only'});dom.window.eval(fs.readFileSync(path.join(__dirname,'../shared/fiscal-google.js'),'utf8'));const g=new dom.window.GoogleFiscal({});g.calendar='Lavoro';let calls=0;g.request=async()=>{calls++;return {description:'Private unrelated event'}};await assert.rejects(()=>g.sync({id:'d',date_verified:true,due_on:'2026-12-02',status:'pending'},[],[]),/non appartenente/);assert.equal(calls,1);dom.window.close();});
 test('Google adapter never publishes template dates',async()=>{const dom=new JSDOM('',{runScripts:'outside-only'});dom.window.eval(fs.readFileSync(path.join(__dirname,'../shared/fiscal-google.js'),'utf8'));const g=new dom.window.GoogleFiscal({});g.calendar='Lavoro';g.request=async()=>{throw Error('must not request')};assert.equal((await g.sync({id:'d',date_verified:false,due_on:'2026-12-16'},[],[])).skipped,true);dom.window.close();});
+test('folder authorization rejects wrong account and non-private folders before Picker',async()=>{
+ const dom=new JSDOM('',{runScripts:'outside-only'});dom.window.eval(fs.readFileSync(path.join(__dirname,'../shared/fiscal-google.js'),'utf8'));const g=new dom.window.GoogleFiscal({});g.calendar='wrong';let calls=0;g.privateFolder=async()=>{calls++;throw Error('not private')};
+ await assert.rejects(()=>g.authorizeFolders({calendar_id:'correct',receipts_folder_id:'root'}),/account Google/);assert.equal(calls,0);g.calendar='correct';await assert.rejects(()=>g.authorizeFolders({calendar_id:'correct',receipts_folder_id:'root'}),/not private/);dom.window.close();
+});
+test('folder authorization checks existing annual folders, not only root',async()=>{
+ const dom=new JSDOM('',{runScripts:'outside-only'});dom.window.eval(fs.readFileSync(path.join(__dirname,'../shared/fiscal-google.js'),'utf8'));const g=new dom.window.GoogleFiscal({});const checked=[];g.privateFolder=async id=>{checked.push(id);if(id==='year'){const e=Error('ungranted');e.status=404;throw e;}};
+ await assert.rejects(()=>g.authorizeFolders({receipts_folder_id:'root',receipts_authorization_folder_ids:['year']}),/Configurare Google Picker/);assert.deepEqual(checked,['root','year']);dom.window.close();
+});

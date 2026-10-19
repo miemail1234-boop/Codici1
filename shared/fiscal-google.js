@@ -14,6 +14,26 @@ class GoogleFiscal{
   if(matches.length!==1)throw Error('Calendario Lavoro non identificato univocamente nell’account Google selezionato.');
   this.calendar=matches[0].id;
  }
+ async authorizeFolders(config){
+  const ids=[...new Set([config.receipts_folder_id,...(config.receipts_authorization_folder_ids||[])].filter(Boolean))];
+  if(!ids.length)throw Error('Cartella ricevute non configurata.');
+  if(config.calendar_id&&this.calendar!==config.calendar_id)throw Error('Seleziona l’account Google del calendario configurato.');
+  const missing=[];
+  for(const id of ids){try{await this.privateFolder(id);}catch(e){if(e.status===404)missing.push(id);else throw e;}}
+  if(!missing.length)return;
+  if(!config.google_picker_api_key||!config.google_project_number)throw Error('Configurare Google Picker per autorizzare le cartelle ricevute esistenti.');
+  if(!window.gapi){await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://apis.google.com/js/api.js';s.onload=resolve;s.onerror=()=>reject(Error('Google Picker non disponibile'));document.head.appendChild(s);});}
+  if(!window.google?.picker)await new Promise((resolve,reject)=>gapi.load('picker',{callback:resolve,onerror:()=>reject(Error('Google Picker non disponibile')),timeout:15000,ontimeout:()=>reject(Error('Google Picker non risponde'))}));
+  await new Promise((resolve,reject)=>{
+   const view=new google.picker.DocsView(google.picker.ViewId.FOLDERS).setIncludeFolders(true).setSelectFolderEnabled(true).setOwnedByMe(true);
+   const picker=new google.picker.PickerBuilder().addView(view).setOAuthToken(this.token).setDeveloperKey(config.google_picker_api_key).setAppId(String(config.google_project_number)).setOrigin(location.origin).setTitle('Seleziona Ricevute e le cartelle annuali esistenti').enableFeature(google.picker.Feature.MULTISELECT_ENABLED).setCallback(data=>{
+    if(data.action===google.picker.Action.CANCEL){picker.dispose();reject(Error('Autorizzazione cartelle annullata.'));}
+    if(data.action===google.picker.Action.PICKED){picker.dispose();const selected=new Set((data.docs||[]).map(d=>d.id));if(missing.some(id=>!selected.has(id)))reject(Error('Seleziona tutte le cartelle ricevute configurate, incluse quelle annuali.'));else resolve();}
+   }).build();picker.setVisible(true);
+  });
+  // A selection is not evidence of privacy: inspect every folder after the grant.
+  for(const id of ids)await this.privateFolder(id);
+ }
  async request(url,options={}){if(!this.token||Date.now()>=this.expires)throw Error('Ricollega Google: autorizzazione di sessione scaduta.');const r=await fetch(url,{...options,headers:{Authorization:'Bearer '+this.token,...options.headers}});if(!r.ok){const e=Error('Google '+r.status+': '+await r.text());e.status=r.status;throw e;}return r.status===204?null:r.json();}
  async pages(url,field){let data=[],token;do{const u=new URL(url);if(token)u.searchParams.set('pageToken',token);const r=await this.request(u);data.push(...(r[field]||[]));token=r.nextPageToken;}while(token);return data;}
  async privateFolder(id){const f=await this.request('https://www.googleapis.com/drive/v3/files/'+encodeURIComponent(id)+'?fields=id,mimeType,trashed,ownedByMe,permissions(type,role)');if(f.trashed||!f.ownedByMe||f.mimeType!=='application/vnd.google-apps.folder'||f.permissions?.some(p=>p.role!=='owner'))throw Error('La cartella deve essere privata e di tua proprietà.');return f;}
