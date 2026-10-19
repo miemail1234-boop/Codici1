@@ -1,0 +1,19 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const {JSDOM}=require('jsdom');
+test('shared UI mounts, escapes data, filters and preserves stale editor',async()=>{
+const dom=new JSDOM('<main id="host"></main>',{runScripts:'outside-only',url:'https://example.test/'});const w=dom.window;let rows=[{id:'1',title:'<img src=x onerror=alert(1)>',category:'fiscale',status:'pending',applicability:'da_verificare',revision:1,fiscal_year:2026,notes:'x'}];
+w.LifeOSFiscal={types:[],Store:class{async all(table='journal_deadlines'){return table==='journal_deadlines'?rows:[]}async update(){throw Error('Modifica concorrente')} }};w.GoogleFiscal=class{disconnect(){}};
+w.eval(fs.readFileSync(path.join(__dirname,'../shared/fiscal-ui.js'),'utf8'));const host=w.document.getElementById('host');const cleanup=await w.mountFiscal(host,{}, {id:'u',email:'test@example.test'});
+assert.equal(host.querySelectorAll('.fiscal-row').length,1);assert.equal(host.querySelectorAll('img').length,0);
+host.querySelector('[data-action="edit"]').click();const form=host.querySelector('form');form.elements.notes.value='local unsaved';await form.onsubmit({preventDefault(){}});assert.match(host.querySelector('[data-status]').textContent,/concorrente/);assert.equal(form.elements.notes.value,'local unsaved');assert.equal(form.hidden,false);
+host.querySelector('[data-year]').value='2025';host.querySelector('[data-year]').dispatchEvent(new w.Event('input'));assert.equal(host.querySelectorAll('.fiscal-row').length,0);cleanup();dom.window.close();
+});
+test('Google adapter blocks edits to unrelated existing events',async()=>{const dom=new JSDOM('',{runScripts:'outside-only'});dom.window.eval(fs.readFileSync(path.join(__dirname,'../shared/fiscal-google.js'),'utf8'));const g=new dom.window.GoogleFiscal({});g.calendar='Lavoro';let calls=0;g.request=async()=>{calls++;return {description:'Private unrelated event'}};await assert.rejects(()=>g.sync({id:'d',date_verified:true,due_on:'2026-12-02',status:'pending'},[],[]),/non appartenente/);assert.equal(calls,1);dom.window.close();});
+test('Google adapter never publishes template dates',async()=>{const dom=new JSDOM('',{runScripts:'outside-only'});dom.window.eval(fs.readFileSync(path.join(__dirname,'../shared/fiscal-google.js'),'utf8'));const g=new dom.window.GoogleFiscal({});g.calendar='Lavoro';g.request=async()=>{throw Error('must not request')};assert.equal((await g.sync({id:'d',date_verified:false,due_on:'2026-12-16'},[],[])).skipped,true);dom.window.close();});
+test('folder authorization rejects wrong account and non-private folders before Picker',async()=>{
+ const dom=new JSDOM('',{runScripts:'outside-only'});dom.window.eval(fs.readFileSync(path.join(__dirname,'../shared/fiscal-google.js'),'utf8'));const g=new dom.window.GoogleFiscal({});g.calendar='wrong';let calls=0;g.privateFolder=async()=>{calls++;throw Error('not private')};
+ await assert.rejects(()=>g.authorizeFolders({calendar_id:'correct',receipts_folder_id:'root'}),/account Google/);assert.equal(calls,0);g.calendar='correct';await assert.rejects(()=>g.authorizeFolders({calendar_id:'correct',receipts_folder_id:'root'}),/not private/);dom.window.close();
+});
+test('folder authorization checks existing annual folders, not only root',async()=>{
+ const dom=new JSDOM('',{runScripts:'outside-only'});dom.window.eval(fs.readFileSync(path.join(__dirname,'../shared/fiscal-google.js'),'utf8'));const g=new dom.window.GoogleFiscal({});const checked=[];g.privateFolder=async id=>{checked.push(id);if(id==='year'){const e=Error('ungranted');e.status=404;throw e;}};
+ await assert.rejects(()=>g.authorizeFolders({receipts_folder_id:'root',receipts_authorization_folder_ids:['year']}),/Configurare Google Picker/);assert.deepEqual(checked,['root','year']);dom.window.close();
+});

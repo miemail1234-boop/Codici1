@@ -1,0 +1,1 @@
+{"private":true,"scripts":{"test:fiscal":"node --test tests/fiscal-core.cjs tests/fiscal-ui.cjs tests/fiscal-edge.cjs"},"devDependencies":{"jsdom":"26.1.0"}}
