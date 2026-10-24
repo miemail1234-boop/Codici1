@@ -10,16 +10,16 @@
 | **Life Tracker 3.1** | App/modulo di monitoraggio e dashboard, inclusi allenamento e nutrizione | `/life-tracker/` |
 | **Journal** | Diario, Da fare, Check-in, Monitoraggi, Scadenze, Pianificazione e Festività | `/journal/` |
 | **Google Calendar** | Fonte autorevole degli appuntamenti (solo calendari «Lavoro», personale, e «Calendario Neuropsi Galeazzi», condiviso) | Connettore esterno; non viene copiato interamente in Journal |
-| **Automazioni ChatGPT** | Briefing, check-in serale, controlli scadenze e revisioni | Funzioni programmate separate dal sito |
+| **Emma in ChatGPT** | Recupero contestuale e funzioni conversazionali su richiesta | Istruzioni canoniche in Supabase e protocolli privati su Drive |
 
 **Compatibilità:** le directory, gli URL, le tabelle esistenti e il nome del modulo *Life Tracker* rimangono invariati. Modificare soltanto l'identità visibile e le istruzioni non interrompe i collegamenti preesistenti.
 
 ## Componenti e flussi
 
-- **Mattino, 07:00:** briefing con attività di Journal, Google Calendar, scadenze verificate, conflitti di pianificazione e domande di monitoraggio. Per il sonno: orario *effettivo* di coricamento della sera precedente, risveglio, energia da 1 a 5 e nota facoltativa.
-- **Sera, 21:30:** verifica attività svolte/non svolte, proposte di ripianificazione, ora *prevista* di andare a letto e nota. La lista Da fare non viene modificata automaticamente.
+- **Mattino, su richiesta:** check-in volontario e successivo menù della giornata, applicando le istruzioni canoniche correnti e le fonti obbligatorie. Nessun briefing parte spontaneamente.
+- **Sera, su richiesta:** check-in volontario, verifica delle attività e analisi soltanto con il consenso previsto. La lista Da fare non viene modificata per deduzione.
 - **Monitoraggi:** obiettivi e rilevazioni strutturate, con revisioni dei progressi e separazione dei giorni privi di dati.
-- **Scadenze:** date accertate, categoria, stato e preavvisi. Una voce con data ignota non riceve una data inventata. Un'unica automazione ChatGPT **LifeOS — scadenze e attività** consulta la lista «Da fare» e le scadenze strutturate ogni giorno (Europe/Rome), deduplica e invia al massimo un riepilogo se ci sono elementi rilevanti. Il briefing mattutino non duplica questi avvisi. Le modifiche via SQL o ChatGPT a `journal_todo_single` devono essere sincronizzate anche su `journal_deadlines`: il JavaScript dell'interfaccia non viene eseguito automaticamente da scritture esterne. Le notifiche push/email devono essere abilitate nell'account per ricevere gli avvisi.
+- **Scadenze:** date accertate, categoria, stato e metadati di preavviso. Una voce con data ignota non riceve una data inventata. Le funzioni LifeOS operano su richiesta; i metadati non costituiscono notifiche automatiche. Le modifiche esterne a `journal_todo_single` devono sincronizzare anche `journal_deadlines`, perché il JavaScript dell'interfaccia non viene eseguito dalle scritture esterne.
 - **Attività con scadenza:** le attività inserite nella lista «Da fare» sotto intestazioni `ENTRO <giorno mese anno>` oppure con un `entro <data>` esplicito vengono sincronizzate dal sito in `journal_deadlines` al salvataggio. La sincronizzazione esterna via ChatGPT deve aggiornare entrambe le tabelle secondo `journal_instructions`; i promemoria sono progressivi (fino a 7, 3, 1, 0 giorni, adattati all'orizzonte). Le scadenze non creano eventi Calendar. Le automazioni programmate e le notifiche ChatGPT sono componenti separati: verificare che le notifiche siano abilitate, non presumere invii push/email.
 - **Pianificazione:** confronto degli eventi fino a 28 giorni, gestione delle sovrapposizioni confermate/potenziali e controllo obbligatorio delle festività nazionali italiane, delle domeniche e delle festività milanesi applicabili.
 - **Revisione:** sintesi settimanale e, quando utile, mensile. Le analisi vengono salvate soltanto quando le fonti e le conferme sono disponibili.
@@ -41,6 +41,14 @@ Progetto: `kujyowhezihjambhpahe`.
 | `journal_holiday_dates` | Festività italiane e milanesi precompilate (2026–2045) |
 
 Le tabelle private applicano Row Level Security per utente. Non aggiungere API key private o dati personali ai file GitHub.
+
+## Istruzioni modulari di Emma
+
+Dal 24 ottobre 2026 `journal_instructions` contiene un nucleo operativo breve. I protocolli specialistici privati risiedono nella cartella Drive `M/Sistema_LifeOS` e sono indirizzati da ID effettivi in `lifeos_system_registry.components.instruction_architecture`.
+
+La memoria di lavoro è composita e viene costruita su richiesta: BloccoNote e fonti operative ordinarie per il contesto corrente, copertura completa per la pianificazione, fonti selettive per gli approfondimenti specialistici. Non esiste un nuovo database che duplica continuamente tutte le fonti.
+
+Questa architettura è dipendente dai connettori. Le istruzioni descrivono il comportamento atteso ma non garantiscono l'accesso automatico in ogni nuova chat o modalità Voice. Le versioni precedenti restano recuperabili in `journal_instruction_history`.
 
 ## Quando l'utente dice «LifeOS»
 
@@ -82,3 +90,4 @@ New optional JSON answer keys: `health_1_10`, `wake_energy_1_10`, `day_energy_1_
 Canonical assistant behavior remains in private `journal_instructions`: compare planned/actual/results/goals, preserve autonomy, use verified local time when tools allow, and separate archived context from conversation updates and verified writes. Scheduled tasks launch that same protocol. New measurements are stored in check-ins; readers must combine them with historical monitoring logs and deduplicate observations. Weight is not automatically copied into a second table.
 
 Run browser regression tests with `node tests/checkin.cjs` after installing Playwright and its Chromium browser. Tests use a mocked backend and never write personal data.
+
