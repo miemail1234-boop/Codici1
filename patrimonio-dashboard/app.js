@@ -142,7 +142,7 @@ function renderHousing(){
  const implied=housing==null?cost*Math.pow(1+state.assumedHouseGrowth/100,years):num(housing);
  $("houseGrowthValue").textContent=(state.assumedHouseGrowth>=0?"+":"")+state.assumedHouseGrowth.toFixed(1).replace(".",",")+"%";
  $("appreciatedHouse").textContent=money(implied-cost+rent-(fees==null?0:num(fees))-(maintenance==null?0:num(maintenance)*days(INCEPTION,state.asof)/30.4375));
- $("houseCaveat").textContent="Acquisto interamente in contanti. Affitto evitato non imponibile. "+(fees==null||maintenance==null?"Costi notarili, imposte e spese di proprietà non ancora quantificati; i risultati prima dei costi non sono un guadagno netto definitivo.":"Costi di acquisto e proprietà inclusi nell'ipotesi.")+" Scenario rivalutazione: "+(housing==null?"in attesa di stima immobiliare.":"valore ipotetico, non perizia.");
+ $("houseCaveat").textContent="Acquisto interamente in contanti. Affitto evitato non imponibile. "+(fees==null||maintenance==null?"Costi notarili, imposte e spese di proprietà non ancora quantificati; i risultati prima dei costi non sono un guadagno netto definitivo.":"Costi di acquisto e proprietà inclusi nell'ipotesi.")+" Scenario rivalutazione: "+(housing==null?"simulazione parametrica al "+state.assumedHouseGrowth.toFixed(1)+"% annuo, NON indice di mercato.":"valore ipotetico, non perizia.");
 }
 function buildSelect(){
  const old=$("seriesSelect").value;
@@ -230,7 +230,7 @@ function drawSvg(series){
 function renderChart(){
  const series=chartSeries(),mode=$("chartMode").value;
  $("chartLegend").innerHTML=series.map(s=>'<span><i class="swatch" style="background:'+s.color+'"></i>'+safe(s.name)+'</span>').join("")+
- (mode==="value"?'<button id="toggleRent" class="button ghost" type="button">'+(state.showRent?"✓ ":"")+'Affitto evitato</button><button id="toggleHouse" class="button ghost" type="button" '+(state.settings?.house_value_today==null?'disabled title="Valore immobiliare non ancora stimato"':'')+'>'+(state.showHouse?"✓ ":"")+'Casa rivalutata</button>':"");
+ (mode==="value"?'<button id="toggleRent" class="button ghost" type="button">'+(state.showRent?"✓ ":"")+'Affitto evitato</button><button id="toggleHouse" class="button ghost" type="button" '+""+'>'+(state.showHouse?"✓ ":"")+'Casa rivalutata</button>':"");
  drawSvg(series);
  if($("toggleRent"))$("toggleRent").onclick=()=>{state.showRent=!state.showRent;renderChart();};
  if($("toggleHouse"))$("toggleHouse").onclick=()=>{state.showHouse=!state.showHouse;renderChart();};
