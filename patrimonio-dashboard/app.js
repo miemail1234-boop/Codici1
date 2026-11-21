@@ -49,7 +49,9 @@ function classify(name) {const n=name.toLowerCase();if(n.includes("overnight"))r
 function brokerName(n) {return n==="Scalable Capital"?"Scalable Capital":n==="Trade Republic"?"Trade Republic":n;}
 async function readAll(table,uid,order="date") {
  let result=[],from=0;for(let part=0;part<40;part++){
- const res=await client.from(table).select("*").eq("user_id",uid).order(order,{ascending:true}).range(from,from+999);
+ let query=client.from(table).select("*").eq("user_id",uid).order(order,{ascending:true});
+ if(table!=="portfolio_dashboard_balances"&&table!=="portfolio_dashboard_scenarios")query=query.order("id",{ascending:true});
+ const res=await query.range(from,from+999);
  if(res.error)throw new Error(table+": "+res.error.message);
  const rows=res.data||[];result.push(...rows);if(rows.length<1000)break;from+=1000;
  }
