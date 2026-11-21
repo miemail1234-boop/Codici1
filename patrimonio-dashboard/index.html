@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1423">
+<title>Patrimonio · Dashboard indipendente</title>
+<link rel="stylesheet" href="styles.css">
+<script src="../vendor/supabase.js" defer></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<header class="site-head">
+ <div class="shell head-inner"><div><div class="eyebrow"><span class="status-dot"></span> PATRIMONIO / LIFEOS</div><h1>Il tuo patrimonio, senza rumore.</h1><p>Una vista indipendente. Dati riservati da Supabase.</p></div><div class="head-actions"><a class="button ghost" href="../invest-tracker/" target="_blank" rel="noopener">Invest Tracker originale ↗</a><button id="reload" class="button primary" type="button">↻ Aggiorna</button></div></div>
+</header>
+<main class="shell">
+ <section id="auth" class="panel auth-note"><h2>Connessione protetta</h2><p>Verifica della sessione Supabase…</p></section>
+ <div id="dashboard" hidden>
+  <section class="hero panel">
+   <div class="hero-copy"><div class="section-kicker">PATRIMONIO FINANZIARIO COMPLESSIVO</div><div id="totalWealth" class="hero-value">—</div><p id="asOf" class="muted">Ultimi dati disponibili</p><div id="accountCards" class="accounts"></div></div>
+   <div class="hero-visual"><div id="donut" class="donut" role="img" aria-label="Distribuzione patrimoniale"><div class="donut-hole"><div>INVESTITO</div><strong id="investedShare">—</strong></div></div><div id="allocationLegend" class="allocation-legend"></div></div>
+  </section>
+  <section class="metric-grid" aria-label="Rendimento">
+    <article class="panel metric"><span>Rendimento lordo annualizzato</span><strong id="grossRate">—</strong><small>XIRR · Scalable + Trade Republic</small></article>
+    <article class="panel metric"><span>Rendimento netto annualizzato stimato</span><strong id="netRate">—</strong><small>Simulazione liquidazione, imposte aperte</small></article>
+    <article class="panel metric"><span>Guadagno netto cumulato stimato</span><strong id="netGain">—</strong><small>Dal 19 settembre 2023</small></article>
+    <article class="panel metric"><span>Media mensile netta equivalente</span><strong id="monthlyGain">—</strong><small>Media storica, non entrata garantita</small></article>
+  </section>
+  <div class="context-note"><span id="taxNote">Imposte stimate sulle plusvalenze positive delle posizioni attualmente aperte al 26%; fiscalità storica e aliquote speciali da verificare.</span></div>
+  <section class="panel chart-panel">
+    <div class="section-header"><div><div class="section-kicker">EVOLUZIONE</div><h2>Patrimonio e rendimento nel tempo</h2><p class="muted">Dal 19 settembre 2023 · i periodi senza valutazioni storiche restano senza linea.</p></div><div class="chart-selectors"><label>Serie <select id="seriesSelect"><option value="global">Patrimonio globale</option><option value="invested">Solo investimenti</option><option value="netgain">Guadagno netto stimato</option></select></label><label>Visualizza <select id="chartMode"><option value="value">Importi €</option><option value="return">Rendimento %</option></select></label></div></div>
+    <div id="chartLegend" class="chart-legend"></div>
+    <div id="chartWrap" class="chart-wrap"><svg id="performanceChart" viewBox="0 0 920 320" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Andamento del patrimonio"></svg><div id="chartTooltip" class="chart-tooltip" hidden></div></div>
+    <p id="chartCoverage" class="coverage-note"></p>
+  </section>
+  <section class="two-col">
+   <article class="panel"><div class="section-kicker">POSIZIONI</div><h2>Allocazione per strumento</h2><div id="holdingsTable" class="holdings"></div></article>
+   <article class="panel housing"><div class="section-kicker">BENCHMARK IMMOBILIARE</div><h2>Se avessi comprato casa nel 2023?</h2><p class="muted">Acquisto in contanti: 250.000 € · Affitto evitato: 940 €/mese.</p><div class="benchmark"><div><span>Affitto teoricamente evitato</span><strong id="savedRent">—</strong></div><div><span>Casa con valore invariato, beneficio lordo di spese</span><strong id="flatHouse">—</strong></div><div><span>Casa rivalutata secondo ipotesi impostata</span><strong id="appreciatedHouse">Da definire</strong></div></div><p id="houseCaveat" class="small">Il risparmio sull'affitto dell'abitazione principale non è reddito da locazione imponibile. Non sono ancora stimati notaio, imposte, manutenzione e rivalutazione di mercato.</p></article>
+  </section>
+  <section class="panel ledger">
+    <div class="section-header"><div><div class="section-kicker">REGISTRO UNIFICATO</div><h2>Tutti i movimenti</h2><p id="movementStats" class="muted">Caricamento movimenti…</p></div></div>
+    <div class="filters"><label>Conto<select id="accountFilter"><option value="all">Tutti i conti</option><option>Scalable Capital</option><option>Trade Republic</option><option>Fineco</option></select></label><label>Tipo<select id="kindFilter"><option value="all">Tutti i tipi</option></select></label><label>Ricerca<input id="movementSearch" type="search" placeholder="Strumento, descrizione, importo…"></label><label class="checkbox"><input type="checkbox" id="showPersonal"><span>Mostra spese e movimenti quotidiani</span></label></div>
+    <div class="ledger-header"><span>Data / Conto</span><span>Movimento</span><span>Importo</span></div>
+    <div id="movements" class="movement-list"></div>
+    <div class="ledger-bottom"><button id="loadMore" class="button ghost" type="button" hidden>Mostra altri movimenti</button></div>
+  </section>
+  <section class="panel transparency"><div class="section-kicker">METODOLOGIA E CONTROLLI</div><h2>Che cosa è verificato</h2><div id="methodology"></div></section>
+ </div>
+ <footer><span>Dashboard autonoma in sola lettura · dati privati Supabase · versione 1.0</span><span>Invest Tracker originale preservato</span></footer>
+</main>
+</body>
+</html>
