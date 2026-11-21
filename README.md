@@ -44,11 +44,24 @@ Le tabelle private applicano Row Level Security per utente. Non aggiungere API k
 
 ## Istruzioni modulari di Emma
 
-Dal 24 ottobre 2026 `journal_instructions` contiene un nucleo operativo breve. I protocolli specialistici privati risiedono nella cartella Drive `M/Sistema_LifeOS` e sono indirizzati da ID effettivi in `lifeos_system_registry.components.instruction_architecture`.
+Dal 24 ottobre 2026 `journal_instructions` contiene un nucleo operativo breve. I protocolli specialistici privati risiedono nella cartella Drive `LifeOS/M/Sistema_LifeOS` e sono indirizzati da ID effettivi in `lifeos_system_registry.components.instruction_architecture`.
 
 La memoria di lavoro è composita e viene costruita su richiesta: BloccoNote e fonti operative ordinarie per il contesto corrente, copertura completa per la pianificazione, fonti selettive per gli approfondimenti specialistici. Non esiste un nuovo database che duplica continuamente tutte le fonti.
 
 Questa architettura è dipendente dai connettori. Le istruzioni descrivono il comportamento atteso ma non garantiscono l'accesso automatico in ogni nuova chat o modalità Voice. Le versioni precedenti restano recuperabili in `journal_instruction_history`.
+
+## Organizzazione documentale Drive (21 novembre 2026)
+
+La radice documentale unica è la cartella privata [LifeOS](https://drive.google.com/drive/folders/11rrynJY2sjISFUt5ytrVxduEOmhD-2ET). Gli ID dei file sono mantenuti invariati dopo la ricollocazione:
+
+- `LifeOS/M/`: memoria di conoscenza, protocolli e indici Markdown; cartella ID `1m8pZAKrDIB7uv0rdhPXK1eAR5eL0HC_p`.
+- `LifeOS/M/Sistema_LifeOS/`: protocolli specialistici privati, ID `1M5Nz5cSFSn1esZHAoHlIZRl1me1DX8cu`.
+- `LifeOS/M/Lavoro_e_Ricerca/`, `Vita_Personale/` ed `Esportazioni_WhatsApp/`: memorie tematiche e fonti di sincronizzazione.
+- `LifeOS/M/Lavoro_e_Ricerca/Didattica_e_Tirocini/`: Registro tirocinanti e tesisti (Google Sheets) ID `1Rt-ty27LANLhOUBDXoxhOeelyFxNllpYTdJeaYrPlmw`; cartella ID `1ooJqc9698N5aUZtspSinrKQ2vQdMDNPW`.
+- `LifeOS/BloccoNote.md`: memoria di lavoro, ID `1_RI7zKwNTKN06dnzCjUItRHRs9jjoctI`.
+- `LifeOS/Fisco/FiscoTracker.md`: memoria fiscale, ID `1Lnc_23SwOvQp97rrN934ltfPcMF5h4gT`.
+
+Il registro autoritativo delle destinazioni e dei componenti è `public.lifeos_system_registry`; le istruzioni versionate per l'uso selettivo degli indici restano in `public.journal_instructions`. I file `indice.md` sono mappe di navigazione e non duplicano dati operativi o autorizzazioni. Le componenti Supabase, Google Calendar e GitHub restano nei rispettivi servizi: l'unificazione è documentale, non una migrazione dell'applicazione.
 
 ## Quando l'utente dice «LifeOS»
 
