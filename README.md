@@ -59,7 +59,7 @@ La radice documentale unica è la cartella privata [LifeOS](https://drive.google
 - `LifeOS/M/Lavoro_e_Ricerca/`, `Vita_Personale/` ed `Esportazioni_WhatsApp/`: memorie tematiche e fonti di sincronizzazione.
 - `LifeOS/M/Lavoro_e_Ricerca/Didattica_e_Tirocini/`: Registro tirocinanti e tesisti (Google Sheets) ID `1Rt-ty27LANLhOUBDXoxhOeelyFxNllpYTdJeaYrPlmw`; cartella ID `1ooJqc9698N5aUZtspSinrKQ2vQdMDNPW`.
 - `LifeOS/BloccoNote.md`: memoria di lavoro, ID `1_RI7zKwNTKN06dnzCjUItRHRs9jjoctI`.
-- `LifeOS/Fisco/FiscoTracker.md`: memoria fiscale, ID `1Lnc_23SwOvQp97rrN934ltfPcMF5h4gT`.
+- `LifeOS/M/Fisco/FiscoTracker.md`: memoria fiscale, ID `1Lnc_23SwOvQp97rrN934ltfPcMF5h4gT`.
 
 Il registro autoritativo delle destinazioni e dei componenti è `public.lifeos_system_registry`; le istruzioni versionate per l'uso selettivo degli indici restano in `public.journal_instructions`. I file `indice.md` sono mappe di navigazione e non duplicano dati operativi o autorizzazioni. Le componenti Supabase, Google Calendar e GitHub restano nei rispettivi servizi: l'unificazione è documentale, non una migrazione dell'applicazione.
 
