@@ -1,49 +1,59 @@
-# Patrimonio — dashboard indipendente (v1)
+# Patrimonio — dashboard indipendente (v1.1)
 
-Applicazione statica su GitHub Pages nella directory `/patrimonio-dashboard/`. È **totalmente distinta nel codice, URL, fogli di stile, componenti e navigazione** da `/invest-tracker/`. Non modifica alcun file dell'app originale.
+Web app statica su GitHub Pages in `/patrimonio-dashboard/`, distinta nel codice e nell'URL dall'app storica `/invest-tracker/`. Non modifica file né tabelle dell'Invest Tracker preesistente.
 
-## Sicurezza e modello dati
+## Fonti e autorizzazione
 
-- Accesso mediante sessione Supabase già autenticata in LifeOS, chiave **pubblicabile**, nessuna password o dato patrimoniale nel repository.
-- L'app è **in sola lettura**: non usa `INSERT`, `UPDATE`, `DELETE` lato client.
-- Legge le tabelle esistenti `public.investment_assets`, `public.investment_entries`, `public.investment_cash_flows`, `public.investment_trades` senza modificarle.
-- Nuove tabelle separate e private, con RLS per proprietario e solo permesso SELECT per utenti autenticati:
-  - `public.portfolio_dashboard_movements`: estratti conto e transazioni complete, chiave (utente,id);
-  - `public.portfolio_dashboard_balances`: saldo Fineco documentato;
-  - `public.portfolio_dashboard_scenarios`: ipotesi del benchmark immobiliare.
-- Snapshot e transazioni sono letti soltanto per `auth.uid()` mediante le policy RLS. Il client non contiene alcun ID utente.
+- Accesso tramite sessione Supabase già autenticata: una chiave *pubblicabile* è nel JS, nessuna password, ID utente o storico patrimoniale sensibile nel repository.
+- Frontend **solo lettura**. Esegue `SELECT` sulle quattro tabelle Invest Tracker `investment_assets`, `investment_entries`, `investment_cash_flows`, `investment_trades`; non le modifica.
+- Le tabelle separate `portfolio_dashboard_movements`, `portfolio_dashboard_balances`, `portfolio_dashboard_scenarios`, `portfolio_dashboard_property_index` hanno policy RLS di selezione per `auth.uid()`, attive, e permesso `SELECT` al ruolo `authenticated`.
+- I controlli immobiliari e i costi immessi nell'interfaccia agiscono soltanto localmente e **non vengono scritti** in Supabase.
 
-## Fonte dei movimenti
+## Registro documentale
 
-- Trade Republic: 1.817 registrazioni effettive del PDF di estratto conto (controllati addebiti, accrediti e saldo).
-- Fineco: 96 movimenti dell'export XLSX, inclusi stipendio, spese e trasferimenti; sul registro i movimenti personali appaiono con filtro dedicato.
-- Scalable: 142 movimenti **effettivi e contabili** trascritti dall'elenco testuale, compresi acquisti, vendite, interessi, commissioni e due movimenti di migrazione. Richieste annullate/rifiutate/scadute non trattate come movimenti monetari.
-- È uno storico cronologico di movimenti di banca/trading, non la somma tra estratto bancario e registro di trade: quelle duplicazioni sono evitate usando una singola fonte per ciascun conto.
+- Trade Republic: 1.817 operazioni dell'estratto conto, riconciliate con saldo al 20/11/2026 di 2.335,49 €.
+- Scalable: 142 movimenti contabili forniti in elenco testuale, inclusi 54 acquisti, 38 vendite, 19 commissioni PRIME+, interessi e altri movimenti.
+- Fineco: 96 operazioni dell'estratto XLSX, riconciliate con saldo 36.394,03 €.
+- Totale: **2.055** movimenti. Vista iniziale: **391** dopo distinzione fra movimenti finanziari e spese quotidiane. Le transazioni nascoste dal filtro non sono eliminate.
+- I record Trade Republic ora distinguono acquisti, vendite, PAC, interessi e imposte senza alterare la descrizione documentale originaria.
+- I giroconti fra conti personali restano verificabili; nel rendimento di un singolo broker sono flussi esterni, mentre nell'analisi del patrimonio complessivo vanno eliminati.
 
-## KPI
+## Contabilità e rendimento
 
-- Il patrimonio attuale è somma delle ultime valorizzazioni disponibili per singolo asset + ultimi saldi di liquidità dei due broker + saldo Fineco.
-- Il rendimento degli **investimenti** è XIRR sui flussi esterni broker verificati e sul terminal value. Non aggiunge un secondo versamento quando Fineco trasferisce fondi a Trade Republic. La liquidità Fineco è inclusa nel patrimonio ma non nel calcolo della performance degli investimenti.
-- La stima delle imposte di liquidazione: `0.26 * sum(max(0, valore corrente - costo residuo medio))` per ciascun asset aperto, usando il registro disponibile; non compensa automaticamente minusvalenze ETF; non copre eventuali imposte ancora dovute sulle **vendite storiche**. Non è un calcolo fiscale ufficiale né una liquidazione realmente eseguita.
-- Il netto mensile è `guadagno totale netto stimato / mesi trascorsi`: media retrospettiva, non distribuzione mensile di reddito.
+- Patrimonio finanziario visualizzato = ultime posizioni valorizzate + saldi disponibili Scalable e Trade Republic + saldo Fineco (snapshot, non streaming).
+- L'indicatore `XIRR broker` usa entrate e uscite **esterne ai broker**, incluse le spese con carta Trade Republic come prelievi dal conto. Non va confuso con il rendimento di un portafoglio investito in titoli senza liquidità o con la crescita del patrimonio complessivo includendo Fineco e UniCredit.
+- Importi ricostruiti al 21/11/2026: patrimonio 253.532,67 €; valore broker 217.138,64 €; flussi netti conferiti ai broker 185.861,85 €; risultato lordo broker 31.276,79 €; imposte ipotetiche su posizioni aperte 2.406,26 €; risultato netto **parziale** 28.870,53 €.
+- XIRR lordo broker: circa 9,67% a.a.; XIRR al netto delle *sole imposte di liquidazione sulle posizioni attualmente aperte*: circa 8,96% a.a. Non sono state ricostruite tutte le imposte storiche o le specificità degli strumenti.
+- La media storica di 758,19 €/mese = risultato netto parziale diviso numero di mesi trascorsi. **Non** è una rendita mensile né una previsione.
+- Gli asset individuali in modalità percentuale utilizzano XIRR annualizzato dei trade disponibili con valore terminale osservato; non `prezzo/costo residuo -1`.
 
-## Grafico e benchmark
+## Serie temporali
 
-- Periodo di riferimento dal 19 settembre 2023.
-- Serie selezionabili: patrimonio globale, investimenti, utile netto teorico, singoli strumenti; valori EUR o tasso percentuale.
-- Le curve storiche **non inventano prezzi** per periodi non documentati. Si richiedono snapshot vicini alla data per le posizioni aperte; i tratti senza copertura rimangono vuoti. Per ricostruire il grafico completo dal 2023 servono quotazioni storiche affidabili.
-- Benchmark casa: acquisto da 250.000 EUR senza mutuo, canone costante da 940 EUR/mese. L'affitto teoricamente evitato dell'abitazione principale non è imponibile al 26%.
-- Scenario rivalutazione con slider parametricamente impostato al 2% annuo **come semplice ipotesi**, non come andamento verificato del mercato di Monza/Milano. Costi di acquisto, manutenzione e imposte della proprietà sono da integrare quando disponibili.
-- Le criptovalute spot su Trade Republic sono valorizzate **convenzionalmente a zero per scelta dell'utente**, non a quotazione di mercato.
+- Intervallo di riferimento dal **19/09/2023**, apertura Scalable.
+- La curva **flussi netti verso i broker** è ricostruibile dal primo versamento, distinguendo depositi e prelievi/consumi.
+- Per valori di mercato effettivi (titoli e liquidità) si usano solo snapshot storici esistenti, in finestre di attendibilità di 45 giorni. I periodi senza dati sono discontinui, non interpolati arbitrariamente.
+- Il grafico non presenta rendimenti percentuali del patrimonio globale quando mancano storia UniCredit e riconciliazioni. Per gli strumenti considera solo finestre in cui risulta detenuta una quantità positiva.
+- In modalità **risultato broker** la curva della casa viene mostrata soltanto come confronto fra benefici economici (non fra valore della casa e valore dei titoli), con avviso di **non omogeneità dei capitali**.
 
-## Questioni aperte
+## Benchmark immobiliare
 
-1. Riconciliare 71,20 EUR tra estratto Trade Republic del 20/11 e saldo app del 21/11.
-2. Riconciliare 33,63 EUR tra totale dei 142 movimenti Scalable e saldo contabile dell'app (da non sanare con un movimento fittizio).
-3. Ottenere storico prezzi 2023–2026 se si desidera una curva completa del rendimento effettivo, non semplici snapshot.
-4. Completare fiscalità di plusvalenze già realizzate, regime fiscale per singolo broker e aliquote speciali.
-5. Integrare costi immobiliari reali e un indice del valore delle case comparabili per il benchmark B.
+- Modello: 250.000 € di acquisto senza mutuo nell'autunno 2023; 940 € mensili di affitto evitato, pro rata sul tempo trascorso; non tassati come reddito da locazione.
+- In Supabase sono archiviate **38 osservazioni mensili** di prezzi medi **richiesti**, per il **Comune di Monza**, da settembre 2023 a ottobre 2026, con fonte [Idealista – serie storica](https://www.idealista.it/sala-stampa/report-prezzo-immobile/vendita/lombardia/monza-brianza/monza/storico/).
+- Prezzi medi richiesti: settembre 2023 **2.684 €/m²**; ottobre 2026 **3.101 €/m²**: differenza **+15,54%**. Idealista segnala una modifica metodologica da luglio 2026; questa variazione è indicativa e **non rappresenta un prezzo di vendita certo** per una casa specifica.
+- Applicato ipoteticamente alla casa da 250.000 €: valore teorico circa **288.841 €**, plusvalore circa **38.841 €**, affitto evitato circa **35.793 €**; beneficio teorico totale circa **74.635 €**, **prima dei costi** di acquisto e gestione.
+- L'interfaccia permette di passare a una rivalutazione parametrica anziché osservata e di inserire costi iniziali e mensili facoltativi.
+- Comparare 250.000 € investiti tutti nel 2023 con un portafoglio alimentato da apporti progressivi **non misura la superiorità effettiva** dell'una o dell'altra scelta: per un confronto controfattuale rigoroso va uniformata la dotazione di capitale e trattato il mancato affitto come risparmio sui consumi.
 
-## Separazione e rollback
+## Riconciliazioni e lavoro ancora necessario
 
-La versione preesistente rimane in `/invest-tracker/`, file originali invariati. Se questa dashboard non funziona, si continua a utilizzare la precedente senza interventi. Per ritirare la dashboard nuova basta non usare `/patrimonio-dashboard/` o eliminare esclusivamente la sua directory e le sue tre tabelle private, previa verifica dei dati.
+1. Scostamento Trade Republic 20–21/11: 71,20 €.
+2. Scostamento Scalable fra ledger disponibile e saldo mostrato: 33,63 €; non inserire voci fittizie per correggerlo.
+3. Mancano serie di prezzi storici giornalieri affidabili e lo storico integrale delle valutazioni 2023–2025; il grafico effettivo non può ancora essere continuo dal 2023.
+4. Fiscalità completa delle plusvalenze già realizzate e regime fiscale dei broker da verificare.
+5. Per un benchmark immobiliare individuale servono zona, metratura, condizioni, costi accessori e potenziale prezzo di realizzo effettivo.
+
+## Verifiche ed esclusione dell'app legacy
+
+Il 21/11/2026 la nuova dashboard è stata caricata in un test funzionale con dati Supabase: **18 asset, 476 valorizzazioni, 55 trade legacy, 663 cash flow, 2.055 movimenti documentali, 38 rilevazioni immobiliari**. Sono stati controllati KPI, indice di mercato (+15,54%), valore della casa (288.841 €), modalità simulata (crescita 2% → 266.213 €), e disponibilità/indisponibilità corretta dei grafici.
+
+Le repository `miemail1234-boop/Codici1` e `miemail1234-boop/neuroapp` sono state verificate all'albero file, non soltanto dai README. L'app finanziaria e quella nuova si trovano entrambe in `Codici1` e in cartelle distinte. La directory originale `invest-tracker/` è invariata e utilizzabile indipendentemente. Se la nuova non funziona, la vecchia non richiede rollback.
