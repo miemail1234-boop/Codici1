@@ -21,21 +21,43 @@
    <div class="hero-visual"><div id="donut" class="donut" role="img" aria-label="Distribuzione patrimoniale"><div class="donut-hole"><div>INVESTITO</div><strong id="investedShare">—</strong></div></div><div id="allocationLegend" class="allocation-legend"></div></div>
   </section>
   <section class="metric-grid" aria-label="Rendimento">
-    <article class="panel metric"><span>Rendimento lordo annualizzato</span><strong id="grossRate">—</strong><small>XIRR · Scalable + Trade Republic</small></article>
-    <article class="panel metric"><span>Rendimento netto annualizzato stimato</span><strong id="netRate">—</strong><small>Simulazione liquidazione, imposte aperte</small></article>
-    <article class="panel metric"><span>Guadagno netto cumulato stimato</span><strong id="netGain">—</strong><small>Dal 19 settembre 2023</small></article>
-    <article class="panel metric"><span>Media mensile netta equivalente</span><strong id="monthlyGain">—</strong><small>Media storica, non entrata garantita</small></article>
+    <article class="panel metric"><span>Rendimento lordo annualizzato</span><strong id="grossRate">—</strong><small>XIRR conti broker · flussi esterni inclusi</small></article>
+    <article class="panel metric"><span>Rendimento netto annualizzato parziale</span><strong id="netRate">—</strong><small>Stima imposte sulle sole posizioni aperte</small></article>
+    <article class="panel metric"><span>Risultato netto parziale dei broker</span><strong id="netGain">—</strong><small>Da flussi broker · non patrimonio totale</small></article>
+    <article class="panel metric"><span>Media storica mensile del risultato</span><strong id="monthlyGain">—</strong><small>Media aritmetica, NON reddito mensile</small></article>
   </section>
   <div class="context-note"><span id="taxNote">Imposte stimate sulle plusvalenze positive delle posizioni attualmente aperte al 26%; fiscalità storica e aliquote speciali da verificare.</span></div>
   <section class="panel chart-panel">
-    <div class="section-header"><div><div class="section-kicker">EVOLUZIONE</div><h2>Patrimonio e rendimento nel tempo</h2><p class="muted">Dal 19 settembre 2023 · i periodi senza valutazioni storiche restano senza linea.</p></div><div class="chart-selectors"><label>Serie <select id="seriesSelect"><option value="global">Patrimonio globale</option><option value="invested">Solo investimenti</option><option value="netgain">Guadagno netto stimato</option></select></label><label>Visualizza <select id="chartMode"><option value="value">Importi €</option><option value="return">Rendimento %</option></select></label></div></div>
+    <div class="section-header"><div><div class="section-kicker">EVOLUZIONE</div><h2>Patrimonio e rendimento nel tempo</h2><p class="muted">Dal 19 settembre 2023 · solo dati osservati; capitale conferito e valore di mercato sono serie diverse.</p></div><div class="chart-selectors"><label>Serie <select id="seriesSelect"><option value="global">Patrimonio globale</option><option value="invested">Solo investimenti</option><option value="netgain">Risultato broker netto parziale</option><option value="capital">Capitale netto conferito ai broker</option><option value="house">Casa: beneficio economico ipotetico</option></select></label><label>Visualizza <select id="chartMode"><option value="value">Importi €</option><option value="return">Rendimento %</option></select></label></div></div>
     <div id="chartLegend" class="chart-legend"></div>
     <div id="chartWrap" class="chart-wrap"><svg id="performanceChart" viewBox="0 0 920 320" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Andamento del patrimonio"></svg><div id="chartTooltip" class="chart-tooltip" hidden></div></div>
-    <p id="chartCoverage" class="coverage-note"></p>
+    <p id="chartCoverage" class="coverage-note"></p><p id="chartCompareWarning" class="coverage-note"></p>
   </section>
   <section class="two-col">
    <article class="panel"><div class="section-kicker">POSIZIONI</div><h2>Allocazione per strumento</h2><div id="holdingsTable" class="holdings"></div></article>
-   <article class="panel housing"><div class="section-kicker">BENCHMARK IMMOBILIARE</div><h2>Se avessi comprato casa nel 2023?</h2><p class="muted">Acquisto in contanti: 250.000 € · Affitto evitato: 940 €/mese.</p><div class="benchmark"><div><span>Affitto teoricamente evitato</span><strong id="savedRent">—</strong></div><div><span>Casa con valore invariato, beneficio lordo di spese</span><strong id="flatHouse">—</strong></div><div><span>Casa rivalutata secondo ipotesi impostata</span><strong id="appreciatedHouse">Da definire</strong></div></div><label for="houseGrowth">Ipotesi rivalutazione annua casa: <strong id="houseGrowthValue">+2,0%</strong> (simulazione, non indice di mercato)</label><input id="houseGrowth" type="range" min="-3" max="8" step="0.5" value="2" aria-label="Rivalutazione annua ipotetica dell’immobile"><p id="houseCaveat" class="small">Il risparmio sull'affitto dell'abitazione principale non è reddito da locazione imponibile. Non sono ancora stimati notaio, imposte, manutenzione e rivalutazione di mercato.</p></article>
+   <article class="panel housing">
+     <div class="section-kicker">BENCHMARK IMMOBILIARE</div>
+     <h2>Se avessi comprato casa nel 2023?</h2>
+     <p class="muted">Abitazione principale acquistata in contanti: 250.000 € · Affitto evitato: 940 €/mese.</p>
+     <div class="market-highlight"><div><span>Monza · rivalutazione prezzi richiesti</span><strong id="marketChange">—</strong></div><small id="marketPeriod">Idealista · settembre 2023 – ultimo mese disponibile</small></div>
+     <div class="benchmark">
+       <div><span>Valore teorico della casa oggi</span><strong id="houseImpliedValue">—</strong></div>
+       <div><span>Plusvalore immobiliare stimato</span><strong id="houseAppreciation">—</strong></div>
+       <div><span>Affitto teoricamente evitato</span><strong id="savedRent">—</strong></div>
+       <div><span>Beneficio con casa invariata</span><strong id="flatHouse">—</strong></div>
+       <div class="benchmark-total"><span>Beneficio teorico complessivo</span><strong id="appreciatedHouse">—</strong></div>
+     </div>
+     <div class="house-controls">
+       <label for="houseMode">Origine della rivalutazione
+        <select id="houseMode"><option value="market">Dati mensili Idealista, Monza</option><option value="scenario">Simulazione personalizzata</option></select></label>
+       <div id="houseScenarioControls" hidden><label for="houseGrowth">Rivalutazione annua simulata: <strong id="houseGrowthValue">+2,0%</strong></label>
+        <input id="houseGrowth" type="range" min="-3" max="8" step="0.5" value="2" aria-label="Rivalutazione annua ipotetica dell'immobile"></div>
+       <div class="house-cost-grid"><label>Costi iniziali acquisto (€)<input id="purchaseCosts" type="number" min="0" step="100" placeholder="Non stimati"></label><label>Costi mensili proprietario (€)<input id="ownerCosts" type="number" min="0" step="10" placeholder="Non stimati"></label></div>
+       <small>Costi facoltativi, validi solo per questa simulazione: non sono salvati.</small>
+     </div>
+     <p id="houseCaveat" class="small">I prezzi richiesti non sono prezzi effettivi di compravendita.</p>
+     <a id="houseSource" class="source-link" target="_blank" rel="noopener" href="https://www.idealista.it/sala-stampa/report-prezzo-immobile/vendita/lombardia/monza-brianza/monza/storico/">Fonte: storico dei prezzi richiesti Idealista, Comune di Monza ↗</a>
+   </article>
   </section>
   <section class="panel ledger">
     <div class="section-header"><div><div class="section-kicker">REGISTRO UNIFICATO</div><h2>Tutti i movimenti</h2><p id="movementStats" class="muted">Caricamento movimenti…</p></div></div>
@@ -46,7 +68,7 @@
   </section>
   <section class="panel transparency"><div class="section-kicker">METODOLOGIA E CONTROLLI</div><h2>Che cosa è verificato</h2><div id="methodology"></div></section>
  </div>
- <footer><span>Dashboard autonoma in sola lettura · dati privati Supabase · versione 1.0</span><span>Invest Tracker originale preservato</span></footer>
+ <footer><span>Dashboard autonoma in sola lettura · dati privati Supabase · versione 1.1</span><span>Invest Tracker originale preservato</span></footer>
 </main>
 </body>
 </html>
