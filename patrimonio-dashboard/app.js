@@ -16,7 +16,7 @@ const dayMs = d => Date.parse(d+"T12:00:00Z");
 const days = (a,b) => (dayMs(b)-dayMs(a))/86400000;
 const unique = arr => [...new Set(arr)];
 const taxRate = .26;
-const state = {assets:[],entries:[],flows:[],trades:[],movements:[],balances:[],settings:null,positions:[],accountCash:{},tax:0,taxUncertain:false,brokerValue:0,netContributions:0, asof:"2026-11-21", primarySeries:"global", returnMode:"value", limit:100, showRent:true, showHouse:false, assumedHouseGrowth:2};
+const state = {assets:[],entries:[],flows:[],trades:[],movements:[],balances:[],marketIndex:[],settings:null,positions:[],accountCash:{},tax:0,taxUncertain:false,brokerValue:0,netContributions:0, asof:"2026-11-21", primarySeries:"broker", returnMode:"value", limit:100, houseMode:"market", purchaseCosts:null, ownerCosts:null, assumedHouseGrowth:2};
 const getValue = x => num(x?.current_value);
 const byDate = (a,b) => String(a.date||"").localeCompare(String(b.date||""));
 function latest(rows) {return rows.slice().sort((a,b)=>byDate(b,a)||num(b.created_at_ms)-num(a.created_at_ms)||String(b.updated_at||"").localeCompare(String(a.updated_at||"")))[0]||null;}
@@ -50,7 +50,7 @@ function brokerName(n) {return n==="Scalable Capital"?"Scalable Capital":n==="Tr
 async function readAll(table,uid,order="date") {
  let result=[],from=0;for(let part=0;part<40;part++){
  let query=client.from(table).select("*").eq("user_id",uid).order(order,{ascending:true});
- if(table!=="portfolio_dashboard_balances"&&table!=="portfolio_dashboard_scenarios")query=query.order("id",{ascending:true});
+ if(!["portfolio_dashboard_balances","portfolio_dashboard_scenarios","portfolio_dashboard_property_index"].includes(table))query=query.order("id",{ascending:true});
  const res=await query.range(from,from+999);
  if(res.error)throw new Error(table+": "+res.error.message);
  const rows=res.data||[];result.push(...rows);if(rows.length<1000)break;from+=1000;
@@ -66,10 +66,10 @@ async function load() {
  if(error)throw error;
  if(!data?.session) {$("auth").innerHTML='<h2>Accedi per vedere il patrimonio</h2><p>Questa dashboard non pubblica i tuoi dati. Effettua prima l’accesso Supabase dal modulo <a href="../life-tracker/" target="_blank" rel="noopener">Life Tracker → Dati → Cloud Supabase</a>, poi torna qui e premi «Aggiorna».</p>';return;}
  const uid=data.session.user.id;
- const [assets,entries,flows,trades,movements,balances,settings]=await Promise.all([
- readAll("investment_assets",uid,"id"),readAll("investment_entries",uid,"date"),readAll("investment_cash_flows",uid,"date"),readAll("investment_trades",uid,"date"),readAll("portfolio_dashboard_movements",uid,"date"),readAll("portfolio_dashboard_balances",uid,"date"),readAll("portfolio_dashboard_scenarios",uid,"inception")
+ const [assets,entries,flows,trades,movements,balances,settings,marketIndex]=await Promise.all([
+ readAll("investment_assets",uid,"id"),readAll("investment_entries",uid,"date"),readAll("investment_cash_flows",uid,"date"),readAll("investment_trades",uid,"date"),readAll("portfolio_dashboard_movements",uid,"date"),readAll("portfolio_dashboard_balances",uid,"date"),readAll("portfolio_dashboard_scenarios",uid,"inception"),readAll("portfolio_dashboard_property_index",uid,"month")
  ]);
- Object.assign(state,{assets,entries,flows,trades,movements,balances,settings:settings[0]||null});
+ Object.assign(state,{assets,entries,flows,trades,movements,balances,marketIndex,settings:settings[0]||null});
  prepare();render();
  $("auth").hidden=true;$("dashboard").hidden=false;
  }catch(error){console.error(error);$("auth").hidden=false;$("auth").innerHTML='<h2>Errore di caricamento</h2><p>'+safe(error.message||"Impossibile accedere a Supabase")+'</p><p>La dashboard originale rimane indipendente e utilizzabile.</p>';}
@@ -132,25 +132,45 @@ function getRentUntil(date){
  const rent=state.settings?num(state.settings.monthly_rent_saved):940;
  return rent*Math.max(0,days(INCEPTION,date))/30.4375;
 }
+function housingAt(date){
+ const purchase=state.settings?num(state.settings.house_purchase_price):250000;
+ const rent=getRentUntil(date);
+ const market=state.marketIndex.slice().sort((a,b)=>String(a.month).localeCompare(String(b.month)));
+ const base=market[0], current=market.filter(x=>x.month<=date.slice(0,7)+"-01").at(-1);
+ const isMarket=state.houseMode==="market"&&base&&current;
+ const years=Math.max(0,days(INCEPTION,date)/365.25);
+ const change=isMarket?num(current.asking_price_eur_sqm)/num(base.asking_price_eur_sqm)-1:Math.pow(1+state.assumedHouseGrowth/100,years)-1;
+ const value=purchase*(1+change);
+ const initial=state.purchaseCosts==null?num(state.settings?.one_time_purchase_cost):state.purchaseCosts;
+ const monthly=state.ownerCosts==null?num(state.settings?.monthly_owner_cost):state.ownerCosts;
+ const cost=initial+monthly*Math.max(0,days(INCEPTION,date)/30.4375);
+ return {purchase,rent,change,value,appreciation:value-purchase,acquisitionCosts:initial,monthlyCosts:monthly,cost,benefit:value-purchase+rent-cost,flat:rent-cost,market:!!isMarket,month:current?.month||null,basePrice:base?num(base.asking_price_eur_sqm):null,currentPrice:current?num(current.asking_price_eur_sqm):null};
+}
 function renderHousing(){
- const cost=state.settings?num(state.settings.house_purchase_price):250000;
- const rent=getRentUntil(state.asof);
- const fees=state.settings?.one_time_purchase_cost;
- const maintenance=state.settings?.monthly_owner_cost;
- $("savedRent").textContent=money(rent);
- $("flatHouse").textContent=money(rent-(fees==null?0:num(fees))-(maintenance==null?0:num(maintenance)*days(INCEPTION,state.asof)/30.4375));
- const housing=state.settings?.house_value_today;
- const years=Math.max(0,days(INCEPTION,state.asof)/365.25);
- const implied=housing==null?cost*Math.pow(1+state.assumedHouseGrowth/100,years):num(housing);
+ const h=housingAt(state.asof);
+ const fromDb=state.settings?.one_time_purchase_cost!=null && state.settings?.monthly_owner_cost!=null;
+ const costsSpecified=(state.purchaseCosts!=null&&state.ownerCosts!=null)||fromDb;
+ $("marketChange").textContent=state.marketIndex.length>1?percent(num(state.marketIndex.at(-1).asking_price_eur_sqm)/num(state.marketIndex[0].asking_price_eur_sqm)-1):"n.d.";
+ $("marketPeriod").textContent=state.marketIndex.length>1?
+  "Idealista: "+Math.round(h.basePrice).toLocaleString("it-IT")+" €/m² (09/2023) → "+Math.round(num(state.marketIndex.at(-1).asking_price_eur_sqm)).toLocaleString("it-IT")+" €/m² ("+fmtDate(state.marketIndex.at(-1).month).slice(3)+")":"Indice di mercato non disponibile";
+ $("houseImpliedValue").textContent=money(h.value);
+ $("houseAppreciation").textContent=(h.appreciation>=0?"+":"")+money(h.appreciation);
+ $("savedRent").textContent=money(h.rent);
+ $("flatHouse").textContent=money(h.flat);
+ $("appreciatedHouse").textContent=money(h.benefit);
  $("houseGrowthValue").textContent=(state.assumedHouseGrowth>=0?"+":"")+state.assumedHouseGrowth.toFixed(1).replace(".",",")+"%";
- $("appreciatedHouse").textContent=money(implied-cost+rent-(fees==null?0:num(fees))-(maintenance==null?0:num(maintenance)*days(INCEPTION,state.asof)/30.4375));
- $("houseCaveat").textContent="Acquisto interamente in contanti. Affitto evitato non imponibile. "+(fees==null||maintenance==null?"Costi notarili, imposte e spese di proprietà non ancora quantificati; i risultati prima dei costi non sono un guadagno netto definitivo.":"Costi di acquisto e proprietà inclusi nell'ipotesi.")+" Scenario rivalutazione: "+(housing==null?"simulazione parametrica al "+state.assumedHouseGrowth.toFixed(1)+"% annuo, NON indice di mercato.":"valore ipotetico, non perizia.");
+ $("houseMode").value=state.houseMode;
+ $("houseScenarioControls").hidden=state.houseMode!=="scenario";
+ $("houseCaveat").textContent=(h.market?
+   "Rivalutazione indicativa derivata dai prezzi richiesti a Monza, non dal prezzo delle compravendite o da una perizia. Dal luglio 2026 Idealista segnala un cambio di metodologia. ":"Rivalutazione simulata, non osservata sul mercato. ")+
+   (costsSpecified?"Costi iniziali e mensili ipotizzati inclusi. ":"Costi di acquisto e proprietà non ancora quantificati: beneficio LORDO di queste spese. ")+
+   "Affitto evitato calcolato pro rata a 940 €/mese, non imponibile. Acquisto ipotetico da 250.000 € nel 2023: NON equivale ai versamenti realmente effettuati nei broker.";
 }
 function buildSelect(){
  const old=$("seriesSelect").value;
- $("seriesSelect").innerHTML='<option value="global">Patrimonio globale</option><option value="invested">Solo investimenti</option><option value="netgain">Guadagno netto stimato</option>'+
+ $("seriesSelect").innerHTML='<option value="broker">Conti broker · titoli e liquidità</option><option value="global">Patrimonio globale (incluso Fineco)</option><option value="invested">Solo valore dei titoli</option><option value="netgain">Risultato broker netto parziale</option><option value="capital">Capitale netto conferito ai broker</option><option value="house">Casa: beneficio economico teorico</option>'+
  state.positions.map(p=>'<option value="asset:'+safe(p.id)+'">'+safe(p.name)+' ('+safe(p.broker)+')</option>').join("");
- $("seriesSelect").value=[...$("seriesSelect").options].some(x=>x.value===old)?old:"global";
+ $("seriesSelect").value=[...$("seriesSelect").options].some(x=>x.value===old)?old:"broker";
 }
 function buildKindFilter(){
  const old=$("kindFilter").value;
@@ -175,7 +195,7 @@ function finecoAt(date){
  if(!rs.length)return null;return rs.reduce((t,x)=>t+num(x.amount),0);
 }
 function historicalPortfolio(date,assetId=null){
- if(assetId){const a=state.assets.find(x=>x.id===assetId);if(!a)return null;const e=lastAt(state.entries.filter(x=>x.generic_option===a.block_id),date);return e?getValue(e):null;}
+ if(assetId){const a=state.assets.find(x=>x.id===assetId);if(!a||rollingBasis(assetId,date).quantity<=0)return null;const e=lastAt(state.entries.filter(x=>x.generic_option===a.block_id),date);return e&&days(e.date,date)<=45?getValue(e):null;}
  const cs=lastCash("Scalable Capital",date),ct=lastCash("Trade Republic",date),f=finecoAt(date);
  const relevant=state.assets.filter(a=>rollingBasis(a.id,date).quantity>0.000001);
  // I valori dei titoli non osservati in quel periodo NON sono inventati come zero.
@@ -184,30 +204,75 @@ function historicalPortfolio(date,assetId=null){
  if(dated.some(e=>!e||days(e.date,date)>45))return null;
  const investments=dated.reduce((s,e)=>s+e.value,0);
  const brokerCash=(cs?cs.value:0)+(ct?ct.value:0);
- return {investments,brokerCash,fineco:f,complete:!!(cs&&ct&&f!=null)};
+ return {investments,brokerCash,fineco:f,hasBrokerCash:!!(cs&&ct),complete:!!(cs&&ct&&f!=null)};
+}
+function assetXirrAt(assetId,date,terminal){
+ const flows=state.trades.filter(t=>t.asset_id===assetId&&t.date<=date).map(t=>({
+  date:t.date,value:t.side==="buy"?-(num(t.amount)+num(t.fee)):t.side==="sell"?num(t.amount)-num(t.fee):0
+ })).filter(x=>x.value!==0);
+ if(terminal>0)flows.push({date,value:terminal});
+ return xirr(flows);
+}
+function brokerCapitalAt(date){
+ return -contributionFlows().filter(f=>f.date<=date).reduce((t,f)=>t+f.value,0);
+}
+function taxForOpenAssetsAt(date){
+ let tax=0;
+ for(const a of state.assets){
+  const b=rollingBasis(a.id,date);
+  if(b.quantity<=0||b.cost<=0)continue;
+  const v=historicalPortfolio(date,a.id);
+  if(v==null)return null;
+  tax+=taxRate*Math.max(0,v-b.cost);
+ }
+ return tax;
 }
 function chartSeries(){
- const selected=$("seriesSelect").value, mode=$("chartMode").value,dates=chartDates(),end=state.asof,flatCost=state.settings?num(state.settings.house_purchase_price):250000;
- let label=selected==="global"?"Patrimonio globale":selected==="invested"?"Investimenti":selected==="netgain"?"Guadagno stimato":state.positions.find(a=>"asset:"+a.id===selected)?.name||"Strumento";
+ const selected=$("seriesSelect").value,mode=$("chartMode").value,dates=chartDates();
+ const names={broker:"Conti broker · titoli e liquidità",global:"Patrimonio complessivo · Fineco incluso",invested:"Valore dei titoli",netgain:"Risultato netto parziale dei broker",capital:"Capitale netto conferito ai broker",house:"Casa · beneficio economico"};
+ const label=names[selected]||state.positions.find(a=>"asset:"+a.id===selected)?.name||"Strumento";
  const primary=dates.map(date=>{
   let value=null;
-  if(selected.startsWith("asset:")){
-   const id=selected.slice(6),v=historicalPortfolio(date,id);if(v!=null){if(mode==="value")value=v;else{const basis=rollingBasis(id,date);value=basis.cost>0?100*(v/basis.cost-1):null;}}
+  if(selected==="house"){
+   const h=housingAt(date);
+   value=mode==="value"?h.benefit:100*h.benefit/h.purchase;
+  }else if(selected==="capital"){
+   value=mode==="value"?brokerCapitalAt(date):null;
+  }else if(selected.startsWith("asset:")){
+   const id=selected.slice(6),v=historicalPortfolio(date,id);
+   if(v!=null){
+    const rate=assetXirrAt(id,date,v);
+    value=mode==="value"?v:rate==null?null:100*rate;
+   }
   }else{
-   const data=historicalPortfolio(date);
-   if(data){
-    if(selected==="invested")value=data.investments;
-    else if(selected==="global")value=data.complete?data.investments+data.brokerCash+data.fineco:null;
-    else if(selected==="netgain"&&data.complete){const netFlows=contributionFlows().filter(f=>f.date<=date).reduce((t,f)=>t-f.value,0);let historicalTax=0;for(const p of state.positions){const val=historicalPortfolio(date,p.id);const b=rollingBasis(p.id,date);if(val!=null&&b.cost>0)historicalTax+=taxRate*Math.max(0,val-b.cost);}value=data.investments+data.brokerCash-netFlows-historicalTax;}
-    if(mode==="return"&&value!=null){const flowUntil=contributionFlows().filter(f=>f.date<=date);if(selected==="netgain"){const netDeposited=flowUntil.reduce((t,f)=>t-f.value,0);value=netDeposited>0?100*value/netDeposited:null;}else{const rate=xirr([...flowUntil,{date,value:data.investments+data.brokerCash}]);value=rate==null?null:100*rate;}}
+   const d=historicalPortfolio(date);
+   if(d){
+    if(mode==="value"){
+     if(selected==="invested")value=d.investments;
+     else if(selected==="broker")value=d.hasBrokerCash?d.investments+d.brokerCash:null;
+     else if(selected==="global")value=d.complete?d.investments+d.brokerCash+d.fineco:null;
+     else if(selected==="netgain"&&d.hasBrokerCash){
+      const tax=taxForOpenAssetsAt(date);
+      value=tax==null?null:d.investments+d.brokerCash-brokerCapitalAt(date)-tax;
+     }
+    }else if((selected==="broker"||selected==="netgain")&&d.hasBrokerCash){
+     const flow=contributionFlows().filter(f=>f.date<=date);
+     const tax=selected==="netgain"?taxForOpenAssetsAt(date):0;
+     if(tax!=null){const rate=xirr([...flow,{date,value:d.investments+d.brokerCash-tax}]);value=rate==null?null:100*rate;}
+    }
    }
   }
-  return{date,value};
+  return {date,value};
  });
  const series=[{name:label,color:"#69c8ca",points:primary,dash:false}];
- if(mode==="value"){
-  if(state.showRent)series.push({name:"Affitto evitato",color:"#e3bd7c",points:dates.map(date=>({date,value:getRentUntil(date)})),dash:true});
-  if(state.showHouse)series.push({name:"Casa: beneficio rivalutazione ipotetica",color:"#bcabeb",points:dates.map(date=>({date,value:flatCost*(Math.pow(1+state.assumedHouseGrowth/100,days(INCEPTION,date)/365.25)-1)+getRentUntil(date)})),dash:true});
+ if(mode==="value"&&selected==="broker"){
+  series.push({name:"Capitale netto conferito (non valore di mercato)",color:"#81a4ed",points:dates.map(date=>({date,value:brokerCapitalAt(date)})),dash:true});
+ }
+ if(mode==="value"&&selected==="netgain"){
+  series.push({name:"Casa · rivalutazione + affitto evitato (confronto non omogeneo)",color:"#e3bd7c",points:dates.map(date=>({date,value:housingAt(date).benefit})),dash:true});
+ }
+ if(mode==="value"&&selected==="house"){
+  series.push({name:"Solo affitto evitato",color:"#81a4ed",points:dates.map(date=>({date,value:getRentUntil(date)})),dash:true});
  }
  return series;
 }
@@ -230,15 +295,28 @@ function drawSvg(series){
  el.onpointerleave=()=>{$("chartTooltip").hidden=true;};
 }
 function renderChart(){
- const series=chartSeries(),mode=$("chartMode").value;
- $("chartLegend").innerHTML=series.map(s=>'<span><i class="swatch" style="background:'+s.color+'"></i>'+safe(s.name)+'</span>').join("")+
- (mode==="value"?'<button id="toggleRent" class="button ghost" type="button">'+(state.showRent?"✓ ":"")+'Affitto evitato</button><button id="toggleHouse" class="button ghost" type="button" '+""+'>'+(state.showHouse?"✓ ":"")+'Casa rivalutata</button>':"");
+ const series=chartSeries(),selected=$("seriesSelect").value,mode=$("chartMode").value;
+ $("chartLegend").innerHTML=series.map(v=>'<span><i class="swatch" style="background:'+v.color+'"></i>'+safe(v.name)+'</span>').join("");
  drawSvg(series);
- if($("toggleRent"))$("toggleRent").onclick=()=>{state.showRent=!state.showRent;renderChart();};
- if($("toggleHouse"))$("toggleHouse").onclick=()=>{state.showHouse=!state.showHouse;renderChart();};
- const valid=series[0]?.points.filter(x=>x.value!=null);
- $("chartCoverage").textContent=(valid?.length?"Osservazioni disponibili per la serie selezionata: "+valid.length+"; prima: "+fmtDate(valid[0].date)+". ":"Nessuna serie storica completa per il periodo selezionato. ")+
- "Le rilevazioni storiche derivano dagli snapshot effettivamente presenti in Supabase, non da quotazioni inventate. Gli intervalli mancanti non indicano rendimento zero. Il benchmark affitto decorre dal 19 settembre 2023; costi immobiliari esclusi finché non stimati.";
+ const valid=series[0]?.points.filter(x=>x.value!=null)||[];
+ const from=valid.length?fmtDate(valid[0].date):"—";
+ const evidence=selected==="house"?"Serie dei prezzi richiesti mensili Idealista; ultimo mese disponibile ottobre 2026. Confronto basato sulla media cittadina, non su compravendite dello stesso immobile.":
+ selected==="capital"?"Serie storica dei flussi di entrata e uscita dai broker, distinta dal valore di mercato. Per Trade Republic le spese con carta sono uscite dal conto.":
+ "Sono rappresentate soltanto valorizzazioni documentate presenti in Supabase; prezzi storici mancanti non sono interpolati. Le posizioni sono mostrate solo nei periodi di detenzione verificati.";
+ $("chartCoverage").textContent=valid.length+" osservazioni nella serie principale; prima: "+from+". "+evidence;
+ $("chartCompareWarning").textContent=selected==="netgain"?
+   "ATTENZIONE: il beneficio della casa presuppone 250.000 € disponibili immediatamente nel 2023, mentre nei broker il capitale è stato conferito progressivamente. Le due curve non misurano opportunità equivalenti.":
+   selected==="global"&&mode==="return"?
+   "Il rendimento percentuale del patrimonio complessivo non è calcolabile: manca lo storico di liquidità UniCredit e la riconciliazione dei flussi esterni a tutto il patrimonio.":
+   selected==="invested"&&mode==="return"?
+   "Il rendimento percentuale dei soli titoli non è ricavabile dai versamenti ai broker perché la liquidità è esclusa. Seleziona «Conti broker» o uno strumento.":
+   selected==="house"?
+   "Percentuale = beneficio cumulato diviso 250.000 €; non è un tasso annualizzato né un rendimento monetario incassato. Costi non inseriti esclusi.":
+   selected==="broker"?
+   "I versamenti netti sono flussi di capitale, non una seconda valorizzazione del patrimonio. La percentuale dei broker è XIRR annualizzata.":
+   selected.startsWith("asset:")&&mode==="return"?
+   "Percentuale = XIRR annualizzata delle compravendite registrate e del valore osservato; il rendimento dei periodi senza quotazione affidabile resta non disponibile.":
+   "";
 }
 function filteredMovements(){
  const account=$("accountFilter").value,kind=$("kindFilter").value,all=$("showPersonal").checked,term=$("movementSearch").value.trim().toLocaleLowerCase("it-IT");
@@ -273,5 +351,9 @@ $("chartMode").addEventListener("change",renderChart);
 $("loadMore").addEventListener("click",()=>{state.limit+=100;renderMovements();});
 $("reload").addEventListener("click",load);
 $("houseGrowth").addEventListener("input",e=>{state.assumedHouseGrowth=Number(e.target.value)||0;renderHousing();renderChart();});
+$("houseMode").addEventListener("change",e=>{state.houseMode=e.target.value;renderHousing();renderChart();});
+$("houseGrowth").addEventListener("input",e=>{state.assumedHouseGrowth=Number(e.target.value)||0;renderHousing();renderChart();});
+$("purchaseCosts").addEventListener("input",e=>{state.purchaseCosts=e.target.value.trim()===""?null:Math.max(0,num(e.target.value));renderHousing();renderChart();});
+$("ownerCosts").addEventListener("input",e=>{state.ownerCosts=e.target.value.trim()===""?null:Math.max(0,num(e.target.value));renderHousing();renderChart();});
 load();
 })();
