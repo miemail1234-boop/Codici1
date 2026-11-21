@@ -44,7 +44,7 @@ Le tabelle private applicano Row Level Security per utente. Non aggiungere API k
 
 ## Istruzioni modulari di Emma
 
-Dal 24 ottobre 2026 `journal_instructions` contiene un nucleo operativo breve. I protocolli specialistici privati risiedono nella cartella Drive `LifeOS/M/Sistema_LifeOS` e sono indirizzati da ID effettivi in `lifeos_system_registry.components.instruction_architecture`.
+Dal 24 ottobre 2026 `journal_instructions` contiene un nucleo operativo breve. I protocolli specialistici privati risiedono nella cartella Drive `LifeOS/Sistema_LifeOS` e sono indirizzati da ID effettivi in `lifeos_system_registry.components.instruction_architecture`.
 
 La memoria di lavoro è composita e viene costruita su richiesta: BloccoNote e fonti operative ordinarie per il contesto corrente, copertura completa per la pianificazione, fonti selettive per gli approfondimenti specialistici. Non esiste un nuovo database che duplica continuamente tutte le fonti.
 
@@ -54,12 +54,14 @@ Questa architettura è dipendente dai connettori. Le istruzioni descrivono il co
 
 La radice documentale unica è la cartella privata [LifeOS](https://drive.google.com/drive/folders/11rrynJY2sjISFUt5ytrVxduEOmhD-2ET). Gli ID dei file sono mantenuti invariati dopo la ricollocazione:
 
-- `LifeOS/M/`: memoria di conoscenza, protocolli e indici Markdown; cartella ID `1m8pZAKrDIB7uv0rdhPXK1eAR5eL0HC_p`.
-- `LifeOS/M/Sistema_LifeOS/`: protocolli specialistici privati, ID `1M5Nz5cSFSn1esZHAoHlIZRl1me1DX8cu`.
-- `LifeOS/M/Lavoro_e_Ricerca/`, `Vita_Personale/` ed `Esportazioni_WhatsApp/`: memorie tematiche e fonti di sincronizzazione.
-- `LifeOS/M/Lavoro_e_Ricerca/Didattica_e_Tirocini/`: Registro tirocinanti e tesisti (Google Sheets) ID `1Rt-ty27LANLhOUBDXoxhOeelyFxNllpYTdJeaYrPlmw`; cartella ID `1ooJqc9698N5aUZtspSinrKQ2vQdMDNPW`.
+- `LifeOS/Conoscenza/`: memorie e documenti di dominio, con indici Markdown; cartella ID `1m8pZAKrDIB7uv0rdhPXK1eAR5eL0HC_p`.
+- `LifeOS/Sistema_LifeOS/`: protocolli specialistici attivi e runbook, ID `1M5Nz5cSFSn1esZHAoHlIZRl1me1DX8cu`. Il nucleo operativo canonico è in Supabase. Backup, bozze e il vecchio 00_Nucleo_Operativo.md sono nello storico non operativo ID `1LRcKYDmvelf4UmAY551p4-DFRhvEZGmv`.
+- `LifeOS/Conoscenza/Lavoro_e_Ricerca/`, `LifeOS/Conoscenza/Vita_Personale/` e `LifeOS/Conoscenza/Fisco/`: memorie tematiche e documenti fiscali.
+- `LifeOS/Esportazioni_WhatsApp/`: fonti in ingresso delle collaborazioni e delle relazioni, separate dalla conoscenza consolidata; ID `1KyFTt7SU5F1X_8SLWveOHQoui_oeqfmf`.
+- `LifeOS/Conoscenza/Lavoro_e_Ricerca/Didattica_e_Tirocini/`: Registro tirocinanti e tesisti (Google Sheets) ID `1Rt-ty27LANLhOUBDXoxhOeelyFxNllpYTdJeaYrPlmw`; cartella ID `1ooJqc9698N5aUZtspSinrKQ2vQdMDNPW`.
 - `LifeOS/BloccoNote.md`: memoria di lavoro, ID `1_RI7zKwNTKN06dnzCjUItRHRs9jjoctI`.
-- `LifeOS/M/Fisco/FiscoTracker.md`: memoria fiscale, ID `1Lnc_23SwOvQp97rrN934ltfPcMF5h4gT`.
+- `LifeOS/Conoscenza/Fisco/FiscoTracker.md`: memoria fiscale, ID `1Lnc_23SwOvQp97rrN934ltfPcMF5h4gT`.
+- `LifeOS/Conoscenza/Vita_Personale/Relazioni/Relazioni.md`: indice canonico delle memorie relazionali ID `1nqhugFKfsz4vFRbF275ffb1eQ_XLrAER`; le versioni precedenti sono archiviate senza eliminazioni.
 
 Il registro autoritativo delle destinazioni e dei componenti è `public.lifeos_system_registry`; le istruzioni versionate per l'uso selettivo degli indici restano in `public.journal_instructions`. I file `indice.md` sono mappe di navigazione e non duplicano dati operativi o autorizzazioni. Le componenti Supabase, Google Calendar e GitHub restano nei rispettivi servizi: l'unificazione è documentale, non una migrazione dell'applicazione.
 
