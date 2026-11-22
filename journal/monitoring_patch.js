@@ -100,7 +100,7 @@ $('mStats').textContent=weekSummary(today(),logs,goal);
 $('mLogs').innerHTML=logs.slice(0,14).map(x=>'<div>'+safe(x.observed_on)+' · '+safe(JSON.stringify(x.metrics))+' · '+safe(x.note)+'</div>').join('');
 $('mReviews').innerHTML=reviews.slice(0,5).map(x=>'<div>'+safe(x.review_on)+' · '+safe(x.summary)+'</div>').join('');
 }
-tab.addEventListener('click',()=>{if(!user)return;$('journalTab').click();['journalLayout','errorsPanel','changePanel','todoPanel','tagsPanel','instructionsPanel'].forEach(id=>$(id).hidden=true);
+tab.addEventListener('click',()=>{if(!user)return;$('journalTab').click();['journalLayout','errorsPanel','changePanel','todoPanel','tagsPanel'].forEach(id=>$(id).hidden=true);
 nav.querySelectorAll('button').forEach(b=>b.classList.remove('active'));tab.classList.add('active');panel.hidden=false;load().catch(error)});
 nav.querySelectorAll('button:not(#monTab)').forEach(b=>b.addEventListener('click',()=>{panel.hidden=true;tab.classList.remove('active')}));
 $('mLog').addEventListener('submit',async e=>{e.preventDefault();if(!goal)return;
