@@ -59,6 +59,13 @@
      <a id="houseSource" class="source-link" target="_blank" rel="noopener" href="https://www.idealista.it/sala-stampa/report-prezzo-immobile/vendita/lombardia/monza-brianza/monza/storico/">Fonte: storico dei prezzi richiesti Idealista, Comune di Monza ↗</a>
    </article>
   </section>
+  <section class="panel ledger" aria-label="Cronologia degli strumenti">
+    <div class="section-header"><div><div class="section-kicker">STORICO DOCUMENTALE</div><h2>Operazioni per singolo strumento</h2><p id="assetHistoryStats" class="muted">Caricamento operazioni…</p></div></div>
+    <div class="filters"><label>Strumento e conto<select id="assetHistorySelect"><option value="all">Tutti gli strumenti</option></select></label></div>
+    <p class="coverage-note">Operazioni documentate nei movimenti importati: quantità, importo contabile e data. I prezzi di esecuzione e la completezza storica non sono certificati; i codici XF identificano criptoattività nel registro Trade Republic. Nessun movimento viene scritto o modificato.</p>
+    <div class="ledger-header"><span>Data / Conto</span><span>Strumento e quantità</span><span>Importo contabile</span></div>
+    <div id="assetHistory" class="movement-list"></div>
+  </section>
   <section class="panel ledger">
     <div class="section-header"><div><div class="section-kicker">REGISTRO UNIFICATO</div><h2>Tutti i movimenti</h2><p id="movementStats" class="muted">Caricamento movimenti…</p></div></div>
     <div class="filters"><label>Conto<select id="accountFilter"><option value="all">Tutti i conti</option><option>Scalable Capital</option><option>Trade Republic</option><option>Fineco</option></select></label><label>Tipo<select id="kindFilter"><option value="all">Tutti i tipi</option></select></label><label>Ricerca<input id="movementSearch" type="search" placeholder="Strumento, descrizione, importo…"></label><label class="checkbox"><input type="checkbox" id="showPersonal"><span>Mostra spese e movimenti quotidiani</span></label></div>
