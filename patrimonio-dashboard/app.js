@@ -126,7 +126,7 @@ function render(){
  $("netGain").textContent=money(netGain);$("monthlyGain").textContent=money(netGain/months);
  $("taxNote").innerHTML="<strong>Base dei calcoli: "+money(state.netContributions)+" di capitale netto conferito ai broker.</strong> L'XIRR considera depositi, prelievi e uscite con carta dal conto; Fineco è incluso nel patrimonio ma non in questo XIRR. Imposte teoriche su <strong>sole posizioni aperte</strong>: "+money(state.tax)+" (26% semplificato sulle plusvalenze positive). Il risultato netto resta <strong>parziale</strong>: imposte su vendite storiche e regole fiscali specifiche non ancora riconciliate"+(state.taxUncertain?"; il costo fiscale di alcune posizioni è incompleto.":".")+" La media mensile è retrospettiva, non un reddito incassato.";
  $("holdingsTable").innerHTML=parts.map((p,i)=>'<div class="hold-row"><div><strong title="'+safe(p.name)+'">'+safe(p.name)+'</strong><small>'+safe(p.account)+' · '+safe(p.category)+'</small><div class="mini-bar"><div style="width:'+(100*p.value/grand).toFixed(2)+'%;background:'+allocationColors[i]+'"></div></div></div><div class="pct">'+percent(p.value/grand)+'</div><div class="money">'+money(p.value)+'</div></div>').join("");
- renderHousing();buildSelect();buildKindFilter();renderChart();renderMovements();renderMethodology();
+ renderHousing();buildSelect();buildKindFilter();renderChart();renderMovements();renderAssetHistory();renderMethodology();
 }
 function getRentUntil(date){
  const rent=state.settings?num(state.settings.monthly_rent_saved):940;
@@ -318,6 +318,44 @@ function renderChart(){
    "Percentuale = XIRR annualizzata delle compravendite registrate e del valore osservato; il rendimento dei periodi senza quotazione affidabile resta non disponibile.":
    "";
 }
+function documentedAssetOperations(){
+ return state.movements.filter(r=>r.category==="Acquisto"||r.category==="Vendita"||r.category==="PAC").map(r=>{
+  if(r.account==="Trade Republic"){
+   const match=String(r.description||"").match(/\b([A-Z]{2}[A-Z0-9]{9}[0-9])\s+(.+?),\s*quantity:\s*([0-9]+(?:\.[0-9]+)?)/i);
+   if(!match)return null;
+   const code=match[1].toUpperCase(),label=match[2].trim(),quantity=Number(match[3]);
+   if(!Number.isFinite(quantity)||quantity<=0)return null;
+   return {key:"tr:"+code,account:r.account,label,code,quantity,date:r.date,category:r.category,amount:num(r.amount),source:r.source};
+  }
+  if(r.account==="Scalable Capital"){
+   const label=String(r.instrument||"").trim(),quantity=num(r.quantity);
+   if(!label||quantity<=0)return null;
+   return {key:"sc:"+label.toLocaleLowerCase("it-IT"),account:r.account,label,code:"",quantity,date:r.date,category:r.category,amount:num(r.amount),source:r.source};
+  }
+  return null;
+ }).filter(Boolean).sort((a,b)=>byDate(b,a)||a.label.localeCompare(b.label,"it"));
+}
+function renderAssetHistory(){
+ const operations=documentedAssetOperations();
+ const select=$("assetHistorySelect"),old=select.value;
+ const grouped=new Map();
+ for(const o of operations){
+  if(!grouped.has(o.key))grouped.set(o.key,{label:o.label,code:o.code,account:o.account,n:0});
+  grouped.get(o.key).n++;
+ }
+ const groups=[...grouped.entries()].sort((a,b)=>a[1].account.localeCompare(b[1].account,"it")||a[1].label.localeCompare(b[1].label,"it"));
+ select.innerHTML='<option value="all">Tutti gli strumenti</option>'+groups.map(([key,g])=>'<option value="'+safe(key)+'">'+safe(g.account+" · "+g.label+(g.code?" · "+g.code:""))+'</option>').join("");
+ select.value=old==="all"||grouped.has(old)?old:"all";
+ const chosen=select.value,filtered=chosen==="all"?operations:operations.filter(o=>o.key===chosen);
+ const shown=chosen==="all"?filtered.slice(0,60):filtered;
+ const tr=operations.filter(o=>o.account==="Trade Republic").length,sc=operations.filter(o=>o.account==="Scalable Capital").length;
+ $("assetHistoryStats").textContent=tr+" operazioni Trade Republic + "+sc+" Scalable Capital · "+groups.length+" strumenti/gruppi · "+filtered.length+" risultati"+(shown.length<filtered.length?" (mostrati i 60 più recenti; scegli uno strumento per lo storico completo)":"");
+ const number=new Intl.NumberFormat("it-IT",{maximumFractionDigits:9});
+ $("assetHistory").innerHTML=shown.map(o=>{
+  const cls=o.amount>0?"plus":o.amount<0?"minus":"zero";
+  return '<article class="movement"><div class="date">'+fmtDate(o.date)+'<span class="bank">'+safe(o.account)+'</span></div><div class="description"><strong>'+safe(o.label)+'</strong><small>'+safe(o.category)+" · "+number.format(o.quantity)+" quote/unità"+(o.code?" · "+safe(o.code):"")+'</small></div><div class="amount '+cls+'">'+(o.amount>0?"+":"")+money(o.amount)+'</div></article>';
+ }).join("")||'<p class="muted">Nessuna operazione documentata per il filtro scelto.</p>';
+}
 function filteredMovements(){
  const account=$("accountFilter").value,kind=$("kindFilter").value,all=$("showPersonal").checked,term=$("movementSearch").value.trim().toLocaleLowerCase("it-IT");
  return state.movements.filter(x=>(account==="all"||x.account===account)&&(kind==="all"||x.category===kind)&&(all||x.is_financial)&&(!term||(x.description+" "+x.instrument+" "+x.category+" "+x.account+" "+x.amount).toLocaleLowerCase("it-IT").includes(term))).sort((a,b)=>byDate(b,a)||String(b.id).localeCompare(String(a.id)));
@@ -347,6 +385,7 @@ function renderMethodology(){
 }
 ["accountFilter","kindFilter"].forEach(id=>$(id).addEventListener("change",()=>{state.limit=100;renderMovements();}));
 $("movementSearch").addEventListener("input",()=>{state.limit=100;renderMovements();});
+$("assetHistorySelect").addEventListener("change",renderAssetHistory);
 $("showPersonal").addEventListener("change",()=>{state.limit=100;renderMovements();});
 $("seriesSelect").addEventListener("change",renderChart);
 $("chartMode").addEventListener("change",renderChart);
