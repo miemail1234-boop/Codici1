@@ -1,5 +1,13 @@
 # Patrimonio — dashboard indipendente (v1.1)
 
+## Ruolo operativo dal 26 novembre 2026
+
+**Patrimonio è il punto d'accesso principale alle finanze di LifeOS**, per Trade Republic, Scalable Capital e Fineco. La home LifeOS collega direttamente `/patrimonio-dashboard/`. Il modulo `/invest-tracker/` rimane disponibile come interfaccia precedente per le funzioni specialistiche non ancora integrate (ad esempio watchlist, operazioni e BTD); entrambi leggono tabelle condivise in Supabase. Non eseguire una migrazione o una dismissione distruttiva prima della verifica delle funzionalità e della completezza delle registrazioni.
+
+**Perimetro e qualità dei dati:** `portfolio_dashboard_movements` registra 2.055 movimenti documentali dei tre conti (1.817 Trade Republic, 142 Scalable, 96 Fineco), mentre `investment_trades` raccoglie 55 compravendite strutturate e `investment_entries` 494 rilevazioni (verifica 26/11/2026). I movimenti non costituiscono automaticamente uno storico completo per singolo asset. Le 92 operazioni di acquisto/vendita Scalable dispongono di strumento e quantità, mentre i 147 movimenti di acquisto/vendita/PAC Trade Republic non sono attribuiti in `portfolio_dashboard_movements` a uno strumento con quantità verificata. Non derivare quantità o prezzi eseguiti da importi generici.
+
+**Analisi consolidata:** leggere sempre posizioni, liquidità e movimenti di tutti e tre i conti con date e provenienza; distinguere patrimonio finanziario globale, capitale investito nei broker, riserva personale su Fineco e rendimenti dei titoli. Non usare `Fineco = 0` solo perché il saldo non compare nelle tabelle Invest Tracker. Il saldo Fineco rimane uno snapshot da estratto conto, non live; la componente crypto spot TR non valorizzata non deve essere interpretata come assenza di asset. Non conteggiare due volte trasferimenti fra conti. Se lo storico per singolo asset è incompleto, dichiararlo prima di esporre rendimenti o suggerire ribilanciamenti.
+
 Web app statica su GitHub Pages in `/patrimonio-dashboard/`, distinta nel codice e nell'URL dall'app storica `/invest-tracker/`. Non modifica file né tabelle dell'Invest Tracker preesistente.
 
 ## Fonti e autorizzazione
