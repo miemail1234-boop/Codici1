@@ -26,9 +26,7 @@
   const changeSaveBtn=document.getElementById('changeSaveBtn');
   const changeCancelBtn=document.getElementById('changeCancelBtn');
 
-  const todoForm=document.getElementById('todoForm');
   const todoInput=document.getElementById('todoInput');
-  const todoSaveBtn=document.getElementById('todoSaveBtn');
   const todoStatus=document.getElementById('todoStatus');
 
   let sectionUser=null;
@@ -106,234 +104,12 @@
 
   // LifeOS: verifica non bloccante delle nuove date nella sezione Da fare.
   // Le festività sono lette dal registro RLS dell'utente, non codificate nel client.
-  const todoHolidayNotice=document.createElement('div');
-  todoHolidayNotice.id='todoHolidayNotice';
-  todoHolidayNotice.className='todo-holiday-notice';
-  todoHolidayNotice.setAttribute('role','status');
-  todoHolidayNotice.setAttribute('aria-live','polite');
-  todoHolidayNotice.hidden=true;
-  todoForm.appendChild(todoHolidayNotice);
-  const todoHolidayStyle=document.createElement('style');
-  todoHolidayStyle.textContent='.todo-holiday-notice{margin:14px 0 4px;padding:13px 15px;border:1px solid #ddb86e;border-radius:10px;background:#fff7e7;color:#593b10;line-height:1.5}.todo-holiday-notice.ok{border-color:#a3d9ca;background:#f1faf5;color:#145c46}.todo-holiday-notice ul{padding-left:20px;margin:8px 0 0}.todo-holiday-notice li{margin:5px 0}.todo-holiday-notice strong{font-weight:750}';
-  document.head.appendChild(todoHolidayStyle);
-
-  let savedTodoContent='';
-  let todoHolidayTimer=null;
-  let todoHolidayRequest=0;
-  const todoMonths={gennaio:1,febbraio:2,marzo:3,aprile:4,maggio:5,giugno:6,luglio:7,agosto:8,settembre:9,ottobre:10,novembre:11,dicembre:12};
-  const todoDateRe=/\b(\d{4})-(\d{1,2})-(\d{1,2})\b|\b(\d{1,2})[\/.\-](\d{1,2})(?:[\/.\-](\d{2,4}))?\b|\b(\d{1,2})\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)(?:\s+(\d{4}))?\b/gi;
-  function todoTodayRome(){
-    const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
-    const val=key=>parts.find(p=>p.type===key).value;
-    return val('year')+'-'+val('month')+'-'+val('day');
-  }
-  function todoISO(y,m,d){
-    if(!Number.isInteger(y)||!Number.isInteger(m)||!Number.isInteger(d)||y<1||m<1||m>12||d<1||d>31)return null;
-    const date=new Date(Date.UTC(y,m-1,d));
-    if(date.getUTCFullYear()!==y||date.getUTCMonth()!==m-1||date.getUTCDate()!==d)return null;
-    return String(y).padStart(4,'0')+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-  }
-  function todoChangedLines(content){
-    const counts=new Map();
-    for(const line of savedTodoContent.split(/\r?\n/))counts.set(line,(counts.get(line)||0)+1);
-    return content.split(/\r?\n/).filter(line=>{
-      const remaining=counts.get(line)||0;
-      if(remaining){counts.set(line,remaining-1);return false}
-      return Boolean(line.trim());
-    });
-  }
-  function todoExtractDates(line,today){
-    const found=new Set();
-    todoDateRe.lastIndex=0;
-    for(const match of line.matchAll(todoDateRe)){
-      let y,m,d,hasYear=true;
-      if(match[1]){y=Number(match[1]);m=Number(match[2]);d=Number(match[3])}
-      else if(match[4]){
-        d=Number(match[4]);m=Number(match[5]);
-        hasYear=Boolean(match[6]);
-        y=hasYear?Number(match[6]):Number(today.slice(0,4));
-        if(y<100)y+=2000;
-      }else{
-        d=Number(match[7]);m=todoMonths[match[8].toLowerCase()];
-        hasYear=Boolean(match[9]);y=hasYear?Number(match[9]):Number(today.slice(0,4));
-      }
-      let iso=todoISO(y,m,d);
-      if(!hasYear&&iso&&iso<today)iso=todoISO(y+1,m,d);
-      if(iso)found.add(iso);
-    }
-    return [...found];
-  }
-  function todoClearHolidayNotice(){
-    todoHolidayRequest++;
-    if(todoHolidayTimer){clearTimeout(todoHolidayTimer);todoHolidayTimer=null}
-    todoHolidayNotice.hidden=true;
-    todoHolidayNotice.textContent='';
-    todoHolidayNotice.classList.remove('ok');
-  }
-  function todoShowHolidayNotice(heading,items,ok=false){
-    todoHolidayNotice.hidden=false;
-    todoHolidayNotice.classList.toggle('ok',ok);
-    todoHolidayNotice.innerHTML='<strong>'+esc(heading)+'</strong>'+
-      (items.length?'<ul>'+items.map(item=>'<li>'+esc(item)+'</li>').join('')+'</ul>':'');
-  }
-  async function todoCheckHolidays(content){
-    if(!sectionUser)return;
-    const request=++todoHolidayRequest;
-    const today=todoTodayRome();
-    const entries=[];
-    for(const line of todoChangedLines(content)){
-      const dates=todoExtractDates(line,today);
-      for(const date of dates)entries.push({date,line});
-    }
-    if(!entries.length){
-      if(request===todoHolidayRequest)todoClearHolidayNotice();
-      return;
-    }
-    const unique=[...new Set(entries.map(e=>e.date))];
-    const checkedDates=unique.filter(date=>Number(date.slice(0,4))>=2026&&Number(date.slice(0,4))<=2045).slice(0,40);
-    const unverified=unique.filter(date=>!checkedDates.includes(date));
-    const notices=[];
-    let rows=[];
-    let lookupFailed=false;
-    if(checkedDates.length){
-      try{
-        const {data,error}=await supabaseClient.from('journal_holiday_dates').select('holiday_date,name,scope')
-          .eq('user_id',sectionUser.id).in('holiday_date',checkedDates);
-        if(error)throw error;
-        rows=data||[];
-      }catch(e){lookupFailed=true}
-    }
-    if(request!==todoHolidayRequest)return;
-    const byDate=new Map();
-    for(const r of rows){
-      if(!byDate.has(r.holiday_date))byDate.set(r.holiday_date,[]);
-      byDate.get(r.holiday_date).push(r);
-    }
-    const reported=new Set();
-    for(const e of entries){
-      const reasons=[];
-      if(new Date(e.date+'T12:00:00Z').getUTCDay()===0)reasons.push('domenica');
-      const inMilan=/\bmilano\b|\bmilanes[ei]\b/i.test(e.line);
-      const inMonza=/\bmonza\b|\bmonzes[ei]\b/i.test(e.line);
-      for(const r of byDate.get(e.date)||[]){
-        if(r.scope==='italia')reasons.push(r.name+' (Italia)');
-        else if(r.scope==='milano'){
-          if(inMilan)reasons.push(r.name+' (Milano)');
-          else if(!inMonza)reasons.push('possibile '+r.name+': se l’attività è a Milano, il giorno è festivo; verifica la sede');
-        }
-      }
-      for(const reason of reasons){
-        const key=e.date+'|'+reason;
-        if(!reported.has(key)){reported.add(key);notices.push(e.date+' — '+reason)}
-      }
-    }
-    if(unverified.length)notices.push('Copertura non disponibile per: '+unverified.join(', ')+'. Verifica la data con fonti ufficiali.');
-    if(lookupFailed)notices.push('Non è stato possibile consultare le festività su Supabase: controllo incompleto (le domeniche sono comunque verificate).');
-    if(notices.length){
-      todoShowHolidayNotice('Attenzione alle date aggiunte o modificate. Il salvataggio resta consentito.',notices);
-    }else{
-      todoShowHolidayNotice('Date riconosciute: nessuna festività nazionale o domenica rilevata.',[
-        'Sono verificate le festività di Milano solo quando pertinenti; le festività locali di altri comuni e le chiusure specifiche non sono censite.'
-      ],true);
-    }
-  }
-  function todoQueueHolidayCheck(){
-    if(todoHolidayTimer)clearTimeout(todoHolidayTimer);
-    const content=todoInput.value;
-    todoHolidayTimer=setTimeout(()=>{todoHolidayTimer=null;todoCheckHolidays(content).catch(()=>todoShowHolidayNotice('Verifica festività non disponibile; salvataggio comunque consentito.',[]))},500);
-  }
-  todoInput.addEventListener('input',todoQueueHolidayCheck);
-
-
-  // LifeOS: traduce solo scadenze ESPLICITE della lista libera in righe strutturate.
-  // Non deduce date da semplici eventi, note o scadenze legali non verificate.
-  const lifeosMonths={gennaio:1,febbraio:2,marzo:3,aprile:4,maggio:5,giugno:6,luglio:7,agosto:8,settembre:9,ottobre:10,novembre:11,dicembre:12};
-  function lifeosDate(day,month,year){
-    const m=Number(month)||lifeosMonths[String(month||'').toLowerCase()],d=Number(day),y=Number(year);
-    if(!m||!d||!y||y<2026||y>2100)return null;
-    const date=new Date(Date.UTC(y,m-1,d));
-    return date.getUTCFullYear()===y&&date.getUTCMonth()===m-1&&date.getUTCDate()===d
-      ?String(y)+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0'):null;
-  }
-  function lifeosParseDate(value){
-    const text=String(value||'').toLowerCase().trim();
-    const iso=text.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
-    if(iso)return lifeosDate(iso[3],iso[2],iso[1]);
-    const numeric=text.match(/\b(\d{1,2})[/.](\d{1,2})[/.](\d{4})\b/);
-    if(numeric)return lifeosDate(numeric[1],numeric[2],numeric[3]);
-    const named=text.match(/\b(\d{1,2})\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\s+(\d{4})\b/);
-    return named?lifeosDate(named[1],named[2],named[3]):null;
-  }
-  function lifeosDatedTasks(content){
-    let headingDate=null;const detected=new Map();
-    for(const raw of String(content||'').split(/\r?\n/)){
-      const line=raw.trim();
-      if(!line)continue;
-      if(!/^(?:[-*]\s+|\d+[.)]\s+)/.test(line)){
-        // Only heading sections explicitly introduced by ENTRO establish a task deadline.
-        if(/^ENTRO\s/i.test(line))headingDate=lifeosParseDate(line);
-        else if(line===line.toLocaleUpperCase('it-IT'))headingDate=null;
-        continue;
-      }
-      if(/^[-*]\s*\[[xX]\]/.test(line))continue;
-      let title=line.replace(/^(?:[-*]\s+|\d+[.)]\s+)/,'').replace(/^\[\s*\]\s*/,'').trim();
-      let due=headingDate;
-      const match=title.match(/\bentro(?:\s+il)?\s+((?:\d{4}-\d{2}-\d{2})|(?:\d{1,2}[/.]\d{1,2}[/.]\d{4})|(?:\d{1,2}\s+(?:gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\s+\d{4}))\b/i);
-      if(match){due=lifeosParseDate(match[1]);title=title.replace(match[0],'').replace(/[—–:,\s]+$/,'').trim();}
-      if(!due)continue;
-      title=title.replace(/\s+\((?:da fare|da completare|preferibilmente)[^)]*\)\s*$/i,'').slice(0,200).trim();
-      if(title)detected.set(title.toLocaleLowerCase('it-IT'),{title,due});
-    }
-    return [...detected.values()];
-  }
-  function lifeosReminderDays(due){
-    const days=Math.round((Date.parse(due+'T12:00:00Z')-Date.parse(todoTodayRome()+'T12:00:00Z'))/86400000);
-    if(days<0)return [0];
-    if(days>7)return [7,3,1,0];
-    if(days>3)return [...new Set([days-1,3,1,0])].sort((a,b)=>b-a);
-    return [...new Set([days,1,0])].filter(n=>n<=days).sort((a,b)=>b-a);
-  }
-  async function lifeosSyncTodoDeadlines(content){
-    const dated=lifeosDatedTasks(content);
-    if(!dated.length)return 0;
-    const {data:existing,error:readError}=await supabaseClient.from('journal_deadlines')
-      .select('id,title,notes,due_on,status,reminder_days').eq('user_id',sectionUser.id);
-    if(readError)throw readError;
-    const known=new Map((existing||[]).map(r=>[r.title.trim().toLocaleLowerCase('it-IT'),r]));
-    let changed=0;
-    for(const task of dated){
-      const key=task.title.toLocaleLowerCase('it-IT'),found=known.get(key);
-      if(found){
-        // Never overwrite separately-managed deadlines or reopen completed tasks.
-        if(found.notes?.includes('[LifeOS:DaFare]')&&found.status==='pending'&&found.due_on!==task.due){
-          const {error}=await supabaseClient.from('journal_deadlines')
-            .update({due_on:task.due,reminder_days:lifeosReminderDays(task.due),last_notified_on:null,updated_at:new Date().toISOString()})
-            .eq('user_id',sectionUser.id).eq('id',found.id);
-          if(error)throw error;
-          changed++;
-        }
-        continue;
-      }
-      const {error}=await supabaseClient.from('journal_deadlines').insert({
-        user_id:sectionUser.id,title:task.title,category:'altro',due_on:task.due,
-        status:'pending',reminder_days:lifeosReminderDays(task.due),
-        notes:'[LifeOS:DaFare] Scadenza operativa dichiarata nella lista Da fare (non è un evento di calendario).'
-      });
-      if(error)throw error;
-      known.set(key,{title:task.title,due_on:task.due,status:'pending',notes:'[LifeOS:DaFare]'});
-      changed++;
-    }
-    return changed;
-  }
-
   async function loadTodo(){
     if(!sectionUser)return;
     todoStatus.textContent='Caricamento...';
     const {data,error}=await supabaseClient.from(TODO_TABLE).select('content').eq('user_id',sectionUser.id).maybeSingle();
     if(error){todoStatus.textContent='Errore';return toastMessage(error.message||'Errore Supabase')}
     todoInput.value=data?.content||'';
-    savedTodoContent=todoInput.value;
-    todoClearHolidayNotice();
     todoLoaded=true;
     todoStatus.textContent='';
   }
@@ -370,8 +146,6 @@
       changePanel.hidden=true;
       todoPanel.hidden=true;
       todoInput.value='';
-      savedTodoContent='';
-      todoClearHolidayNotice();
       todoStatus.textContent='';
       todoLoaded=false;
       activeSection='journal';
@@ -433,33 +207,6 @@
       cancelChangeEdit();renderChanges();toastMessage('Salvato su Supabase');
     }catch(error){toastMessage(error.message||'Errore Supabase')}
     finally{changeSaveBtn.disabled=false}
-  });
-
-  todoForm.addEventListener('submit',async event=>{
-    event.preventDefault();if(!sectionUser)return;
-    todoSaveBtn.disabled=true;
-    todoStatus.textContent='Salvataggio...';
-    const content=todoInput.value;
-    if(todoHolidayTimer){clearTimeout(todoHolidayTimer);todoHolidayTimer=null}
-    void todoCheckHolidays(content);
-    const {error}=await supabaseClient.from(TODO_TABLE).upsert({user_id:sectionUser.id,content,updated_at:new Date().toISOString()},{onConflict:'user_id'});
-    if(error){
-      todoStatus.textContent='Errore';
-      toastMessage(error.message||'Errore Supabase');
-    }else{
-      savedTodoContent=content;
-      todoLoaded=true;
-      try{
-        const synced=await lifeosSyncTodoDeadlines(content);
-        todoStatus.textContent='Salvato';
-        toastMessage(synced?'Da fare salvato · '+synced+' scadenze sincronizzate':'Da fare salvato su Supabase');
-      }catch(syncError){
-        todoStatus.textContent='Lista salvata · sincronizzazione scadenze non riuscita';
-        toastMessage('Da fare salvato. Verifica Scadenze: '+(syncError.message||'errore'));
-      }
-      setTimeout(()=>{if(todoStatus.textContent==='Salvato')todoStatus.textContent=''},1800);
-    }
-    todoSaveBtn.disabled=false;
   });
 
   supabaseClient.auth.getSession().then(({data})=>syncSession(data?.session||null));

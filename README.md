@@ -19,8 +19,8 @@
 - **Mattino, su richiesta:** check-in volontario e successivo menù della giornata, applicando le istruzioni canoniche correnti e le fonti obbligatorie. Nessun briefing parte spontaneamente.
 - **Sera, su richiesta:** check-in volontario, verifica delle attività e analisi soltanto con il consenso previsto. La lista Da fare non viene modificata per deduzione.
 - **Monitoraggi:** obiettivi e rilevazioni strutturate, con revisioni dei progressi e separazione dei giorni privi di dati.
-- **Scadenze:** date accertate, categoria, stato e metadati di preavviso. Una voce con data ignota non riceve una data inventata. Le funzioni LifeOS operano su richiesta; i metadati non costituiscono notifiche automatiche. Le modifiche esterne a `journal_todo_single` devono sincronizzare anche `journal_deadlines`, perché il JavaScript dell'interfaccia non viene eseguito dalle scritture esterne.
-- **Attività con scadenza:** le attività inserite nella lista «Da fare» sotto intestazioni `ENTRO <giorno mese anno>` oppure con un `entro <data>` esplicito vengono sincronizzate dal sito in `journal_deadlines` al salvataggio. La sincronizzazione esterna via ChatGPT deve aggiornare entrambe le tabelle secondo `journal_instructions`; i promemoria sono progressivi (fino a 7, 3, 1, 0 giorni, adattati all'orizzonte). Le scadenze non creano eventi Calendar. Le automazioni programmate e le notifiche ChatGPT sono componenti separati: verificare che le notifiche siano abilitate, non presumere invii push/email.
+- **Scadenze:** consultare e aggiornare l’evento «Cose da fare» su Google Calendar. In Journal la lista Supabase è consultabile come archivio.
+- **Attività con scadenza:** usare le date verificate riportate in «Cose da fare» su Google Calendar.
 - **Pianificazione:** confronto degli eventi fino a 28 giorni, gestione delle sovrapposizioni confermate/potenziali e controllo obbligatorio delle festività nazionali italiane, delle domeniche e delle festività milanesi applicabili.
 - **Revisione:** sintesi settimanale e, quando utile, mensile. Le analisi vengono salvate soltanto quando le fonti e le conferme sono disponibili.
 
@@ -31,11 +31,11 @@ Progetto: `kujyowhezihjambhpahe`.
 | Tabella in `public` | Ruolo |
 | --- | --- |
 | `lifeos_system_registry` | **Identità canonica LifeOS**, alias, mappa dei componenti e repository |
-| `journal_instructions` | Istruzioni operative permanenti versionate, compresa l'identità LifeOS |
-| `journal_todo_single` | Testo della lista Da fare |
+| Google Docs | Nucleo operativo v58 e protocolli LifeOS, risolti per ID dal registro |
+| `journal_todo_single` | Archivio storico di Da fare, consultabile in sola lettura da Journal |
 | `journal_monitoring_goals`, `journal_monitoring_logs`, `journal_monitoring_reviews` | Obiettivi, osservazioni e revisioni |
 | `journal_daily_checkins` | Risposte strutturate mattino/sera |
-| `journal_deadlines` | Scadenze e soglie di promemoria |
+| `journal_deadlines` | Archivio storico delle scadenze |
 | `journal_planning_audits` | Verifiche della pianificazione con fonti e criticità |
 | `journal_periodic_reviews` | Revisioni settimanali/mensili |
 | `journal_holiday_dates` | Festività italiane e milanesi precompilate (2026–2045) |
@@ -44,11 +44,11 @@ Le tabelle private applicano Row Level Security per utente. Non aggiungere API k
 
 ## Istruzioni modulari di Emma
 
-Dal 24 ottobre 2026 `journal_instructions` contiene un nucleo operativo breve. I protocolli specialistici privati risiedono nella cartella Drive `LifeOS/Sistema_LifeOS` e sono indirizzati da ID effettivi in `lifeos_system_registry.components.instruction_architecture`.
+Il nucleo operativo v58 e i protocolli specialistici sono documenti Google Docs privati. Il registro `public.lifeos_system_registry` ne pubblica i riferimenti autorizzati nella sezione `components.instruction_architecture`.
 
 La memoria di lavoro è composita e viene costruita su richiesta: BloccoNote e fonti operative ordinarie per il contesto corrente, copertura completa per la pianificazione, fonti selettive per gli approfondimenti specialistici. Non esiste un nuovo database che duplica continuamente tutte le fonti.
 
-Questa architettura è dipendente dai connettori. Le istruzioni descrivono il comportamento atteso ma non garantiscono l'accesso automatico in ogni nuova chat o modalità Voice. Le versioni precedenti restano recuperabili in `journal_instruction_history`.
+La disponibilità dei connettori varia tra sessioni. Per consultare le versioni storiche usare i riferimenti d’archivio registrati in LifeOS.
 
 ## Organizzazione documentale Drive (21 novembre 2026)
 
@@ -63,12 +63,12 @@ La radice documentale unica è la cartella privata [LifeOS](https://drive.google
 - `LifeOS/Conoscenza/Fisco/FiscoTracker.md`: memoria fiscale, ID `1Lnc_23SwOvQp97rrN934ltfPcMF5h4gT`.
 - `LifeOS/Conoscenza/Vita_Personale/Relazioni/Relazioni.md`: indice canonico delle memorie relazionali ID `1nqhugFKfsz4vFRbF275ffb1eQ_XLrAER`; le versioni precedenti sono archiviate senza eliminazioni.
 
-Il registro autoritativo delle destinazioni e dei componenti è `public.lifeos_system_registry`; le istruzioni versionate per l'uso selettivo degli indici restano in `public.journal_instructions`. I file `indice.md` sono mappe di navigazione e non duplicano dati operativi o autorizzazioni. Le componenti Supabase, Google Calendar e GitHub restano nei rispettivi servizi: l'unificazione è documentale, non una migrazione dell'applicazione.
+Il registro delle destinazioni e dei componenti è `public.lifeos_system_registry`. Il nucleo operativo v58 descrive l’uso degli indici Google Docs per orientarsi su Drive.
 
 ## Quando l'utente dice «LifeOS»
 
 1. Interpretare il riferimento come **l'ecosistema** di questa pagina.
-2. Se disponibile il connettore Supabase, consultare `public.lifeos_system_registry` e la versione corrente di `public.journal_instructions`.
+2. Consultare `public.lifeos_system_registry` per gli ID e leggere il nucleo operativo v58 in Google Docs.
 3. Per domande su attività, sonno, scadenze o appuntamenti leggere le **fonti operative attuali**; non presentare dati storici o istruzioni statiche come stato aggiornato.
 4. Non eseguire modifiche di calendario, notifiche o task senza richiesta/consenso; segnalare chiaramente le fonti non disponibili.
 
@@ -88,7 +88,7 @@ LifeOS consulta come fonti per gli appuntamenti **solo «Lavoro» e «Calendario
 
 **Qualsiasi nuovo evento o modifica di calendario autorizzata dall'utente va eseguita per impostazione predefinita su «Lavoro», anche per gli appuntamenti clinici.** Usare o modificare «Calendario Neuropsi Galeazzi» soltanto quando l'utente lo richiede espressamente; non scegliere il calendario di destinazione deducendolo dal tipo di attività. Nessun evento va creato o modificato senza richiesta o autorizzazione specifica.
 
-Il briefing mattutino deve incrociare i due calendari con gli appuntamenti menzionati nei check-in e segnalare gli impegni confermati ma **non ancora calendarizzati**, senza considerarli automaticamente salvati in Google Calendar. Il check-in serale verifica gli appuntamenti di domani e chiede autorizzazione per quelli mancanti. Le impostazioni tecniche aggiornate e gli ID dei calendari sono registrati in Supabase, in `public.lifeos_system_registry.components.integrations.calendar_policy` e nella versione corrente di `public.journal_instructions`.
+Nel briefing mattutino e nel check-in serale seguire i protocolli vigenti. Gli ID dei calendari autorizzati sono in `public.lifeos_system_registry.components.integrations.calendar_policy`.
 
 ## LifeOS Voice Bridge — lettura resiliente
 
@@ -102,7 +102,7 @@ The Check-in tab reads life directions from the authenticated user's `lifeos_sys
 
 New optional JSON answer keys: `health_1_10`, `wake_energy_1_10`, `day_energy_1_10`, `weight_kg`, `symptoms`, actual `bed_time`/`wake_time`, separately reported `actual_sleep_hours`, training fields, actual dinner, intended bedtime, actual results, strategic minutes, task outcomes and contextual pillar contributions. Historical `energy_1_5` and unknown fields are preserved unchanged. Existing date/phase records are prefilled. Updates require confirmation and use an `updated_at` concurrency condition; inserts rely on the existing unique user/date/phase constraint. Blank untouched fields remain absent, not zero. Task completion is never automatic.
 
-Canonical assistant behavior remains in private `journal_instructions`: compare planned/actual/results/goals, preserve autonomy, use verified local time when tools allow, and separate archived context from conversation updates and verified writes. Scheduled tasks launch that same protocol. New measurements are stored in check-ins; readers must combine them with historical monitoring logs and deduplicate observations. Weight is not automatically copied into a second table.
+The current operating core and specialist protocols are native Google Docs. The LifeOS registry identifies their document IDs. Measurements remain in check-ins and historical monitoring logs.
 
 Run browser regression tests with `node tests/checkin.cjs` after installing Playwright and its Chromium browser. Tests use a mocked backend and never write personal data.
 

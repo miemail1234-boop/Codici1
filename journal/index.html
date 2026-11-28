@@ -135,16 +135,15 @@
     <section id="todoPanel" class="panel todo-panel" hidden>
       <div class="todo-head">
         <div>
-          <p class="eyebrow">Lista libera</p>
+          <p class="eyebrow">Archivio storico</p>
           <h2>Da fare</h2>
-          <p>Un unico spazio per tutte le cose da fare. Scrivi e organizza il testo come preferisci.</p>
+          <p>Per aggiornare attività e scadenze, cerca l’evento «Cose da fare» in <a href="https://calendar.google.com/" target="_blank" rel="noopener noreferrer">Google Calendar</a>.</p>
         </div>
       </div>
       <form id="todoForm" class="todo-form">
-        <textarea id="todoInput" rows="18" placeholder="Scrivi qui tutte le cose da fare…"></textarea>
+        <textarea id="todoInput" rows="18" aria-label="Lista storica" readonly></textarea>
         <div class="todo-footer">
           <span id="todoStatus" class="todo-status"></span>
-          <button id="todoSaveBtn" type="submit" class="button primary">Salva</button>
         </div>
       </form>
     </section>
@@ -202,13 +201,13 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="../vendor/supabase.js?v=21"></script>
   <script src="app.js?v=3"></script>
-  <script src="errors_patch.js?v=5"></script>
+  <script src="errors_patch.js?v=6"></script>
   <script src="tags_patch.js?v=1"></script>
   <script src="monitoring_patch.js?v=4"></script>
   <script src="monitoring_seed_patch.js?v=1"></script>
   <script src="daily_checkin_patch.js?v=4"></script>
-  <script src="deadlines_patch.js?v=1"></script>
-  <script src="planning_patch.js?v=1"></script>
+  <script src="deadlines_patch.js?v=2"></script>
+  <script src="planning_patch.js?v=2"></script>
   <script src="holidays_patch.js?v=1"></script>
 </body>
 </html>
